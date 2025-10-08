@@ -40,7 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'PrimeBankApp',
+    'graphene_django',
 ]
+
+GRAPHENE = {
+    "SCHEMA": "PrimeBank.schema.schema",  # chemin vers ton schema (fichier ci-dessous)
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
