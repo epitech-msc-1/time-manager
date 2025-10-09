@@ -24,6 +24,10 @@ class CustomUser(AbstractUser):
         Team, on_delete=models.SET_NULL, related_name="team_members", null=True
     )
     hour_contract = models.IntegerField(null=True)
+
+    # Indique que l'email est le champ utilisé pour l'authentification -> obligatoire si on supprime username
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
     
     def __str__(self):
         return f"User {self.id} is {self.first_name.last_name} with email {self.email}"

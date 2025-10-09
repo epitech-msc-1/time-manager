@@ -44,7 +44,7 @@ INSTALLED_APPS = [
 ]
 
 GRAPHENE = {
-    "SCHEMA": "PrimeBank.schema.schema",  # chemin vers ton schema (fichier ci-dessous)
+    "SCHEMA": "PrimeBank.schema.schema", 
 }
 
 MIDDLEWARE = [

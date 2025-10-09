@@ -1,0 +1,116 @@
+import graphene
+from graphene_django import DjangoObjectType
+from django.contrib.auth import get_user_model
+from graphql import GraphQLError
+
+# Get the user model, here the CustomUser
+User = get_user_model()
+
+class UserType(DjangoObjectType):
+    class Meta:
+        model = User
+        fields = ("id", "email", "first_name", "last_name",
+                  "phone_number", "hour_contract", "team", "team_managed")
+
+# Query to import in schema.py
+class UserQuery(graphene.ObjectType):
+    users = graphene.List(UserType)
+    user = graphene.Field(UserType, id=graphene.ID(required=True))
+
+    def resolve_users(self, info):
+        return User.objects.all().order_by("id")
+
+    def resolve_user(self, info, id):
+        return User.objects.get(pk=id)
+
+class CreateUser(graphene.Mutation):
+    class Arguments:
+        email = graphene.String(required=True)
+        password = graphene.String(required=True)
+        phone_number = graphene.String(required=True)
+        first_name = graphene.String(required=True)
+        last_name = graphene.String(required=True)
+        hour_contract = graphene.Int()
+        team_id = graphene.ID()
+        team_managed_id = graphene.ID()
+
+    user = graphene.Field(UserType)
+
+    @classmethod
+    def mutate(cls, root, info, email, password, phone_number, first_name, last_name,
+               hour_contract=None, team_id=None, team_managed_id=None):
+        if User.objects.filter(email=email).exists():
+            raise GraphQLError("Email already in use.")
+        u = User(
+            email=email,
+            phone_number=phone_number,
+            first_name=first_name,
+            last_name=last_name,
+            hour_contract=hour_contract,
+            team_id=team_id,
+            team_managed_id=team_managed_id,
+        )
+        
+        # hash the password
+        u.set_password(password)
+        u.save()
+        return CreateUser(user=u)
+
+class UpdateUser(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+        email = graphene.String()
+        password = graphene.String()
+        phone_number = graphene.String()
+        first_name = graphene.String()
+        last_name = graphene.String()
+        hour_contract = graphene.Int()
+        team_id = graphene.ID()
+        team_managed_id = graphene.ID()
+
+    user = graphene.Field(UserType)
+
+    @classmethod
+    # **data to get field given by client
+    def mutate(cls, root, info, id, **data):
+        try:
+            u = User.objects.get(pk=id)
+        except User.DoesNotExist:
+            raise GraphQLError("User not found.")
+
+        # if email is changing, ensure it's unique
+        new_email = data.get("email")
+        if new_email and User.objects.filter(email=new_email).exclude(pk=id).exists():
+            raise GraphQLError("Email already in use.")
+
+        # password handling 
+        pwd = data.pop("password", None)
+        if pwd:
+            u.set_password(pwd)
+
+        # update other fields
+        for field in ["email", "phone_number", "first_name", "last_name",
+                      "hour_contract", "team_id", "team_managed_id"]:
+            if field in data:
+                setattr(u, field, data[field])
+
+        u.save()
+        return UpdateUser(user=u)
+    
+class DeleteUser(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+
+    ok = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, id):
+        # .delete() returns a tuple (number of objects deleted, {object_type: number}) since we don't need the second part we use _
+        deleted, _ = User.objects.filter(pk=id).delete()
+        return DeleteUser(ok=bool(deleted))
+
+# Mutation to import in schema.py
+class UserMutation(graphene.ObjectType):
+    create_user = CreateUser.Field()
+    update_user = UpdateUser.Field()
+    delete_user = DeleteUser.Field()
