@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# ignore generated TypeScript declaration files and build artifacts
+**/*.d.ts
+**/*.d.ts.map
+.next
+tsconfig.tsbuildinfo
+.cache
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
