@@ -58,10 +58,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-black text-white hover:opacity-95 dark:bg-white dark:text-black"
-          >
+          <Button type="submit" className="w-full">
             Se connecter
           </Button>
         </form>
