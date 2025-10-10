@@ -1,62 +1,113 @@
 import React, { useState } from 'react'
-import AuthCard from '@/components/ui/AuthCard'
+import { AuthCard } from '@/components/auth-card'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 
 export default function RegisterPage() {
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+  })
 
-  const onSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
-    if (!email || !password || !firstName || !lastName) return setError('Tous les champs obligatoires')
-    // TODO: appel API
-    console.log('register', { firstName, lastName, email, phone, password })
+    // Logique de création de compte ici
+    console.log("Register:", formData)
   }
 
   return (
-    <AuthCard title="Créer un compte" description="Crée ton compte pour commencer">
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-2">
-          <div>
+    <AuthCard title="Créer un compte" description="Rejoignez-nous dès aujourd'hui">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
             <Label htmlFor="firstName">Prénom</Label>
-            <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            <Input
+              id="firstName"
+              name="firstName"
+              type="text"
+              placeholder="Jean"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+            />
           </div>
-          <div>
+
+          <div className="space-y-2">
             <Label htmlFor="lastName">Nom</Label>
-            <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            <Input
+              id="lastName"
+              name="lastName"
+              type="text"
+              placeholder="Dupont"
+              value={formData.lastName}
+              onChange={handleChange}
+              required
+            />
           </div>
         </div>
 
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <div className="space-y-2">
+          <Label htmlFor="email">Adresse email</Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="nom@exemple.com"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="phone">Numéro de téléphone</Label>
-          <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            placeholder="+33 6 12 34 56 78"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+          />
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="password">Mot de passe</Label>
-          <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
         </div>
 
-        {error && <div className="text-sm text-red-600">{error}</div>}
-
-        <div className="flex items-center justify-between">
-          <Button type="submit">Créer mon compte</Button>
-          <Link to="/login" className="text-sm text-sky-600 hover:underline">Déjà un compte ? Se connecter</Link>
-        </div>
+        <Button type="submit" className="w-full">
+          Créer mon compte
+        </Button>
       </form>
+
+      <div className="mt-4 text-center text-sm">
+        <span className="text-muted-foreground">Déjà un compte ? </span>
+        <Link to="/login" className="underline underline-offset-4 hover:text-primary">
+          Se connecter
+        </Link>
+      </div>
     </AuthCard>
   )
 }
