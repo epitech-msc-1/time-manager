@@ -1,9 +1,10 @@
 import graphene
+from PrimeBankApp.schema_user import UserQuery, UserMutation
 
-class Query(graphene.ObjectType):
-    test = graphene.String()
+class Query(UserQuery, graphene.ObjectType):
+    pass
 
-    def resolve_test(root, info):
-        return "Hello, PrimeBank!"
+class Mutation(UserMutation, graphene.ObjectType):
+    pass
 
-schema = graphene.Schema(query=Query) 
+schema = graphene.Schema(query=Query, mutation=Mutation)
