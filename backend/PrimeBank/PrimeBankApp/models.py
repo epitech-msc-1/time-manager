@@ -1,15 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 
 class Team(models.Model):
-    members_nr = models.PositiveBigIntegerField(null=True)
-    description = models.TextField(null=True)
-    
+    description = models.TextField(null=True, blank=True)
+
     def __str__(self):
-        return f"Team {self.id} is composed by {self.members_nr}"
+        # 'members' come from the related_name in CustomUser model
+        return f"Team {self.pk} — {self.members.count()} member(s)"
     
 class CustomUser(AbstractUser):
     username = None
@@ -21,21 +22,26 @@ class CustomUser(AbstractUser):
         Team, on_delete=models.SET_NULL, related_name="team_manager", null=True
     )
     team = models.ForeignKey(
-        Team, on_delete=models.SET_NULL, related_name="team_members", null=True
+        Team,
+        on_delete=models.SET_NULL,
+        related_name="members",  # really important to count the nr of members in a team
+        null=True,
+        blank=True,
     )
-    hour_contract = models.IntegerField(null=True)
+    hour_contract = models.IntegerField(null=True) 
 
     # Indique que l'email est le champ utilisé pour l'authentification -> obligatoire si on supprime username
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     
     def __str__(self):
-        return f"User {self.id} is {self.first_name.last_name} with email {self.email}"
+        return f"User {self.id} is {self.first_name} {self.last_name} with email {self.email}"
     
 class TimeClock(models.Model):
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="user_time_clock"
     )
+    
     day = models.DateField(default=timezone.localdate)
     clock_in = models.DateTimeField(default=timezone.now, null=True)
     clock_out = models.DateTimeField(null=True)
