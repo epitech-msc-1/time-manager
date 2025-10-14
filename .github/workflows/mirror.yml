@@ -1,0 +1,36 @@
+name: Mirror Repository
+
+on:
+    pull_request:
+        types: [closed]
+        branches:
+            - main
+            - dev
+
+jobs:
+    mirror:
+        runs-on: ubuntu-latest
+        if: github.event.pull_request.merged == true
+
+        steps:
+            - name: Checkout source repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.merge_commit_sha }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Setup Git
+              run: |
+                  git config --global user.name "GitHub Action"
+                  git config --global user.email "action@github.com"
+
+            - name: Add mirror remote
+              run: |
+                  git remote add mirror https://${{ secrets.MIRROR_TOKEN }}@github.com/EpitechMscProPromo2027/T-DEV-700-project-PAR_15.git
+
+            - name: Push to mirror
+              run: |
+                  BRANCH_NAME="${{ github.event.pull_request.base.ref }}"
+                  git push mirror $BRANCH_NAME:$BRANCH_NAME --force
+                  git push mirror --tags --force
