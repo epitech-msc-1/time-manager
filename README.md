@@ -1,6 +1,6 @@
 # Time Manager pour PrimeBank
 
-![PrimeBank Logo](assets/prime-bank.png)
+![PrimeBank Logo](assets/images/prime-bank-white.png)
 
 **Time Manager** est une solution interne de gestion du temps de travail conçue pour **PrimeBank**, une banque digitale de nouvelle génération. Cet outil vise à centraliser et optimiser le suivi des heures, la gestion des équipes et l'analyse de la productivité au sein de l'entreprise.
 
