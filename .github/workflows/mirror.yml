@@ -33,4 +33,4 @@ jobs:
               run: |
                   BRANCH_NAME="${{ github.event.pull_request.base.ref }}"
                   git push mirror $BRANCH_NAME:$BRANCH_NAME --force
-                  git push mirror --tags --force
+                  git push mirror --tags
