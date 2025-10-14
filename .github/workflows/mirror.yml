@@ -28,7 +28,7 @@ jobs:
 
             - name: Add mirror remote
               run: |
-                  git remote add mirror https://${{ secrets.MIRROR_TOKEN }}@${{ secrets.MIRROR_REPO_URL }}
+                  git remote add mirror https://${{ secrets.MIRROR_TOKEN }}@${{ vars.MIRROR_REPO_URL }}
 
             - name: Debug - Check current state
               run: |
@@ -43,6 +43,5 @@ jobs:
               run: |
                   BRANCH_NAME="${{ github.event.pull_request.base.ref }}"
                   echo "Pushing HEAD to branch: $BRANCH_NAME"
-                  # Push HEAD vers la branche cible, pas une branche locale
                   git push mirror HEAD:$BRANCH_NAME --force
                   git push mirror --tags --force
