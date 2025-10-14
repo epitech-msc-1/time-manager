@@ -25,8 +25,11 @@ jobs:
           git config --global user.email "action@github.com"
 
       - name: Add mirror remote
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          MIRROR_REPO_URL: ${{ vars.MIRROR_REPO_URL }}
         run: |
-          git remote add mirror https://${{ secrets.MIRROR_TOKEN }}@${{ vars.MIRROR_REPO_URL }}
+          git remote add mirror https://${MIRROR_TOKEN}@${MIRROR_REPO_URL}
 
       - name: Debug - Check current state
         run: |
