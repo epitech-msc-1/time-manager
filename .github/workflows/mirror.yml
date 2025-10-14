@@ -27,7 +27,7 @@ jobs:
 
             - name: Add mirror remote
               run: |
-                  git remote add mirror https://${{ secrets.MIRROR_TOKEN }}@github.com/EpitechMscProPromo2027/T-DEV-700-project-PAR_15.git
+                  git remote add mirror https://${{ secrets.MIRROR_TOKEN }}@${{ secrets.MIRROR_REPO_URL }}
 
             - name: Push to mirror
               run: |
