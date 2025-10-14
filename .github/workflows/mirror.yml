@@ -25,18 +25,9 @@ jobs:
           git config --global user.email "action@github.com"
 
       - name: Add mirror remote
-        env:
-          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
-          MIRROR_REPO_URL: ${{ vars.MIRROR_REPO_URL }}
         run: |
-          if [ -z "${MIRROR_REPO_URL}" ]; then
-            echo "MIRROR_REPO_URL is not set"
-            exit 1
-          fi
-          SANITIZED_URL="${MIRROR_REPO_URL#https://}"
-          SANITIZED_URL="${SANITIZED_URL#http://}"
-          SANITIZED_URL="${SANITIZED_URL#/}"
-          git remote add mirror "https://${MIRROR_TOKEN}@${SANITIZED_URL}"
+          echo "MIRROR_REPO_URL: ${{ vars.MIRROR_REPO_URL }}"
+          git remote add mirror "https://${{secrets.MIRROR_TOKEN }}@${{ vars.MIRROR_REPO_URL }}"
 
       - name: Debug - Check current state
         run: |
