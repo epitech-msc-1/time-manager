@@ -12,7 +12,6 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Logique de connexion ici
     console.log("Login:", { email, password })
   }
 
