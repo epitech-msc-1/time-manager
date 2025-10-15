@@ -1,11 +1,14 @@
+name: time-manager
 services:
   db:
     image: postgres:16-alpine
-    container_name: db
+    container_name: postgres
+    env_file:
+      - .env
     environment:
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
@@ -18,25 +21,37 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: backend/
       dockerfile: Dockerfile
+    image: backend:1.0.0
+    container_name: backend
     working_dir: /app/PrimeBank
-    command: >
-      sh -c "
-      uv run manage.py runserver 0.0.0.0:8000
-      "
-    env_file: ./.env
+    env_file:
+      - .env
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
       DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
     volumes:
-      - ./backend:/app
+      - ./backend/PrimeBank/:/app/PrimeBank/
+    command: sh -c "uv run manage.py migrate && uv run manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    image: frontend:1.0.0
+    container_name: frontend
+    ports:
+      - 5173:5173
+    depends_on:
+      backend:
+        condition: service_started
 
 volumes:
   db_data:
