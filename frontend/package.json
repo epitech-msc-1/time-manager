@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "biome lint --write .",
-    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "format": "biome format .",
     "preview": "vite preview"
   },
   "dependencies": {
