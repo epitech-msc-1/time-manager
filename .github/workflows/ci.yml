@@ -34,11 +34,11 @@ jobs:
 
       - name: Lint with Biome
         working-directory: frontend
-        run: bun lint
+        run: bun run lint
 
       - name: Format check
         working-directory: frontend
-        run: bun format --check
+        run: bun run format --check
 
       - name: Run tests
         working-directory: frontend
@@ -79,7 +79,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend
-        run: uv pip install .[dev]
+        run: uv pip install .[dev] --system
 
       - name: Lint with Ruff
         working-directory: backend
