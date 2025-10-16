@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN bun install --frozen-lock
+RUN bun install --frozen-lockfile
 
 CMD [ "bun", "dev", "--host", "0.0.0.0" ]
