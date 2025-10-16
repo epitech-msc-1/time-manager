@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,11 +42,31 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'PrimeBankApp',
     'graphene_django',
+    'graphql_jwt',
+    "graphql_jwt.refresh_token",
 ]
 
 GRAPHENE = {
     "SCHEMA": "PrimeBank.schema.schema", 
+    "MIDDLEWARE": [
+        "graphql_jwt.middleware.JSONWebTokenMiddleware",
+    ],
 }
+
+GRAPHQL_JWT = {
+    "JWT_VERIFY_EXPIRATION": True,
+    # Acces token
+    "JWT_EXPIRATION_DELTA": timedelta(minutes=15),   
+    # Persistent refresh token in database
+    "JWT_LONG_RUNNING_REFRESH_TOKEN": True,          
+    # Refresh token
+    "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
+}
+
+AUTHENTICATION_BACKENDS = [
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
