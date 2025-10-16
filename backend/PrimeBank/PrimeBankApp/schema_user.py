@@ -10,7 +10,7 @@ class UserType(DjangoObjectType):
     class Meta:
         model = User
         fields = ("id", "email", "first_name", "last_name",
-                  "phone_number", "hour_contract", "team", "team_managed")
+                  "phone_number", "hour_contract", "team", "team_managed", "is_admin")
 
 # Query to import in schema.py
 class UserQuery(graphene.ObjectType):
@@ -33,14 +33,17 @@ class CreateUser(graphene.Mutation):
         hour_contract = graphene.Int()
         team_id = graphene.ID()
         team_managed_id = graphene.ID()
+        is_admin = graphene.Boolean()
 
     user = graphene.Field(UserType)
 
     @classmethod
     def mutate(cls, root, info, email, password, phone_number, first_name, last_name,
-               hour_contract=None, team_id=None, team_managed_id=None):
+               hour_contract=None, team_id=None, team_managed_id=None, is_admin=False):
         if User.objects.filter(email=email).exists():
             raise GraphQLError("Email already in use.")
+        if User.objects.filter(phone_number=phone_number).exists():
+            raise GraphQLError("Phone number already in use.")
         u = User(
             email=email,
             phone_number=phone_number,
@@ -49,6 +52,7 @@ class CreateUser(graphene.Mutation):
             hour_contract=hour_contract,
             team_id=team_id,
             team_managed_id=team_managed_id,
+            is_admin=is_admin
         )
         
         # hash the password
@@ -67,6 +71,7 @@ class UpdateUser(graphene.Mutation):
         hour_contract = graphene.Int()
         team_id = graphene.ID()
         team_managed_id = graphene.ID()
+        is_admin = graphene.Boolean()
 
     user = graphene.Field(UserType)
 
