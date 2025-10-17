@@ -7,7 +7,7 @@ from PrimeBankApp.schema_auth import Mutation, AuthDevQuery
 class Query(UserQuery, TeamQuery, TimeClockQuery, AuthDevQuery, graphene.ObjectType):
     pass
 
-class Mutation(UserMutation, TeamMutation, TimeClockMutation,Mutation, graphene.ObjectType):
+class Mutation(UserMutation, TeamMutation, TimeClockMutation, Mutation, graphene.ObjectType):
     pass
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
