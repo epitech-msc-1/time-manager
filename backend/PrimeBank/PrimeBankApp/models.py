@@ -17,6 +17,7 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
+    is_admin = models.BooleanField(default=False)
     team_managed = models.OneToOneField(
         Team, on_delete=models.SET_NULL, related_name="team_manager", null=True
     )
@@ -42,8 +43,8 @@ class TimeClock(models.Model):
     )
     
     day = models.DateField(default=timezone.localdate)
-    clock_in = models.DateTimeField(default=timezone.now, null=True)
-    clock_out = models.DateTimeField(null=True)
+    clock_in = models.TimeField(null=True)
+    clock_out = models.TimeField(null=True)
 
 
     # permet de trier les entrées par date décroissante

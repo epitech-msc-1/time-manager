@@ -4,7 +4,7 @@ from django.db.models import Count
 from graphql import GraphQLError
 from .models import TimeClock  
 from django.utils import timezone
-
+from datetime import timedelta, datetime
 
 class TimeClockType(DjangoObjectType):
 
@@ -22,6 +22,51 @@ class TimeClockQuery(graphene.ObjectType):
         user_id=graphene.ID(required=True),
         day=graphene.Date(),
     )
+    kpi_clock = graphene.Float(
+        user_id=graphene.ID(required=False),
+        period=graphene.Int(required=False)
+    )
+
+    def resolve_kpi_clock(self, info, user_id=None, period=None):
+        user = info.context.user
+
+        # check if the period is valid
+        if period is None or period <= 0:
+            raise GraphQLError("Period need to be a positive integer.")
+        if period > 365:
+            raise GraphQLError("Period too long, max is 365 days.")
+
+        # We do that to allow user to fetch there own data if no user_id is provided
+        if user_id is None:
+            if not user or not user.is_authenticated:
+                raise GraphQLError("Authentication required")
+            user_id = user.id
+
+        # Calculate the date range, between the start date and today 
+        today = timezone.localdate()
+        start = today - timedelta(days=(period - 1))
+
+        tcl = TimeClock.objects.filter(
+            user_id=user_id, 
+            day__range=(start, today)
+        ).order_by("day", "clock_in")
+        
+        count = 0
+
+        for entry in tcl:
+            if not entry.clock_in or not entry.clock_out:
+                    continue
+            
+            start_dt = datetime.combine(entry.day, entry.clock_in)
+            end_dt = datetime.combine(entry.day, entry.clock_out)
+
+            # handle overnight shifts
+            if end_dt < start_dt:
+                end_dt += timedelta(days=1)
+
+            count += (end_dt - start_dt).total_seconds()
+
+        return round(count, 2)
 
     def resolve_time_clocks(self, info):
         return TimeClock.objects.all().order_by("id")
@@ -52,7 +97,7 @@ class ClockIn(graphene.Mutation):
         tc = TimeClock.objects.create(
             user_id=user_id,
             day=day,
-            clock_in=timezone.now(),
+            clock_in=timezone.localtime().time(),
             clock_out=None,
         )
         return ClockIn(time_clock=tc)
@@ -74,7 +119,7 @@ class ClockOut(graphene.Mutation):
             raise GraphQLError("You have to clock in before clocking out.")
         if tc.clock_out:
             raise GraphQLError("You already clocked out today.")
-        tc.clock_out = timezone.now()
+        tc.clock_out = timezone.localtime().time()
         tc.save()
         return ClockOut(time_clock=tc)
     
