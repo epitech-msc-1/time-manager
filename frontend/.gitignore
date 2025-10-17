@@ -29,3 +29,7 @@ tsconfig.tsbuildinfo
 *.njsproj
 *.sln
 *.sw?
+
+
+# Docs
+docs/

@@ -96,8 +96,8 @@ Ce projet est construit sur une architecture moderne et robuste, en suivant la p
     ```
 
 3. Une fois les conteneurs démarrés :
-    - Le **frontend** sera accessible sur `http://localhost:3223`.
-    - Le **backend** (API GraphQL) sera accessible sur `http://localhost:8998/graphql`.
+    - Le **frontend** sera accessible sur `http://localhost:5173`.
+    - Le **backend** (API GraphQL) sera accessible sur `http://localhost:8000/graphql`.
 
 ## Pipeline CI/CD
 

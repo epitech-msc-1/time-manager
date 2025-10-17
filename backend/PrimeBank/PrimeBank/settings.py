@@ -30,6 +30,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173"
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -40,15 +46,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'PrimeBankApp',
     'graphene_django',
     'graphql_jwt',
     'graphql_jwt.refresh_token',
-    'corsheaders'
 ]
 
 GRAPHENE = {
-    "SCHEMA": "PrimeBank.schema.schema", 
+    "SCHEMA": "PrimeBank.schema.schema",
     "MIDDLEWARE": [
         "graphql_jwt.middleware.JSONWebTokenMiddleware",
     ],
@@ -57,9 +63,9 @@ GRAPHENE = {
 GRAPHQL_JWT = {
     "JWT_VERIFY_EXPIRATION": True,
     # Acces token
-    "JWT_EXPIRATION_DELTA": timedelta(minutes=15),   
+    "JWT_EXPIRATION_DELTA": timedelta(minutes=15),
     # Persistent refresh token in database
-    "JWT_LONG_RUNNING_REFRESH_TOKEN": True,          
+    "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
     # Refresh token
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     # Cookie settings
@@ -77,6 +83,7 @@ AUTHENTICATION_BACKENDS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
