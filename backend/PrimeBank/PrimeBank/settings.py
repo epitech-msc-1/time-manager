@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'PrimeBankApp',
     'graphene_django',
     'graphql_jwt',
-    "graphql_jwt.refresh_token",
+    'graphql_jwt.refresh_token',
+    'corsheaders'
 ]
 
 GRAPHENE = {
@@ -61,6 +62,12 @@ GRAPHQL_JWT = {
     "JWT_LONG_RUNNING_REFRESH_TOKEN": True,          
     # Refresh token
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
+    # Cookie settings
+    "JWT_COOKIE": True,  # Active l'utilisation des cookies
+    "JWT_COOKIE_SECURE": False,  # False en développement, True en production
+    "JWT_COOKIE_SAMESITE": "Lax",  # Protection contre les attaques CSRF
+    "JWT_COOKIE_NAME": "JWT",  # Nom du cookie pour le token
+    "JWT_COOKIE_HTTPONLY": True,  # Cookie accessible uniquement via HTTP(S)
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -71,12 +78,28 @@ AUTHENTICATION_BACKENDS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+CORS_ALLOW_HEADERS = [
+    "authorization", "content-type", "x-csrftoken", "accept", "origin", "cookie",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+
 
 ROOT_URLCONF = 'PrimeBank.urls'
 
