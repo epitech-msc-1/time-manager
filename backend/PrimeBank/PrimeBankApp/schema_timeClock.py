@@ -64,7 +64,7 @@ class TimeClockQuery(graphene.ObjectType):
             if end_dt < start_dt:
                 end_dt += timedelta(days=1)
 
-            count += (end_dt - start_dt).total_seconds() / 3600.0
+            count += (end_dt - start_dt).total_seconds()
 
         return round(count, 2)
 
