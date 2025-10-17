@@ -43,8 +43,8 @@ class TimeClock(models.Model):
     )
     
     day = models.DateField(default=timezone.localdate)
-    clock_in = models.DateTimeField(default=timezone.now, null=True)
-    clock_out = models.DateTimeField(null=True)
+    clock_in = models.TimeField(null=True)
+    clock_out = models.TimeField(null=True)
 
 
     # permet de trier les entrées par date décroissante
