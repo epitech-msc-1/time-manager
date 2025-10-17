@@ -4,10 +4,11 @@ from graphql_jwt.refresh_token.models import RefreshToken
 from graphql import GraphQLError
 
 class Mutation(graphene.ObjectType):
-    token_auth   = graphql_jwt.ObtainJSONWebToken.Field()
-    verify_token = graphql_jwt.Verify.Field()
-    refresh_token= graphql_jwt.Refresh.Field()
-    revoke_token = graphql_jwt.Revoke.Field()
+    token_auth = graphql_jwt.relay.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.relay.Verify.Field()
+    refresh_token = graphql_jwt.relay.Refresh.Field()
+    revoke_token = graphql_jwt.relay.Revoke.Field()
+    delete_token_cookie = graphql_jwt.relay.DeleteJSONWebTokenCookie.Field()
 
 
 # To remove, it is only for dev purposes

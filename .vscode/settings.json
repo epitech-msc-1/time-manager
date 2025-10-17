@@ -1,6 +1,0 @@
-{
-    "sonarlint.connectedMode.project": {
-        "connectionId": "sonargroup",
-        "projectKey": "sonargroup_time-manager"
-    }
-}
