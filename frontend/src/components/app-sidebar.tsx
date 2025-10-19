@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
+import { useTheme } from "@/components/theme-provider";
 import {
     Sidebar,
     SidebarContent,
@@ -20,7 +21,6 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/components/theme-provider";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const auth = useAuth();
