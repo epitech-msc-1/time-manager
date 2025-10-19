@@ -3,6 +3,8 @@ from graphene_django import DjangoObjectType
 from django.contrib.auth import get_user_model
 from graphql import GraphQLError
 
+from PrimeBankApp.roles import require_auth, is_admin, is_manager
+
 # Get the user model, here the CustomUser
 User = get_user_model()
 
@@ -16,12 +18,30 @@ class UserType(DjangoObjectType):
 class UserQuery(graphene.ObjectType):
     users = graphene.List(UserType)
     user = graphene.Field(UserType, id=graphene.ID(required=True))
+    user_by_email = graphene.Field(UserType, email=graphene.String(required=True))
 
     def resolve_users(self, info):
         return User.objects.all().order_by("id")
 
     def resolve_user(self, info, id):
         return User.objects.get(pk=id)
+
+    def resolve_user_by_email(self, info, email):
+        requester = info.context.user
+        require_auth(requester)
+
+        if not (is_admin(requester) or is_manager(requester)):
+            raise GraphQLError("Access denied.")
+
+        try:
+            target_user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise GraphQLError("User not found.")
+
+        if target_user.is_admin and not is_admin(requester):
+            raise GraphQLError("Managers cannot target admin users.")
+
+        return target_user
 
 class CreateUser(graphene.Mutation):
     class Arguments:

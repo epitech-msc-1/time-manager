@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-w14q8fvdlz&!6k4b$d3v&sic8z5m17pwt87w!=b_3bu(j==u1s'
+SECRET_KEY = "django-insecure-w14q8fvdlz&!6k4b$d3v&sic8z5m17pwt87w!=b_3bu(j==u1s"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,26 +31,24 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173"
-]
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://localhost:5174"]
 
 CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'corsheaders',
-    'PrimeBankApp',
-    'graphene_django',
-    'graphql_jwt',
-    'graphql_jwt.refresh_token',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "corsheaders",
+    "PrimeBankApp",
+    "graphene_django",
+    "graphql_jwt",
+    "graphql_jwt.refresh_token",
 ]
 
 GRAPHENE = {
@@ -61,6 +59,8 @@ GRAPHENE = {
 }
 
 GRAPHQL_JWT = {
+    "JWT_COOKIE": True,  # Active l'utilisation des cookies
+    "JWT_COOKIE_SECURE": False,  # ! False en développement, True en production
     "JWT_VERIFY_EXPIRATION": True,
     # Acces token
     "JWT_EXPIRATION_DELTA": timedelta(minutes=15),
@@ -69,8 +69,6 @@ GRAPHQL_JWT = {
     # Refresh token
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     # Cookie settings
-    "JWT_COOKIE": True,  # Active l'utilisation des cookies
-    "JWT_COOKIE_SECURE": False,  # False en développement, True en production
     "JWT_COOKIE_SAMESITE": "Lax",  # Protection contre les attaques CSRF
     "JWT_COOKIE_NAME": "JWT",  # Nom du cookie pour le token
     "JWT_COOKIE_HTTPONLY": True,  # Cookie accessible uniquement via HTTP(S)
@@ -84,56 +82,60 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://localhost:5174"]
 
-CORS_ALLOW_HEADERS = [
-    "authorization", "content-type", "x-csrftoken", "accept", "origin", "cookie",
-]
+# CORS_ALLOW_HEADERS = [
+#     "authorization",
+#     "content-type",
+#     "x-csrftoken",
+#     "accept",
+#     "origin",
+#     "cookie",
+# ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:5174",
 ]
 
 
-ROOT_URLCONF = 'PrimeBank.urls'
+ROOT_URLCONF = "PrimeBank.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'PrimeBank.wsgi.application'
+WSGI_APPLICATION = "PrimeBank.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-load_dotenv() # permet de charger les variables d'environnement depuis le fichier .env
+load_dotenv()  # permet de charger les variables d'environnement depuis le fichier .env
 
 DATABASES = {
     "default": {
@@ -143,7 +145,7 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
         "HOST": os.getenv("DB_HOST", "db"),
         "PORT": os.getenv("DB_PORT", "5432"),
-    }
+    },
 }
 
 
@@ -152,16 +154,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -169,9 +171,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -181,11 +183,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "PrimeBankApp.CustomUser"

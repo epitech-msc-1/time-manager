@@ -2,7 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from django.db.models import Count
 from graphql import GraphQLError
-from .models import Team, CustomUser  
+from .models import Team, CustomUser
 from PrimeBankApp.roles import require_auth, is_admin, is_manager_of
 
 class TeamType(DjangoObjectType):
@@ -11,7 +11,7 @@ class TeamType(DjangoObjectType):
     class Meta:
         model = Team
         fields = ("id", "description")
-        
+
 # Query to import in schema.py
 class TeamQuery(graphene.ObjectType):
     team = graphene.Field(TeamType, id=graphene.ID(required=True))
@@ -19,7 +19,7 @@ class TeamQuery(graphene.ObjectType):
 
     def resolve_teams(self, info):
         return Team.objects.annotate(nr_members=Count("members", distinct=True)).all().order_by("id")
-    
+
 
     def resolve_team(self, info, id):
         # members is the related_name in CustomUser model
@@ -96,20 +96,29 @@ class AddUserToTeam(graphene.Mutation):
         require_auth(user)
         if not (is_admin(user) or is_manager_of(user, int(team_id))):
             raise GraphQLError("Not authorized to add user to this team.")
-    
+
         try:
             u = CustomUser.objects.get(pk=user_id)
         except CustomUser.DoesNotExist:
             raise GraphQLError("User not found.")
-        
+
+        if u.is_admin and not is_admin(user):
+            raise GraphQLError("Managers cannot add admin users.")
+
+        current_team_id = getattr(u, "team_id", None)
+        if current_team_id is not None:
+            if str(current_team_id) == str(team_id):
+                raise GraphQLError("User already belongs to this team.")
+            raise GraphQLError("User already belongs to another team.")
+
         try:
             t = Team.objects.get(pk=team_id)
         except Team.DoesNotExist:
             raise GraphQLError("Team not found.")
-        
+
         u.team = t
         u.save()
-        
+
         # same as create, we need to set nr_members since it is required in the graphql type
         t.nr_members = t.members.count()
         return AddUserToTeam(team=t)
