@@ -9,6 +9,7 @@ dependencies = [
     "django>=5.2.7",
     "django-cors-headers>=4.9.0",
     "django-graphql-jwt>=0.4.0",
+    "django-health-check>=3.20.0",
     "graphene-django>=3.2.3",
     "psycopg[binary]>=3.2.10",
     "pyjwt>=2.10.1",
