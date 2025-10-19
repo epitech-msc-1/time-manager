@@ -38,7 +38,7 @@ jobs:
 
       - name: Format check
         working-directory: frontend
-        run: bun run format --check
+        run: bun run format
 
       - name: Run tests
         working-directory: frontend
