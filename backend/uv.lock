@@ -20,6 +20,7 @@ dependencies = [
     { name = "django" },
     { name = "django-cors-headers" },
     { name = "django-graphql-jwt" },
+    { name = "django-health-check" },
     { name = "graphene-django" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pyjwt" },
@@ -37,6 +38,7 @@ requires-dist = [
     { name = "django", specifier = ">=5.2.7" },
     { name = "django-cors-headers", specifier = ">=4.9.0" },
     { name = "django-graphql-jwt", specifier = ">=0.4.0" },
+    { name = "django-health-check", specifier = ">=3.20.0" },
     { name = "graphene-django", specifier = ">=3.2.3" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2.10" },
     { name = "pyjwt", specifier = ">=2.10.1" },
@@ -98,6 +100,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a8/44/6781e0ef4438f9f8b8b0fc39d4e874659b555bc57159243faee99c66483e/django_graphql_jwt-0.4.0.tar.gz", hash = "sha256:537972519f0deeec7a0e4a306ddfed1fe385266ef61c9f78c54cd04ac01a171e", size = 20668, upload-time = "2023-08-04T09:47:07.515Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/96/82/9b6e9425515ccec08894f3dbdd2b439244859c5516777a576b929eb6f854/django_graphql_jwt-0.4.0-py3-none-any.whl", hash = "sha256:5823aa8ac9bf0b7a6e3b2febd029598b332c41fe9043d89900c116fcecd23f5e", size = 47080, upload-time = "2023-08-04T09:47:05.896Z" },
+]
+
+[[package]]
+name = "django-health-check"
+version = "3.20.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1e/a5/5c33c7dc834df3351f9acf448e8fec97b096db32c94265885a1062841199/django_health_check-3.20.0.tar.gz", hash = "sha256:cd69ac5facf73fe7241d9492d939b57bd20e24f46c4edea91e6a900bf22c2d8e", size = 20641, upload-time = "2025-06-16T09:22:35.015Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/7f/49ba63f078015b0a52e09651b94ba16b41154ac7079c83153edd14e15ca0/django_health_check-3.20.0-py3-none-any.whl", hash = "sha256:bcb2b8f36f463cead0564a028345c5b17e2a2d18e9cc88ecd611b13a26521926", size = 31788, upload-time = "2025-06-16T09:22:32.069Z" },
 ]
 
 [[package]]
