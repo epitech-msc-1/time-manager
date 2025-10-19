@@ -8,7 +8,7 @@ from graphql_jwt.decorators import jwt_cookie
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("health/", include("health_check.urls")),
+    path("ht/", include("health_check.urls")),
     path(
         "graphql",
         jwt_cookie(csrf_exempt(GraphQLView.as_view(graphiql=True))),

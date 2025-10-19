@@ -1,8 +1,7 @@
 import graphene
 import graphql_jwt
-from graphql_jwt.refresh_token.models import RefreshToken
 from graphql import GraphQLError
-from django.conf import settings
+from graphql_jwt.refresh_token.models import RefreshToken
 from graphql_jwt.settings import jwt_settings
 from graphql_jwt.utils import jwt_payload as _default_payload
 

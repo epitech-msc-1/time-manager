@@ -1,9 +1,11 @@
 import graphene
-from graphene_django import DjangoObjectType
 from django.db.models import Count
+from graphene_django import DjangoObjectType
 from graphql import GraphQLError
-from .models import Team, CustomUser
-from PrimeBankApp.roles import require_auth, is_admin, is_manager_of
+
+from PrimeBankApp.roles import is_admin, is_manager_of, require_auth
+
+from .models import CustomUser, Team
 
 
 class TeamType(DjangoObjectType):

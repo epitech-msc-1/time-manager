@@ -1,8 +1,8 @@
 import graphene
-from PrimeBankApp.schema_user import UserQuery, UserMutation
-from PrimeBankApp.schema_team import TeamQuery, TeamMutation
-from PrimeBankApp.schema_timeClock import TimeClockQuery, TimeClockMutation
-from PrimeBankApp.schema_auth import Mutation, AuthDevQuery
+from PrimeBankApp.schema_auth import AuthDevQuery, Mutation
+from PrimeBankApp.schema_team import TeamMutation, TeamQuery
+from PrimeBankApp.schema_timeClock import TimeClockMutation, TimeClockQuery
+from PrimeBankApp.schema_user import UserMutation, UserQuery
 
 
 class Query(UserQuery, TeamQuery, TimeClockQuery, AuthDevQuery, graphene.ObjectType):

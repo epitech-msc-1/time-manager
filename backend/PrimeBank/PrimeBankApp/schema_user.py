@@ -1,16 +1,29 @@
+"""
+GraphQL schema for user management.
+
+This module provides:
+- UserType: GraphQL type for User model
+- UserQuery: queries to fetch users (all, by id, by email)
+- UserMutation: mutations to create, update and delete users
+"""
+
 import graphene
-from graphene_django import DjangoObjectType
 from django.contrib.auth import get_user_model
+from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 
-from PrimeBankApp.roles import require_auth, is_admin, is_manager
+from PrimeBankApp.roles import is_admin, is_manager, require_auth
 
 # Get the user model, here the CustomUser
 User = get_user_model()
 
 
 class UserType(DjangoObjectType):
+    """Expose core user attributes through the GraphQL schema layer."""
+
     class Meta:
+        """meta."""
+
         model = User
         fields = (
             "id",
@@ -27,6 +40,8 @@ class UserType(DjangoObjectType):
 
 # Query to import in schema.py
 class UserQuery(graphene.ObjectType):
+    """Expose user-centric GraphQL query resolvers."""
+
     users = graphene.List(UserType)
     user = graphene.Field(UserType, id=graphene.ID(required=True))
     user_by_email = graphene.Field(UserType, email=graphene.String(required=True))

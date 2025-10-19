@@ -1,12 +1,13 @@
 import math
-import graphene
-from graphene_django import DjangoObjectType
-from graphql import GraphQLError
 from collections import defaultdict
 from datetime import datetime, timedelta
-from django.utils import timezone
-from .models import TimeClock, CustomUser, Team
 
+import graphene
+from django.utils import timezone
+from graphene_django import DjangoObjectType
+from graphql import GraphQLError
+
+from .models import CustomUser, Team, TimeClock
 
 SECONDS_PER_HOUR = 3600
 DAYS_PER_WEEK = 7
