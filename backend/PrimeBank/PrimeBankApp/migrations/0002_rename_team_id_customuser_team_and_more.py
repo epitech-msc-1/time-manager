@@ -4,24 +4,23 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('PrimeBankApp', '0001_initial'),
+        ("PrimeBankApp", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='customuser',
-            old_name='team_id',
-            new_name='team',
+            model_name="customuser",
+            old_name="team_id",
+            new_name="team",
         ),
         migrations.RenameField(
-            model_name='timeclock',
-            old_name='user_id',
-            new_name='user',
+            model_name="timeclock",
+            old_name="user_id",
+            new_name="user",
         ),
         migrations.RemoveField(
-            model_name='customuser',
-            name='username',
+            model_name="customuser",
+            name="username",
         ),
     ]

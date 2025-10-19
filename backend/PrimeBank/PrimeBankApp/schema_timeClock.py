@@ -14,8 +14,8 @@ DEFAULT_DAILY_WORK_HOURS = 7
 TEAM_SCORE_DEFAULT_PERIOD_DAYS = 30
 TEAM_SCORE_MAX_PERIOD_DAYS = 365
 
-class TimeClockType(DjangoObjectType):
 
+class TimeClockType(DjangoObjectType):
     class Meta:
         model = TimeClock
         fields = ("id", "user", "day", "clock_in", "clock_out")
@@ -53,7 +53,7 @@ class TimeClockQuery(graphene.ObjectType):
     kpi_clock = graphene.Field(
         KPIClockMetricsType,
         user_id=graphene.ID(required=False),
-        period=graphene.Int(required=True)
+        period=graphene.Int(required=True),
     )
     user_team_presence = graphene.List(
         lambda: TeamMemberSnapshotType,
@@ -94,8 +94,8 @@ class TimeClockQuery(graphene.ObjectType):
             day__range=(start, today),
         ).order_by("day", "clock_in")
 
-        current_total_seconds, current_worked_days, current_daily_totals = _aggregate_timeclock_entries(
-            current_entries
+        current_total_seconds, current_worked_days, current_daily_totals = (
+            _aggregate_timeclock_entries(current_entries)
         )
 
         daily_totals = []
@@ -122,9 +122,7 @@ class TimeClockQuery(graphene.ObjectType):
         )
 
         current_total_hours = current_total_seconds / 3600 if current_total_seconds else 0.0
-        current_average_hours_per_day = (
-            current_total_hours / period if period else 0.0
-        )
+        current_average_hours_per_day = current_total_hours / period if period else 0.0
         current_average_hours_per_workday = (
             current_total_hours / current_worked_days if current_worked_days else 0.0
         )
@@ -136,9 +134,7 @@ class TimeClockQuery(graphene.ObjectType):
             capped_ratio = max(0.0, min(ratio_current, 1.0))
             current_presence_rate = capped_ratio * 100
         else:
-            current_presence_rate = (
-                (current_worked_days / period) * 100 if period else 0.0
-            )
+            current_presence_rate = (current_worked_days / period) * 100 if period else 0.0
 
         previous_total_hours = previous_total_seconds / 3600 if previous_total_seconds else 0.0
         ratio_previous = None
@@ -149,9 +145,7 @@ class TimeClockQuery(graphene.ObjectType):
             capped_previous_ratio = max(0.0, min(ratio_previous, 1.0))
             previous_presence_rate = capped_previous_ratio * 100
         else:
-            previous_presence_rate = (
-                (previous_worked_days / period) * 100 if period else 0.0
-            )
+            previous_presence_rate = (previous_worked_days / period) * 100 if period else 0.0
         previous_average_hours = (
             previous_total_hours / previous_worked_days if previous_worked_days else 0.0
         )
@@ -185,7 +179,6 @@ class TimeClockQuery(graphene.ObjectType):
     def resolve_time_clocks(self, info):
         return TimeClock.objects.all().order_by("id")
 
-
     def resolve_time_clock(self, info, user_id=None):
         if user_id:
             day = timezone.localdate()
@@ -203,9 +196,7 @@ class TimeClockQuery(graphene.ObjectType):
         if period_days <= 0:
             raise GraphQLError("Period needs to be a positive integer.")
         if period_days > TEAM_SCORE_MAX_PERIOD_DAYS:
-            raise GraphQLError(
-                f"Period too long, max is {TEAM_SCORE_MAX_PERIOD_DAYS} days."
-            )
+            raise GraphQLError(f"Period too long, max is {TEAM_SCORE_MAX_PERIOD_DAYS} days.")
 
         target_team = _determine_team_for_user(request_user)
         if target_team is None:

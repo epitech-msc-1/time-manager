@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('PrimeBankApp', '0004_customuser_is_admin'),
+        ("PrimeBankApp", "0004_customuser_is_admin"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='timeclock',
-            name='clock_in',
+            model_name="timeclock",
+            name="clock_in",
             field=models.TimeField(null=True),
         ),
         migrations.AlterField(
-            model_name='timeclock',
-            name='clock_out',
+            model_name="timeclock",
+            name="clock_out",
             field=models.TimeField(null=True),
         ),
     ]

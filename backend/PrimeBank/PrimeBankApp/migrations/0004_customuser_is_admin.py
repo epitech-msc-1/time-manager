@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('PrimeBankApp', '0003_remove_team_members_nr_alter_customuser_team_and_more'),
+        ("PrimeBankApp", "0003_remove_team_members_nr_alter_customuser_team_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customuser',
-            name='is_admin',
+            model_name="customuser",
+            name="is_admin",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -5,6 +5,7 @@ from graphql import GraphQLError
 from .models import Team, CustomUser
 from PrimeBankApp.roles import require_auth, is_admin, is_manager_of
 
+
 class TeamType(DjangoObjectType):
     nr_members = graphene.Int()
 
@@ -12,22 +13,26 @@ class TeamType(DjangoObjectType):
         model = Team
         fields = ("id", "description")
 
+
 # Query to import in schema.py
 class TeamQuery(graphene.ObjectType):
     team = graphene.Field(TeamType, id=graphene.ID(required=True))
     teams = graphene.List(TeamType)
 
     def resolve_teams(self, info):
-        return Team.objects.annotate(nr_members=Count("members", distinct=True)).all().order_by("id")
-
+        return (
+            Team.objects.annotate(nr_members=Count("members", distinct=True))
+            .all()
+            .order_by("id")
+        )
 
     def resolve_team(self, info, id):
         # members is the related_name in CustomUser model
         try:
-            return (
-                Team.objects.annotate(nr_members=Count("members", distinct=True)).get(pk=id))
+            return Team.objects.annotate(nr_members=Count("members", distinct=True)).get(pk=id)
         except Team.DoesNotExist:
-                raise GraphQLError(f"Équipe id={id} introuvable.")
+            raise GraphQLError(f"Équipe id={id} introuvable.")
+
 
 class CreateTeam(graphene.Mutation):
     class Arguments:
@@ -83,6 +88,7 @@ class DeleteTeam(graphene.Mutation):
         deleted, _ = Team.objects.filter(pk=id).delete()
         return DeleteTeam(ok=bool(deleted))
 
+
 class AddUserToTeam(graphene.Mutation):
     class Arguments:
         user_id = graphene.ID(required=True)
@@ -123,6 +129,7 @@ class AddUserToTeam(graphene.Mutation):
         t.nr_members = t.members.count()
         return AddUserToTeam(team=t)
 
+
 class SetTeamManager(graphene.Mutation):
     class Arguments:
         team_id = graphene.ID(required=True)
@@ -162,6 +169,7 @@ class SetTeamManager(graphene.Mutation):
         new_manager.save()
 
         return SetTeamManager(ok=True, team_id_out=team.id, manager_user_id_out=new_manager.id)
+
 
 # Mutation to import in schema.py
 class TeamMutation(graphene.ObjectType):

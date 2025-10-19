@@ -5,24 +5,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('PrimeBankApp', '0002_rename_team_id_customuser_team_and_more'),
+        ("PrimeBankApp", "0002_rename_team_id_customuser_team_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='team',
-            name='members_nr',
+            model_name="team",
+            name="members_nr",
         ),
         migrations.AlterField(
-            model_name='customuser',
-            name='team',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='members', to='PrimeBankApp.team'),
+            model_name="customuser",
+            name="team",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="members",
+                to="PrimeBankApp.team",
+            ),
         ),
         migrations.AlterField(
-            model_name='team',
-            name='description',
+            model_name="team",
+            name="description",
             field=models.TextField(blank=True, null=True),
         ),
     ]

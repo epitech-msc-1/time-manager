@@ -8,11 +8,22 @@ from PrimeBankApp.roles import require_auth, is_admin, is_manager
 # Get the user model, here the CustomUser
 User = get_user_model()
 
+
 class UserType(DjangoObjectType):
     class Meta:
         model = User
-        fields = ("id", "email", "first_name", "last_name",
-                  "phone_number", "hour_contract", "team", "team_managed", "is_admin")
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "phone_number",
+            "hour_contract",
+            "team",
+            "team_managed",
+            "is_admin",
+        )
+
 
 # Query to import in schema.py
 class UserQuery(graphene.ObjectType):
@@ -43,6 +54,7 @@ class UserQuery(graphene.ObjectType):
 
         return target_user
 
+
 class CreateUser(graphene.Mutation):
     class Arguments:
         email = graphene.String(required=True)
@@ -58,8 +70,20 @@ class CreateUser(graphene.Mutation):
     user = graphene.Field(UserType)
 
     @classmethod
-    def mutate(cls, root, info, email, password, phone_number, first_name, last_name,
-               hour_contract=None, team_id=None, team_managed_id=None, is_admin=False):
+    def mutate(
+        cls,
+        root,
+        info,
+        email,
+        password,
+        phone_number,
+        first_name,
+        last_name,
+        hour_contract=None,
+        team_id=None,
+        team_managed_id=None,
+        is_admin=False,
+    ):
         if User.objects.filter(email=email).exists():
             raise GraphQLError("Email already in use.")
         if User.objects.filter(phone_number=phone_number).exists():
@@ -72,13 +96,14 @@ class CreateUser(graphene.Mutation):
             hour_contract=hour_contract,
             team_id=team_id,
             team_managed_id=team_managed_id,
-            is_admin=is_admin
+            is_admin=is_admin,
         )
-        
+
         # hash the password
         u.set_password(password)
         u.save()
         return CreateUser(user=u)
+
 
 class UpdateUser(graphene.Mutation):
     class Arguments:
@@ -108,20 +133,28 @@ class UpdateUser(graphene.Mutation):
         if new_email and User.objects.filter(email=new_email).exclude(pk=id).exists():
             raise GraphQLError("Email already in use.")
 
-        # password handling 
+        # password handling
         pwd = data.pop("password", None)
         if pwd:
             u.set_password(pwd)
 
         # update other fields
-        for field in ["email", "phone_number", "first_name", "last_name",
-                      "hour_contract", "team_id", "team_managed_id"]:
+        for field in [
+            "email",
+            "phone_number",
+            "first_name",
+            "last_name",
+            "hour_contract",
+            "team_id",
+            "team_managed_id",
+        ]:
             if field in data:
                 setattr(u, field, data[field])
 
         u.save()
         return UpdateUser(user=u)
-    
+
+
 class DeleteUser(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
@@ -133,6 +166,7 @@ class DeleteUser(graphene.Mutation):
         # .delete() returns a tuple (number of objects deleted, {object_type: number}) since we don't need the second part we use _
         deleted, _ = User.objects.filter(pk=id).delete()
         return DeleteUser(ok=bool(deleted))
+
 
 # Mutation to import in schema.py
 class UserMutation(graphene.ObjectType):

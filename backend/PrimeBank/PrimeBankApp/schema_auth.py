@@ -21,22 +21,24 @@ def jwt_payload(user, context=None):
 
     # Add useful user fields
     try:
-        payload.update({
-            "user_id": user.id,
-            "email": user.email,
-            "first_name": getattr(user, "first_name", ""),
-            "last_name": getattr(user, "last_name", ""),
-            "is_admin": getattr(user, "is_admin", False),
-            "team_id": getattr(user.team, "id", None)
-            if getattr(user, "team", None)
-            else None,
-            "team_managed_id": getattr(user.team_managed, "id", None)
-            if getattr(user, "team_managed", None)
-            else None,
-            "is_manager": bool(getattr(user, "team_managed_id", None)),
-            "hour_contract": getattr(user, "hour_contract", None),
-            "phone_number": getattr(user, "phone_number", None),
-        })
+        payload.update(
+            {
+                "user_id": user.id,
+                "email": user.email,
+                "first_name": getattr(user, "first_name", ""),
+                "last_name": getattr(user, "last_name", ""),
+                "is_admin": getattr(user, "is_admin", False),
+                "team_id": getattr(user.team, "id", None)
+                if getattr(user, "team", None)
+                else None,
+                "team_managed_id": getattr(user.team_managed, "id", None)
+                if getattr(user, "team_managed", None)
+                else None,
+                "is_manager": bool(getattr(user, "team_managed_id", None)),
+                "hour_contract": getattr(user, "hour_contract", None),
+                "phone_number": getattr(user, "phone_number", None),
+            }
+        )
     except Exception:
         # Keep payload minimal on any unexpected error
         pass
