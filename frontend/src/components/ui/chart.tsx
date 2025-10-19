@@ -66,33 +66,44 @@ function ChartContainer({
 }
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
-    const colorConfig = Object.entries(config).filter(([, config]) => config.theme || config.color);
+    const styleContent = React.useMemo(() => {
+        const colorConfig = Object.entries(config).filter(
+            ([, itemConfig]) => itemConfig.theme || itemConfig.color,
+        );
 
-    if (!colorConfig.length) {
+        if (!colorConfig.length) {
+            return null;
+        }
+
+        return Object.entries(THEMES)
+            .map(([theme, prefix]) => {
+                const cssVariables = colorConfig
+                    .map(([key, itemConfig]) => {
+                        const color =
+                            itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
+                            itemConfig.color;
+                        return color ? `  --color-${key}: ${color};` : null;
+                    })
+                    .filter((value): value is string => Boolean(value))
+                    .join("\n");
+
+                if (!cssVariables) {
+                    return null;
+                }
+
+                return `${prefix} [data-chart=${id}] {
+${cssVariables}
+}`;
+            })
+            .filter((value): value is string => Boolean(value))
+            .join("\n");
+    }, [config, id]);
+
+    if (!styleContent) {
         return null;
     }
 
-    return (
-        <style
-            dangerouslySetInnerHTML={{
-                __html: Object.entries(THEMES)
-                    .map(
-                        ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-    .map(([key, itemConfig]) => {
-        const color =
-            itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-        return color ? `  --color-${key}: ${color};` : null;
-    })
-    .join("\n")}
-}
-`,
-                    )
-                    .join("\n"),
-            }}
-        />
-    );
+    return <style>{styleContent}</style>;
 };
 
 const ChartTooltip = RechartsPrimitive.Tooltip;

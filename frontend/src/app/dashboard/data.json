@@ -4,31 +4,31 @@
         "firstname": "Yassin",
         "lastname": "TIZAOUI",
         "status": "Manager",
-        "presence": "Present",
-        "score": 92
+        "presence": true,
+        "score": 64
     },
     {
         "id": 2,
         "firstname": "Paul",
         "lastname": "JACQUEMOT",
         "status": "Member",
-        "presence": "Present",
-        "score": 92
+        "presence": false,
+        "score": 32
     },
     {
         "id": 3,
         "firstname": "Rayan",
         "lastname": "HABES",
         "status": "Member",
-        "presence": "Present",
-        "score": 76
+        "presence": false,
+        "score": 16
     },
     {
         "id": 4,
         "firstname": "Arnaud",
-        "lastname": "Méron",
+        "lastname": "MERON",
         "status": "Member",
-        "presence": "Absent",
-        "score": 14
+        "presence": true,
+        "score": 8
     }
 ]

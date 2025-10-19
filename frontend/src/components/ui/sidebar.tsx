@@ -26,6 +26,24 @@ const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
+type CookieStoreLike = {
+    get?: (name: string) => Promise<{ value?: string } | undefined>;
+    set?: (cookie: {
+        name: string;
+        value: string;
+        path?: string;
+        expires?: number | Date | string;
+    }) => Promise<void>;
+};
+
+const getCookieStore = (): CookieStoreLike | undefined => {
+    if (typeof window === "undefined") {
+        return undefined;
+    }
+
+    return (window as unknown as { cookieStore?: CookieStoreLike }).cookieStore;
+};
+
 type SidebarContextProps = {
     state: "expanded" | "collapsed";
     open: boolean;
@@ -63,6 +81,35 @@ function SidebarProvider({
     const isMobile = useIsMobile();
     const [openMobile, setOpenMobile] = React.useState(false);
 
+    const persistSidebarPreference = React.useCallback((isOpen: boolean) => {
+        if (typeof window === "undefined") {
+            return;
+        }
+
+        const expiration = Date.now() + SIDEBAR_COOKIE_MAX_AGE * 1000;
+        const cookieStore = getCookieStore();
+        const persistedValue = isOpen ? "1" : "0";
+
+        if (cookieStore?.set) {
+            void cookieStore.set({
+                name: SIDEBAR_COOKIE_NAME,
+                value: persistedValue,
+                path: "/",
+                expires: expiration,
+            });
+            return;
+        }
+
+        try {
+            window.localStorage.setItem(
+                SIDEBAR_COOKIE_NAME,
+                JSON.stringify({ value: persistedValue, expires: expiration }),
+            );
+        } catch {
+            // No storage available, ignore the persistence failure.
+        }
+    }, []);
+
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen);
@@ -76,16 +123,68 @@ function SidebarProvider({
                 _setOpen(openState);
             }
 
-            // This sets the cookie to keep the sidebar state.
-            document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+            // Persist the preference so we can restore it later.
+            persistSidebarPreference(openState);
         },
-        [setOpenProp, open],
+        [setOpenProp, open, persistSidebarPreference],
     );
+
+    React.useEffect(() => {
+        if (typeof window === "undefined" || openProp !== undefined) {
+            return;
+        }
+
+        let active = true;
+        const cookieStore = getCookieStore();
+
+        const applyState = (rawValue: string | null | undefined) => {
+            if (!active || rawValue == null) {
+                return;
+            }
+
+            _setOpen(rawValue === "1");
+        };
+
+        const restoreSidebarPreference = async () => {
+            try {
+                if (cookieStore?.get) {
+                    const cookie = await cookieStore.get(SIDEBAR_COOKIE_NAME);
+                    applyState(cookie?.value ?? null);
+                    return;
+                }
+
+                const stored = window.localStorage.getItem(SIDEBAR_COOKIE_NAME);
+                if (!stored) {
+                    return;
+                }
+
+                const parsed = JSON.parse(stored) as { value?: string; expires?: number };
+                if (typeof parsed?.value !== "string") {
+                    return;
+                }
+
+                if (typeof parsed.expires === "number" && parsed.expires < Date.now()) {
+                    window.localStorage.removeItem(SIDEBAR_COOKIE_NAME);
+                    return;
+                }
+
+                applyState(parsed.value);
+            } catch {
+                // If persistence fails we fall back to the default state.
+            }
+        };
+
+        void restoreSidebarPreference();
+
+        return () => {
+            active = false;
+        };
+    }, [openProp]);
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
         return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
-    }, [isMobile, setOpen, setOpenMobile]);
+    }, [isMobile, setOpen]);
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -114,7 +213,7 @@ function SidebarProvider({
             setOpenMobile,
             toggleSidebar,
         }),
-        [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar],
+        [state, open, setOpen, isMobile, openMobile, toggleSidebar],
     );
 
     return (
