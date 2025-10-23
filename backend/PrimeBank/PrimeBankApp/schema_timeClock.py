@@ -6,7 +6,7 @@ import graphene
 from django.utils import timezone
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
-
+from PrimeBankApp.roles import is_admin, is_manager_of, require_auth
 from .models import CustomUser, Team, TimeClock
 
 SECONDS_PER_HOUR = 3600
@@ -321,12 +321,51 @@ class ClockOut(graphene.Mutation):
         tc.clock_out = timezone.localtime().time()
         tc.save()
         return ClockOut(time_clock=tc)
+    
+class ModifyClockEntry(graphene.Mutation):
+    class Arguments:
+        user_id = graphene.ID(required=True)
+        day = graphene.Date(required=False)
+        clock_in = graphene.Time(required=False)
+        clock_out = graphene.Time(required=False)
 
+    time_clock = graphene.Field(TimeClockType)
+
+    @classmethod
+    def mutate(cls, root, info, user_id, day=None, clock_in=None, clock_out=None):
+        user = info.context.user
+        require_auth(user)
+        try:
+            u = CustomUser.objects.get(pk=user_id)
+            u_team = getattr(u, "team_id", None)
+        except CustomUser.DoesNotExist:
+            raise GraphQLError("User not found.")
+        
+        if day is None:
+            raise GraphQLError("Day is required to modify clock entry")
+
+        if not (is_admin(user) or is_manager_of(user, u_team)):
+            raise GraphQLError("Not authorized to modify clock entry for this user. You are not admin or manager of the user's team.")
+
+        if u.is_admin and not is_admin(user):
+            raise GraphQLError("Managers cannot modify admin clock entry.")
+        
+        tc = TimeClock.objects.filter(user_id=user_id, day=day).first()
+        if not tc:
+            raise GraphQLError(f"No TimeClock entry for user {user_id} on {day}.")
+        if clock_in is not None:
+            tc.clock_in = clock_in
+        if clock_out is not None:
+            tc.clock_out = clock_out
+
+        tc.save()
+        return ModifyClockEntry(time_clock=tc)
 
 # Mutation to import in schema.py
 class TimeClockMutation(graphene.ObjectType):
     clock_in = ClockIn.Field()
     clock_out = ClockOut.Field()
+    modify_clock_entry = ModifyClockEntry.Field()
 
 
 class TeamMemberSnapshotType(graphene.ObjectType):
