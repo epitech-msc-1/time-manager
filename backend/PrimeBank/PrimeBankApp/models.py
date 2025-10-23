@@ -55,3 +55,16 @@ class TimeClock(models.Model):
 
     def __str__(self):
         return f"This user {self.user_id} clocked in at {self.clock_in.date()} and clock out at {self.clock_out.date()}"
+
+class RequestModifyTimeClock(models.Model):
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="user_request_modify_time_clock"
+    )
+    current_date = models.DateTimeField(auto_now_add=True)
+    day = models.DateField(default=timezone.localdate)
+    description = models.TextField(null=True, blank=True)
+    new_clock_in = models.TimeField(null=True, blank=True)
+    new_clock_out = models.TimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Request by user {self.user_id} to modify time clock on {self.day}"

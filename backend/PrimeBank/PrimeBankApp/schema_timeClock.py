@@ -7,13 +7,25 @@ from django.utils import timezone
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 from PrimeBankApp.roles import is_admin, is_manager_of, require_auth
-from .models import CustomUser, Team, TimeClock
+from .models import CustomUser, Team, TimeClock, RequestModifyTimeClock
 
 SECONDS_PER_HOUR = 3600
 DAYS_PER_WEEK = 7
 DEFAULT_DAILY_WORK_HOURS = 7
 TEAM_SCORE_DEFAULT_PERIOD_DAYS = 30
 TEAM_SCORE_MAX_PERIOD_DAYS = 365
+
+class RequestModifyTimeClockType(DjangoObjectType):
+    class Meta:
+        model = RequestModifyTimeClock
+        fields = ("id", "user", "current_date", "day", "description",
+                  "old_clock_in", "old_clock_out", "new_clock_in", "new_clock_out")
+
+class ModifyClockQuery(graphene.ObjectType):
+    all_requests = graphene.List(RequestModifyTimeClockType)
+
+    def resolve_all_requests(root, info):
+        return RequestModifyTimeClock.objects.all().order_by("-current_date")
 
 
 class TimeClockType(DjangoObjectType):
@@ -360,12 +372,80 @@ class ModifyClockEntry(graphene.Mutation):
 
         tc.save()
         return ModifyClockEntry(time_clock=tc)
+    
+class CreateRequestModifyTimeClock(graphene.Mutation):
+    class Arguments:
+        day = graphene.Date(required=True)
+        description = graphene.String(required=False)
+        new_clock_in = graphene.Time(required=True)
+        new_clock_out = graphene.Time(required=True)
+
+    request = graphene.Field(RequestModifyTimeClockType)
+
+    @classmethod
+    def mutate(cls, root, info, day, description=None, new_clock_in=None, new_clock_out=None):
+        user = info.context.user
+        require_auth(user)
+
+        team_id = getattr(user, "team_id", None)
+        if team_id is None:
+            raise GraphQLError("User does not belong to any team.")
+        
+        tc = TimeClock.objects.filter(user_id=user.id, day=day).first()
+        if not tc:
+            raise GraphQLError(f"No TimeClock entry for user {user.id} on {day}.")
+        
+        if new_clock_in is None or new_clock_out is None:
+            raise GraphQLError("Both new_clock_in and new_clock_out are required.")
+        rmtc = RequestModifyTimeClock.objects.create(
+            user=user, 
+            day=day,
+            description=description,
+            new_clock_in=new_clock_in,
+            new_clock_out=new_clock_out,
+        )
+        return CreateRequestModifyTimeClock(request=rmtc)
+
+class AcceptedChangeRequest(graphene.Mutation):
+    class Arguments:
+        request_id = graphene.ID(required=True)
+        accepted = graphene.Boolean(required=True)
+
+    message = graphene.String()
+
+    @classmethod
+    def mutate(cls, root, info, request_id, accepted):
+        user = info.context.user
+        require_auth(user)
+        try:
+            rmtc = RequestModifyTimeClock.objects.get(pk=request_id)
+        except RequestModifyTimeClock.DoesNotExist:
+            raise GraphQLError("RequestModifyTimeClock not found.")
+        
+        user_team = getattr(rmtc.user, "team_id", None)
+        if not (is_admin(user) or is_manager_of(user, int(user_team))):
+            raise GraphQLError("Not authorized to accept this request.")
+        
+        if accepted == True:
+            tc = TimeClock.objects.filter(user_id=rmtc.user.id, day=rmtc.day).first()
+            if not tc:
+                raise GraphQLError(f"No TimeClock entry for user {rmtc.user.id} on {rmtc.day}.")
+            tc.clock_in = rmtc.new_clock_in
+            tc.clock_out = rmtc.new_clock_out
+            tc.save()
+            rmtc.delete()
+            return AcceptedChangeRequest(message="Change request accepted and applied.")
+        else :
+            rmtc.delete()
+            return AcceptedChangeRequest(message="Change request rejected and deleted.")
 
 # Mutation to import in schema.py
 class TimeClockMutation(graphene.ObjectType):
     clock_in = ClockIn.Field()
     clock_out = ClockOut.Field()
     modify_clock_entry = ModifyClockEntry.Field()
+    create_request_modify_time_clock = CreateRequestModifyTimeClock.Field()
+    accepted_change_request = AcceptedChangeRequest.Field()
 
 
 class TeamMemberSnapshotType(graphene.ObjectType):
