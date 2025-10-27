@@ -4,18 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('PrimeBankApp', '0006_requestmodifytimeclock'),
+        ("PrimeBankApp", "0006_requestmodifytimeclock"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='requestmodifytimeclock',
-            name='old_clock_in',
+            model_name="requestmodifytimeclock",
+            name="old_clock_in",
         ),
         migrations.RemoveField(
-            model_name='requestmodifytimeclock',
-            name='old_clock_out',
+            model_name="requestmodifytimeclock",
+            name="old_clock_out",
         ),
     ]

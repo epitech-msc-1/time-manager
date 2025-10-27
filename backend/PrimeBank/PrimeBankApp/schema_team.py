@@ -3,7 +3,7 @@ from django.db.models import Count
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 
-from PrimeBankApp.roles import is_admin, is_manager_of, require_auth
+from .roles import is_admin, is_manager_of, require_auth
 
 from .models import CustomUser, Team
 
@@ -180,3 +180,12 @@ class TeamMutation(graphene.ObjectType):
     delete_team = DeleteTeam.Field()
     add_user_to_team = AddUserToTeam.Field()
     set_team_manager = SetTeamManager.Field()
+
+
+class TeamMemberSnapshotType(graphene.ObjectType):
+    id = graphene.ID()
+    firstname = graphene.String()
+    lastname = graphene.String()
+    status = graphene.String()
+    presence = graphene.Boolean()
+    score = graphene.Int()
