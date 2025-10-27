@@ -386,7 +386,7 @@ class CreateRequestModifyTimeClock(graphene.Mutation):
     def mutate(cls, root, info, day, description=None, new_clock_in=None, new_clock_out=None):
         user = info.context.user
         require_auth(user)
-
+        
         team_id = getattr(user, "team_id", None)
         if team_id is None:
             raise GraphQLError("User does not belong to any team.")
@@ -395,12 +395,20 @@ class CreateRequestModifyTimeClock(graphene.Mutation):
         if not tc:
             raise GraphQLError(f"No TimeClock entry for user {user.id} on {day}.")
         
+        old_clock_in = tc.clock_in
+        old_clock_out = tc.clock_out
+
+        if RequestModifyTimeClock.objects.filter(user_id=user.id, day=day).exists():
+            raise GraphQLError(f"A modification request for {day} already exists.")
+        
         if new_clock_in is None or new_clock_out is None:
             raise GraphQLError("Both new_clock_in and new_clock_out are required.")
         rmtc = RequestModifyTimeClock.objects.create(
             user=user, 
             day=day,
             description=description,
+            old_clock_in=old_clock_in,
+            old_clock_out=old_clock_out,
             new_clock_in=new_clock_in,
             new_clock_out=new_clock_out,
         )
