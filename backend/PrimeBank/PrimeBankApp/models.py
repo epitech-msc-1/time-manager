@@ -56,6 +56,7 @@ class TimeClock(models.Model):
     def __str__(self):
         return f"This user {self.user_id} clocked in at {self.clock_in.date()} and clock out at {self.clock_out.date()}"
 
+
 class RequestModifyTimeClock(models.Model):
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="user_request_modify_time_clock"
