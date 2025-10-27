@@ -63,6 +63,8 @@ class RequestModifyTimeClock(models.Model):
     current_date = models.DateTimeField(auto_now_add=True)
     day = models.DateField(default=timezone.localdate)
     description = models.TextField(null=True, blank=True)
+    old_clock_in = models.TimeField(null=True, blank=True)
+    old_clock_out = models.TimeField(null=True, blank=True)
     new_clock_in = models.TimeField(null=True, blank=True)
     new_clock_out = models.TimeField(null=True, blank=True)
 
