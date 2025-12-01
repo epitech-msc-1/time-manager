@@ -24,6 +24,6 @@ docker compose run --rm sonar-scanner
 
 ## Remarques utiles
 
-- `SONAR_TOKEN` est nécessaire, exporte-la ou place-la dans `.env` utilisé par `docker compose`.
+- `SONAR_TOKEN` est nécessaire, exporte-le ou place-le dans `.env` utilisé par `docker compose`.
 - Le scanner monte le repo : assure-toi que le dossier `.git` est présent si tu veux les infos de blame.
 - Après l'upload, le scanner affiche l'URL du rapport et l'ID de tâche CE; patienter le temps que SonarQube traite le rapport.
