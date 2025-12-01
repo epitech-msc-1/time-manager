@@ -16,6 +16,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,15 +26,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-w14q8fvdlz&!6k4b$d3v&sic8z5m17pwt87w!=b_3bu(j==u1s"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+FRONTEND_URL = "http://localhost:" + os.getenv("VITE_PORT", "5173")
+
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://localhost:5174"]
+CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -96,23 +100,11 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://localhost:5174"]
-
-# CORS_ALLOW_HEADERS = [
-#     "authorization",
-#     "content-type",
-#     "x-csrftoken",
-#     "accept",
-#     "origin",
-#     "cookie",
-# ]
+CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
 
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-]
+CSRF_TRUSTED_ORIGINS = [FRONTEND_URL]
 
 
 ROOT_URLCONF = "PrimeBank.urls"
@@ -137,8 +129,6 @@ WSGI_APPLICATION = "PrimeBank.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-load_dotenv()  # permet de charger les variables d'environnement depuis le fichier .env
 
 DATABASES = {
     "default": {

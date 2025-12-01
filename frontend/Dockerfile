@@ -1,9 +1,13 @@
-FROM oven/bun:1.3
+FROM oven/bun:1.3.3
+
+RUN useradd --system --create-home --shell /bin/sh appuser
+
+USER appuser
 
 WORKDIR /app
 
-COPY . .
+COPY  . .
 
 RUN bun install
 
-CMD [ "bun", "dev", "--host", "0.0.0.0" ]
+ENTRYPOINT [ "scripts/entrypoint.sh" ]
