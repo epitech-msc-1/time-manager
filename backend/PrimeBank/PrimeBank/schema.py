@@ -3,12 +3,10 @@ from PrimeBankApp.schema_auth import AuthDevQuery, Mutation
 from PrimeBankApp.schema_team import TeamMutation, TeamQuery
 from PrimeBankApp.schema_time_clock import TimeClockMutation, ModifyClockQuery
 from PrimeBankApp.schema_user import UserMutation, UserQuery
-from PrimeBankApp.schema_kpi import TimeClockQuery
+from PrimeBankApp.schema_timeclock_export import TimeClockExportQuery
 
 
-class Query(
-    UserQuery, TeamQuery, TimeClockQuery, AuthDevQuery, ModifyClockQuery, graphene.ObjectType
-):
+class Query(UserQuery, TeamQuery, TimeClockQuery, TimeClockExportQuery , AuthDevQuery, ModifyClockQuery, graphene.ObjectType):
     pass
 
 
