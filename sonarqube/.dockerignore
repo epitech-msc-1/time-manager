@@ -14,7 +14,7 @@ wheels/
 
 # Node
 node_modules/
-.env
+
 .env.example
 Dockerfile
 
@@ -24,4 +24,4 @@ assets/
 docs/
 .gitignore
 LICENSE
-REAMDE.md
+README.md
