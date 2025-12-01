@@ -12,7 +12,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - ${DB_PORT}:${DB_PORT}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
@@ -34,16 +34,16 @@ services:
       DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
     volumes:
       - ./backend/PrimeBank/:/app/PrimeBank/
-    command: sh -c "uv run manage.py migrate && uv run manage.py runserver 0.0.0.0:8000"
+    command: sh -c "uv run manage.py migrate && uv run manage.py runserver 0.0.0.0:${DJANGO_PORT}"
     ports:
-      - "8000:8000"
+      - ${DJANGO_PORT}:${DJANGO_PORT}
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
       test:
         - CMD-SHELL
-        - "curl --fail --silent --show-error -H 'Accept: application/json' http://127.0.0.1:8000/ht/"
+        - "curl --fail --silent --show-error -H 'Accept: application/json' http://127.0.0.1:${DJANGO_PORT}/ht/"
       interval: 5s
       timeout: 5s
       start_period: 10s
@@ -56,10 +56,48 @@ services:
     image: frontend:1.0.0
     container_name: frontend
     ports:
-      - 5173:5173
+      - ${VITE_PORT}:${VITE_PORT}
     depends_on:
       backend:
         condition: service_healthy
 
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - 9000:9000
+    restart: unless-stopped
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'curl -sf http://localhost:9000/api/system/status | grep -q ''"status":"UP"'''
+      interval: 10s
+      timeout: 10s
+      start_period: 60s
+      retries: 10
+
+  sonar-scanner:
+    build:
+      context: .
+      dockerfile: sonarqube/Dockerfile
+    container_name: sonar-scanner
+    environment:
+      SONAR_HOST_URL: http://sonarqube:${SONAR_PORT}
+      SONAR_TOKEN: ${SONAR_TOKEN}
+    depends_on:
+      sonarqube:
+        condition: service_healthy
+
 volumes:
   db_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+
+networks:
+  default:
+    name: time-manager-net
