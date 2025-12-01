@@ -11,8 +11,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
     ports:
-      - "5432:5432"
+      - ${DB_PORT}:${DB_PORT}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
@@ -23,27 +24,27 @@ services:
     build:
       context: backend/
       dockerfile: Dockerfile
+    restart: unless-stopped
     image: backend:1.0.0
     container_name: backend
-    working_dir: /app/PrimeBank
     env_file:
       - .env
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
       DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
-    volumes:
-      - ./backend/PrimeBank/:/app/PrimeBank/
-    command: sh -c "uv run manage.py migrate && uv run manage.py runserver 0.0.0.0:8000"
+      DJANGO_PORT: ${DJANGO_PORT}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      VITE_PORT: ${VITE_PORT}
     ports:
-      - "8000:8000"
+      - ${DJANGO_PORT}:${DJANGO_PORT}
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
       test:
         - CMD-SHELL
-        - "curl --fail --silent --show-error -H 'Accept: application/json' http://127.0.0.1:8000/ht/"
+        - "curl --fail --silent --show-error -H 'Accept: application/json' http://localhost:${DJANGO_PORT}/ht/"
       interval: 5s
       timeout: 5s
       start_period: 10s
@@ -53,13 +54,61 @@ services:
     build:
       context: frontend/
       dockerfile: Dockerfile
+    restart: unless-stopped
     image: frontend:1.0.0
     container_name: frontend
+    env_file:
+      - .env
+    environment:
+      VITE_API_URL: http://localhost:${DJANGO_PORT}/graphql
+      VITE_PORT: ${VITE_PORT}
     ports:
-      - 5173:5173
+      - ${VITE_PORT}:${VITE_PORT}
     depends_on:
       backend:
         condition: service_healthy
 
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - ${SONAR_PORT}:9000
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      SONAR_WEB_HOST: 0.0.0.0
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'curl -sf http://localhost:9000/api/system/status | grep -q ''"status":"UP"'''
+      interval: 10s
+      timeout: 10s
+      start_period: 60s
+      retries: 10
+
+  sonar-scanner:
+    build:
+      context: .
+      dockerfile: sonarqube/Dockerfile
+    container_name: sonar-scanner
+    environment:
+      SONAR_HOST_URL: http://sonarqube:9000
+      SONAR_TOKEN: ${SONAR_TOKEN}
+    depends_on:
+      sonarqube:
+        condition: service_healthy
+
 volumes:
   db_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+
+networks:
+  default:
+    name: time-manager-net
