@@ -50,44 +50,43 @@ const refreshAccessToken = async (): Promise<boolean> => {
     }
 };
 
-const errorLink = new ErrorLink(({ graphQLErrors, networkError, operation, forward }) => {
+const errorLink = new ErrorLink(({ graphQLErrors, _networkError, operation, forward }) => {
     const hasExpiredToken = !!graphQLErrors?.some(
         (graphError) => graphError.message === "Signature has expired",
     );
 
-        if (hasExpiredToken) {
-            console.log("Access token expired. Attempting to refresh...");
+    if (hasExpiredToken) {
+        console.log("Access token expired. Attempting to refresh...");
 
-            return new Observable<ApolloLink.Result>((observer) => {
-                let subscription: { unsubscribe: () => void } | undefined;
+        return new Observable<ApolloLink.Result>((observer) => {
+            let subscription: { unsubscribe: () => void } | undefined;
 
-                refreshAccessToken()
-                    .then((isRefreshed) => {
-                        if (!isRefreshed) {
-                            observer.error(new Error("Failed to refresh token."));
-                            return;
-                        }
+            refreshAccessToken()
+                .then((isRefreshed) => {
+                    if (!isRefreshed) {
+                        observer.error(new Error("Failed to refresh token."));
+                        return;
+                    }
 
-                        subscription = forward(operation).subscribe({
-                            next: (value: ApolloLink.Result) => observer.next?.(value),
-                            error: (subscriptionError: unknown) =>
-                                observer.error?.(subscriptionError),
-                            complete: () => observer.complete?.(),
-                        });
-                    })
-                    .catch((refreshError) => {
-                        observer.error?.(refreshError);
+                    subscription = forward(operation).subscribe({
+                        next: (value: ApolloLink.Result) => observer.next?.(value),
+                        error: (subscriptionError: unknown) => observer.error?.(subscriptionError),
+                        complete: () => observer.complete?.(),
                     });
+                })
+                .catch((refreshError) => {
+                    observer.error?.(refreshError);
+                });
 
-                return () => {
-                    subscription?.unsubscribe();
-                };
-            });
-        }
+            return () => {
+                subscription?.unsubscribe();
+            };
+        });
+    }
 
-        console.error(`[GraphQL error]: ${graphQLErrors?.map(e => e.message).join(', ')}`);
-        return;
-    });
+    console.error(`[GraphQL error]: ${graphQLErrors?.map((e) => e.message).join(", ")}`);
+    return;
+});
 
 const link = ApolloLink.from([errorLink, httpLink]);
 
