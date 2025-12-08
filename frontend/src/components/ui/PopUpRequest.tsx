@@ -1,4 +1,4 @@
-import { useState, type JSX } from "react";
+import { type JSX } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./card";
 import { Label } from "./label";
 import { Button } from "./button";
@@ -6,23 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 
-type PopUpRequestProps = {
-  requestNumber: string | number;
-  clockIn: string;
-  clockOut: string;
-  newClockIn?: string;
-  newClockOut?: string;
-  description?: string;
-  onClose: () => void;
-};
-
-const clockInExample = "09:00";
-const clockOutExample = "17:00";
-//const newClockInExample = "09:30";
-//const newClockOutExample = "17:30";
-//const descriptionExample =
-//  "c'est a cause de yassin j'avais clock out et rentrer chez moi il m'a rappeler pour me refiler son travail.";
-//const requestNumberExample = 106;
+// PopUpRequest: modal that displays all pending requests
 
 export function PopUpRequest(): JSX.Element {
   const { user } = useAuth();
@@ -49,26 +33,27 @@ export function PopUpRequest(): JSX.Element {
     }
   `;
 
-  type ZENGACRAZY = {
+  type RequestType = {
     id: string;
     day: string;
-    description: string;
-    newClockIn: string;
-    newClockOut: string;
-    oldClockOut: string;
-    oldClockIn: string;
-    currentDate: string;
+    description: string | null;
+    newClockIn: string | null;
+    newClockOut: string | null;
+    oldClockOut: string | null;
+    oldClockIn: string | null;
+    currentDate: string | null;
+    user?: { id: string; firstName?: string; lastName?: string } | null;
   };
 
-  type DATATYPE = {
-    allRequests: ZENGACRAZY[];
+  type AllRequestsData = {
+    allRequests: RequestType[];
   };
 
-  const { data } = useQuery<DATATYPE>(popUpRequestQuery, {
+  const { data } = useQuery<AllRequestsData>(popUpRequestQuery, {
     fetchPolicy: "cache-and-network",
   });
-  const [id, setId] = useState(data?.allRequests);
-  console.log("Random Request Data:", data?.allRequests[0].id);
+  // defensive logging
+  console.log("Random Request Data count:", data?.allRequests?.length ?? 0);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
