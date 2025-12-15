@@ -4,7 +4,7 @@ from PrimeBankApp.schema_team import TeamMutation, TeamQuery
 from PrimeBankApp.schema_time_clock import TimeClockMutation, ModifyClockQuery
 from PrimeBankApp.schema_user import UserMutation, UserQuery
 from PrimeBankApp.schema_timeclock_export import TimeClockExportQuery
-
+from PrimeBankApp.schema_kpi import TimeClockQuery
 
 class Query(UserQuery, TeamQuery, TimeClockQuery, TimeClockExportQuery , AuthDevQuery, ModifyClockQuery, graphene.ObjectType):
     pass
