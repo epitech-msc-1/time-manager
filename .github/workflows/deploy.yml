@@ -85,7 +85,7 @@ jobs:
                   ssh ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }} "mkdir -p ~/code/traefik-lab"
 
                   # Copy files
-                  scp -r traefik.compose.yml traefik error-pages ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/traefik-lab/
+                  scp -r traefik.compose.yml traefik traefik/error-pages ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/traefik-lab/
 
             - name: Deploy to Server
               env:
