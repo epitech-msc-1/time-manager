@@ -1,0 +1,84 @@
+name: Build and Deploy
+
+on:
+    push:
+        branches: ["prod"]
+    workflow_dispatch:
+
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+    build-and-push:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+
+        strategy:
+            matrix:
+                service: [backend, frontend]
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Log in to the Container registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Extract metadata (tags, labels) for Docker
+              id: meta
+              uses: docker/metadata-action@v5
+              with:
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}
+                  tags: |
+                      type=raw,value=latest
+                      type=sha,prefix={{date 'YYYYMMDD'}}-
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: ./${{ matrix.service }}
+                  push: true
+                  tags: ${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
+
+    deploy:
+        needs: build-and-push
+        runs-on: ubuntu-latest
+        if: success()
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup SSH
+              run: |
+                  mkdir -p ~/.ssh/
+                  echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+                  chmod 600 ~/.ssh/id_rsa
+                  ssh-keyscan -H ${{ secrets.HOST_IP }} >> ~/.ssh/known_hosts
+
+            - name: Deploy to Server
+              env:
+                  HOST_USER: ${{ secrets.HOST_USER }}
+                  HOST_IP: ${{ secrets.HOST_IP }}
+
+              run: |
+                  ssh $HOST_USER@$HOST_IP << 'EOF'
+                    cd ~/code/traefik-lab
+
+                    # Pull latest images
+                    docker compose pull backend frontend
+
+                    # Recreate containers
+                    docker compose up -d --no-deps backend frontend
+
+                    # Clean up old images
+                    docker image prune -f
+                  EOF

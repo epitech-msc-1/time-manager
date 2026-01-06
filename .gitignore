@@ -20,7 +20,6 @@ Dockerfile
 
 # Repo
 assets/
-.github/
 docs/
 .gitignore
 LICENSE
