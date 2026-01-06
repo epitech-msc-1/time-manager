@@ -52,7 +52,7 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings}
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-PrimeBank.settings}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
       DJANGO_PORT: ${DJANGO_PORT:-8000}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}

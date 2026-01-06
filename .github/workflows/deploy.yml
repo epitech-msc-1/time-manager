@@ -115,6 +115,8 @@ jobs:
                   # Copy files
                   scp -r traefik.compose.yml traefik .env ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/time-manager/
 
+                  
+
             - name: Deploy to Server
               env:
                   HOST_USER: ${{ secrets.HOST_USER }}
