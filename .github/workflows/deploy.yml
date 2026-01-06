@@ -57,12 +57,35 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
+            - name: Validate Secrets
+              run: |
+                  if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+                    echo "Error: SSH_PRIVATE_KEY is missing"
+                    exit 1
+                  fi
+                  if [ -z "${{ secrets.HOST_IP }}" ]; then
+                    echo "Error: HOST_IP is missing"
+                    exit 1
+                  fi
+                  if [ -z "${{ secrets.HOST_USER }}" ]; then
+                    echo "Error: HOST_USER is missing"
+                    exit 1
+                  fi
+
             - name: Setup SSH
               run: |
                   mkdir -p ~/.ssh/
                   echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
                   chmod 600 ~/.ssh/id_rsa
                   ssh-keyscan -H ${{ secrets.HOST_IP }} >> ~/.ssh/known_hosts
+
+            - name: Copy files to server
+              run: |
+                  # Create directory
+                  ssh ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }} "mkdir -p ~/code/traefik-lab"
+
+                  # Copy files
+                  scp -r traefik.compose.yml traefik error-pages ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/traefik-lab/
 
             - name: Deploy to Server
               env:
@@ -74,10 +97,10 @@ jobs:
                     cd ~/code/traefik-lab
 
                     # Pull latest images
-                    docker compose pull backend frontend
+                    docker compose -f traefik.compose.yml pull backend frontend
 
                     # Recreate containers
-                    docker compose up -d --no-deps backend frontend
+                    docker compose -f traefik.compose.yml up -d --no-deps backend frontend
 
                     # Clean up old images
                     docker image prune -f

@@ -16,7 +16,7 @@ services:
     image: nginx:alpine
     container_name: error-pages
     volumes:
-      - ./error-pages:/usr/share/nginx/html
+      - ./traefik/error-pages:/usr/share/nginx/html
     labels:
       - traefik.enable=true
       - traefik.http.routers.error-pages.rule=HostRegexp(`{catchall:.*}`)
