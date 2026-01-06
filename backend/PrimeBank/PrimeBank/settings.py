@@ -34,7 +34,7 @@ DEBUG = False
 
 FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://localhost:" + os.getenv("VITE_PORT", "5173")
 
-ALLOWED_HOSTS = [FRONTEND_URL]
+# ALLOWED_HOSTS is defined lower down
 
 # Application definition
 
@@ -86,7 +86,6 @@ AUTHENTICATION_BACKENDS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -97,8 +96,26 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
-CSRF_TRUSTED_ORIGINS = [FRONTEND_URL]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://yt-labs.space",
+    "https://www.yt-labs.space",
+    "https://api.yt-labs.space",  # Sometimes self-requests or dev tools
+]
+if FRONTEND_URL:
+    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://yt-labs.space",
+    "https://api.yt-labs.space",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+if FRONTEND_URL:
+    CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL)
+
+ALLOWED_HOSTS = ["*"]
 
 
 ROOT_URLCONF = "PrimeBank.urls"
