@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Non Trouvée - 404</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outlet:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outlet', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 15rem;
+            margin: 0;
+            background: linear-gradient(135deg, #e94560 0%, #0f3460 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 10px 10px 0px rgba(0, 0, 0, 0.2);
+            line-height: 0.8;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 20px;
+            color: #e94560;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #a8a8b3;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #e94560;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: transform 0.3s ease, background 0.3s ease;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            background: #ff5e78;
+        }
+
+        /* Glitch effect based on pure CSS */
+        .glitch-wrapper {
+            position: relative;
+        }
+
+        .glitch-wrapper::before,
+        .glitch-wrapper::after {
+            content: "404";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a2e;
+        }
+
+        .glitch-wrapper::before {
+            left: 2px;
+            text-shadow: -1px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch-wrapper::after {
+            left: -2px;
+            text-shadow: -1px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip: rect(2px, 9999px, 86px, 0);
+            }
+
+            5% {
+                clip: rect(48px, 9999px, 49px, 0);
+            }
+
+            10% {
+                clip: rect(74px, 9999px, 83px, 0);
+            }
+
+            15% {
+                clip: rect(3px, 9999px, 5px, 0);
+            }
+
+            20% {
+                clip: rect(69px, 9999px, 16px, 0);
+            }
+
+            25% {
+                clip: rect(98px, 9999px, 7px, 0);
+            }
+
+            30% {
+                clip: rect(2px, 9999px, 52px, 0);
+            }
+
+            35% {
+                clip: rect(81px, 9999px, 57px, 0);
+            }
+
+            40% {
+                clip: rect(66px, 9999px, 2px, 0);
+            }
+
+            45% {
+                clip: rect(28px, 9999px, 20px, 0);
+            }
+
+            50% {
+                clip: rect(13px, 9999px, 95px, 0);
+            }
+
+            55% {
+                clip: rect(31px, 9999px, 87px, 0);
+            }
+
+            60% {
+                clip: rect(46px, 9999px, 44px, 0);
+            }
+
+            65% {
+                clip: rect(89px, 9999px, 11px, 0);
+            }
+
+            70% {
+                clip: rect(92px, 9999px, 57px, 0);
+            }
+
+            75% {
+                clip: rect(96px, 9999px, 48px, 0);
+            }
+
+            80% {
+                clip: rect(4px, 9999px, 81px, 0);
+            }
+
+            85% {
+                clip: rect(74px, 9999px, 35px, 0);
+            }
+
+            90% {
+                clip: rect(32px, 9999px, 66px, 0);
+            }
+
+            95% {
+                clip: rect(23px, 9999px, 14px, 0);
+            }
+
+            100% {
+                clip: rect(54px, 9999px, 82px, 0);
+            }
+        }
+
+        @keyframes glitch-anim2 {
+            0% {
+                clip: rect(20px, 9999px, 65px, 0);
+            }
+
+            5% {
+                clip: rect(87px, 9999px, 2px, 0);
+            }
+
+            10% {
+                clip: rect(77px, 9999px, 78px, 0);
+            }
+
+            15% {
+                clip: rect(55px, 9999px, 19px, 0);
+            }
+
+            20% {
+                clip: rect(95px, 9999px, 13px, 0);
+            }
+
+            25% {
+                clip: rect(59px, 9999px, 35px, 0);
+            }
+
+            30% {
+                clip: rect(52px, 9999px, 86px, 0);
+            }
+
+            35% {
+                clip: rect(12px, 9999px, 94px, 0);
+            }
+
+            40% {
+                clip: rect(59px, 9999px, 40px, 0);
+            }
+
+            45% {
+                clip: rect(80px, 9999px, 87px, 0);
+            }
+
+            50% {
+                clip: rect(20px, 9999px, 29px, 0);
+            }
+
+            55% {
+                clip: rect(39px, 9999px, 65px, 0);
+            }
+
+            60% {
+                clip: rect(97px, 9999px, 92px, 0);
+            }
+
+            65% {
+                clip: rect(8px, 9999px, 59px, 0);
+            }
+
+            70% {
+                clip: rect(22px, 9999px, 10px, 0);
+            }
+
+            75% {
+                clip: rect(44px, 9999px, 22px, 0);
+            }
+
+            80% {
+                clip: rect(6px, 9999px, 82px, 0);
+            }
+
+            85% {
+                clip: rect(72px, 9999px, 66px, 0);
+            }
+
+            90% {
+                clip: rect(13px, 9999px, 19px, 0);
+            }
+
+            95% {
+                clip: rect(58px, 9999px, 97px, 0);
+            }
+
+            100% {
+                clip: rect(11px, 9999px, 84px, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="glitch-wrapper">
+            <h1>404</h1>
+        </div>
+        <h2>Oops! Page Introuvable</h2>
+        <p>Il semble que vous vous soyez perdu dans l'espace...</p>
+        <a href="/" class="btn">Retour à la base</a>
+    </div>
+</body>
+
+</html>

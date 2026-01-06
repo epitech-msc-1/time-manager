@@ -1,0 +1,145 @@
+services:
+  traefik:
+    image: traefik:v3.6.4
+    environment:
+      HOSTINGER_API_TOKEN: ${HOSTINGER_API_TOKEN}
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/certs:/var/traefik/certs:rw
+
+  error-pages:
+    image: nginx:alpine
+    container_name: error-pages
+    volumes:
+      - ./error-pages:/usr/share/nginx/html
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.error-pages.rule=HostRegexp(`{catchall:.*}`)
+      - traefik.http.routers.error-pages.priority=1
+      - traefik.http.routers.error-pages.service=error-pages
+      - traefik.http.services.error-pages.loadbalancer.server.port=80
+      # Middleware check
+      - traefik.http.middlewares.custom-404.errors.status=404
+      - traefik.http.middlewares.custom-404.errors.service=error-pages
+      - traefik.http.middlewares.custom-404.errors.query=/404.html
+
+  db:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-yassin}/traefik-lab-backend:latest
+    container_name: backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
+      DJANGO_PORT: ${DJANGO_PORT:-8000}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      VITE_PORT: ${VITE_PORT:-5173}
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.backend.rule=Host(`api.yt-labs.space`)
+      - traefik.http.routers.backend.entrypoints=websecure
+      - traefik.http.routers.backend.tls=true
+      - traefik.http.routers.backend.tls.certresolver=hostinger
+      - traefik.http.routers.backend.middlewares=security-headers,rate-limit,compression
+      - traefik.http.services.backend.loadbalancer.server.port=${DJANGO_PORT:-8000}
+
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-yassin}/traefik-lab-frontend:latest
+    container_name: frontend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      VITE_API_URL: https://api.yt-labs.space/graphql
+      VITE_PORT: ${VITE_PORT:-5173}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.frontend.rule=Host(`yt-labs.space`)
+      - traefik.http.routers.frontend.entrypoints=websecure
+      - traefik.http.routers.frontend.tls=true
+      - traefik.http.routers.frontend.tls.certresolver=hostinger
+      - traefik.http.routers.frontend.middlewares=security-headers,compression
+      - traefik.http.services.frontend.loadbalancer.server.port=${VITE_PORT:-5173}
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - 9000:9000
+    restart: unless-stopped
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'curl -sf http://localhost:9000/api/system/status | grep -q ''"status":"UP"'''
+      interval: 10s
+      timeout: 10s
+      start_period: 60s
+      retries: 10
+    labels:
+      # Middlewares
+      - traefik.http.middlewares.redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.redirect.redirectscheme.permanent=true
+      # Security Headers
+      - traefik.http.middlewares.security-headers.headers.sslredirect=true
+      - traefik.http.middlewares.security-headers.headers.stsseconds=315360000
+      - traefik.http.middlewares.security-headers.headers.browserxssfilter=true
+      - traefik.http.middlewares.security-headers.headers.contenttypeNosniff=true
+      - traefik.http.middlewares.security-headers.headers.forceSTSHeader=true
+      - traefik.http.middlewares.security-headers.headers.framedeny=true
+      # Rate Limit
+      - traefik.http.middlewares.rate-limit.ratelimit.average=100
+      - traefik.http.middlewares.rate-limit.ratelimit.burst=50
+      # Compression
+      - traefik.http.middlewares.compression.compress=true
+      # Retry
+      - traefik.http.middlewares.retry.retry.attempts=3
+      # HTTP
+      - traefik.enable=true
+      - traefik.http.routers.sonarqube.rule=Host(`sonarqube.yt-labs.space`)
+      - traefik.http.routers.sonarqube.entrypoints=web
+      - traefik.http.routers.sonarqube.middlewares=redirect,custom-404
+      # HTTPS
+      - traefik.http.routers.sonarqube-secure.rule=Host(`sonarqube.yt-labs.space`)
+      - traefik.http.routers.sonarqube-secure.entrypoints=websecure
+      - traefik.http.routers.sonarqube-secure.tls=true
+      - traefik.http.routers.sonarqube-secure.tls.certresolver=hostinger
+      - traefik.http.routers.sonarqube-secure.middlewares=custom-404,security-headers,rate-limit,compression,retry
+
+networks:
+  default:
+    name: traefik-net
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  db_data:
