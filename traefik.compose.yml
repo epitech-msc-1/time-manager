@@ -46,7 +46,7 @@ services:
       retries: 10
 
   backend:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-yassin}/traefik-lab-backend:latest
+    image: ghcr.io/epitech-msc-1/time-manager-backend:latest
     container_name: backend
     restart: unless-stopped
     env_file: .env
@@ -70,7 +70,7 @@ services:
       - traefik.http.services.backend.loadbalancer.server.port=${DJANGO_PORT:-8000}
 
   frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-yassin}/traefik-lab-frontend:latest
+    image: ghcr.io/epitech-msc-1/time-manager-frontend:latest
     container_name: frontend
     restart: unless-stopped
     env_file: .env

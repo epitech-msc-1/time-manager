@@ -82,10 +82,10 @@ jobs:
             - name: Copy files to server
               run: |
                   # Create directory
-                  ssh ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }} "mkdir -p ~/code/traefik-lab"
+                  ssh ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }} "mkdir -p ~/code/time-manager"
 
                   # Copy files
-                  scp -r traefik.compose.yml traefik traefik/error-pages ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/traefik-lab/
+                  scp -r traefik.compose.yml traefik ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/time-manager/
 
             - name: Deploy to Server
               env:
@@ -94,7 +94,7 @@ jobs:
 
               run: |
                   ssh $HOST_USER@$HOST_IP << 'EOF'
-                    cd ~/code/traefik-lab
+                    cd ~/code/time-manager
 
                     # Pull latest images
                     docker compose -f traefik.compose.yml pull backend frontend
