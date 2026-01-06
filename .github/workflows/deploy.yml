@@ -71,6 +71,26 @@ jobs:
                     echo "Error: HOST_USER is missing"
                     exit 1
                   fi
+                  if [ -z "${{ secrets.HOSTINGER_API_TOKEN }}" ]; then
+                    echo "Error: HOSTINGER_API_TOKEN is missing"
+                    exit 1
+                  fi
+                  if [ -z "${{ secrets.POSTGRES_DB }}" ]; then
+                    echo "Error: POSTGRES_DB is missing"
+                    exit 1
+                  fi
+                  if [ -z "${{ secrets.POSTGRES_USER }}" ]; then
+                    echo "Error: POSTGRES_USER is missing"
+                    exit 1
+                  fi
+                  if [ -z "${{ secrets.POSTGRES_PASSWORD }}" ]; then
+                    echo "Error: POSTGRES_PASSWORD is missing"
+                    exit 1
+                  fi
+                  if [ -z "${{ secrets.DJANGO_SECRET_KEY }}" ]; then
+                    echo "Error: DJANGO_SECRET_KEY is missing"
+                    exit 1
+                  fi
 
             - name: Setup SSH
               run: |
@@ -79,13 +99,21 @@ jobs:
                   chmod 600 ~/.ssh/id_rsa
                   ssh-keyscan -H ${{ secrets.HOST_IP }} >> ~/.ssh/known_hosts
 
+            - name: Create .env file
+              run: |
+                  echo "HOSTINGER_API_TOKEN=${{ secrets.HOSTINGER_API_TOKEN }}" >> .env
+                  echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+                  echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+                  echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+                  echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
+
             - name: Copy files to server
               run: |
                   # Create directory
                   ssh ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }} "mkdir -p ~/code/time-manager"
 
                   # Copy files
-                  scp -r traefik.compose.yml traefik ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/time-manager/
+                  scp -r traefik.compose.yml traefik .env ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/time-manager/
 
             - name: Deploy to Server
               env:
