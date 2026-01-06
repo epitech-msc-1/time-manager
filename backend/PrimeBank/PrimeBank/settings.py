@@ -29,16 +29,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
-FRONTEND_URL = "http://localhost:" + os.getenv("VITE_PORT", "5173")
-
-# CORS Configuration
-CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
-
-CORS_ALLOW_CREDENTIALS = True
+FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://localhost:" + os.getenv("VITE_PORT", "5173")
 
 # Application definition
 
@@ -66,8 +61,8 @@ GRAPHENE = {
 }
 
 GRAPHQL_JWT = {
-    "JWT_COOKIE": True,  # Active l'utilisation des cookies
-    "JWT_COOKIE_SECURE": False,  # ! False en développement, True en production
+    "JWT_COOKIE": True,
+    "JWT_COOKIE_SECURE": True,
     "JWT_VERIFY_EXPIRATION": True,
     # Acces token
     "JWT_EXPIRATION_DELTA": timedelta(minutes=15),
@@ -100,10 +95,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
-
 CORS_ALLOW_CREDENTIALS = True
-
+CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
 CSRF_TRUSTED_ORIGINS = [FRONTEND_URL]
 
 
