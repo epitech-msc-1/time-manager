@@ -31,9 +31,10 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
 
 FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://localhost:" + os.getenv("VITE_PORT", "5173")
+
+ALLOWED_HOSTS = [FRONTEND_URL]
 
 # Application definition
 
