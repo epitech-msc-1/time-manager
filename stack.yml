@@ -163,6 +163,7 @@ services:
         - traefik.http.routers.sonarqube-secure.tls=true
         - traefik.http.routers.sonarqube-secure.tls.certresolver=hostinger
         - traefik.http.routers.sonarqube-secure.middlewares=custom-404,security-headers,rate-limit,compression,retry
+        - traefik.http.services.sonarqube.loadbalancer.server.port=9000
 
 networks:
   default:
