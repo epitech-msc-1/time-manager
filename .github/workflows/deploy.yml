@@ -126,6 +126,9 @@ jobs:
                   ssh $HOST_USER@$HOST_IP << 'EOF'
                     cd ~/code/time-manager
 
+                    # Load environment variables
+                    export $(grep -v '^#' .env | xargs)
+
                     # Deploy stack (update services with new images)
                     docker stack deploy -c stack.yml time-manager --prune --resolve-image always
 

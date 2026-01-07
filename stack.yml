@@ -9,7 +9,7 @@ services:
       - 8080:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/traefik.swarm.yml:/etc/traefik/traefik.yml:ro
       - traefik-certs:/var/traefik/certs:rw
     deploy:
       mode: global
