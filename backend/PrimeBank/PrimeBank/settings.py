@@ -99,16 +99,15 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://yt-labs.space",
-    "https://www.yt-labs.space",
-    "https://api.yt-labs.space",  # Sometimes self-requests or dev tools
+    "https://ytlabs.space",
+    "https://api.ytlabs.space",  # Sometimes self-requests or dev tools
 ]
 if FRONTEND_URL:
     CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://yt-labs.space",
-    "https://api.yt-labs.space",
+    "https://ytlabs.space",
+    "https://api.ytlabs.space",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]

@@ -18,7 +18,7 @@ services:
       labels:
         - traefik.enable=true
         - traefik.docker.network=time-manager-net
-        - traefik.http.routers.api.rule=Host(`traefik.yt-labs.space`)
+        - traefik.http.routers.api.rule=Host(`traefik.ytlabs.space`)
         - traefik.http.routers.api.service=api@internal
         - traefik.http.routers.api.entrypoints=websecure
         - traefik.http.routers.api.tls=true
@@ -111,7 +111,7 @@ services:
         failure_action: rollback
       labels:
         - traefik.enable=true
-        - traefik.http.routers.backend.rule=Host(`api.yt-labs.space`)
+        - traefik.http.routers.backend.rule=Host(`api.ytlabs.space`)
         - traefik.http.routers.backend.entrypoints=websecure
         - traefik.http.routers.backend.tls=true
         - traefik.http.routers.backend.tls.certresolver=hostinger
@@ -122,7 +122,7 @@ services:
     image: ghcr.io/epitech-msc-1/time-manager-frontend:latest
     env_file: .env
     environment:
-      VITE_API_URL: https://api.yt-labs.space/graphql
+      VITE_API_URL: https://api.ytlabs.space/graphql
       VITE_PORT: ${VITE_PORT:-5173}
     deploy:
       replicas: 2
@@ -132,7 +132,7 @@ services:
         failure_action: rollback
       labels:
         - traefik.enable=true
-        - traefik.http.routers.frontend.rule=Host(`yt-labs.space`)
+        - traefik.http.routers.frontend.rule=Host(`ytlabs.space`)
         - traefik.http.routers.frontend.entrypoints=websecure
         - traefik.http.routers.frontend.tls=true
         - traefik.http.routers.frontend.tls.certresolver=hostinger
@@ -159,12 +159,12 @@ services:
       replicas: 1
       labels:
         # HTTP
-        - traefik.enable=true
-        - traefik.http.routers.sonarqube.rule=Host(`sonarqube.yt-labs.space`)
-        - traefik.http.routers.sonarqube.entrypoints=web
-        - traefik.http.routers.sonarqube.middlewares=redirect,custom-404
+        # - traefik.enable=true
+        # - traefik.http.routers.sonarqube.rule=Host(`sonarqube.ytlabs.space`)
+        # - traefik.http.routers.sonarqube.entrypoints=web
+        # - traefik.http.routers.sonarqube.middlewares=redirect,custom-404
         # HTTPS
-        - traefik.http.routers.sonarqube-secure.rule=Host(`sonarqube.yt-labs.space`)
+        - traefik.http.routers.sonarqube-secure.rule=Host(`sonarqube.ytlabs.space`)
         - traefik.http.routers.sonarqube-secure.entrypoints=websecure
         - traefik.http.routers.sonarqube-secure.tls=true
         - traefik.http.routers.sonarqube-secure.tls.certresolver=hostinger
