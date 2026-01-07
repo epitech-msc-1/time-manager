@@ -74,6 +74,7 @@ GRAPHQL_JWT = {
     # Cookie settings
     "JWT_COOKIE_SAMESITE": "Lax",  # Protection contre les attaques CSRF
     "JWT_COOKIE_NAME": "JWT",  # Nom du cookie pour le token
+    "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-refresh-token",  # Cookie pour le refresh token
     "JWT_COOKIE_HTTPONLY": True,  # Cookie accessible uniquement via HTTP(S)
     # Custom payload handler to include extra user info in tokens
     "JWT_PAYLOAD_HANDLER": "PrimeBankApp.schema_auth.jwt_payload",
