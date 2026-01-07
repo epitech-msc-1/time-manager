@@ -50,6 +50,9 @@ services:
       - ./traefik/error-pages:/usr/share/nginx/html
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       labels:
         - traefik.enable=true
         - traefik.docker.network=time-manager-net
@@ -78,6 +81,9 @@ services:
       retries: 10
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
 
@@ -141,11 +147,10 @@ services:
         - traefik.http.routers.frontend.tls.certresolver=hostinger
         - traefik.http.routers.frontend.middlewares=security-headers,compression,custom-404
         - traefik.http.services.frontend.loadbalancer.server.port=${VITE_PORT:-5173}
-
   sonarqube:
     image: sonarqube:community
-    ports:
-      - 9000:9000
+    # ports:
+    #   - 9000:9000
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
@@ -160,6 +165,9 @@ services:
       retries: 10
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       labels:
         # HTTP
         # - traefik.enable=true
@@ -167,6 +175,7 @@ services:
         # - traefik.http.routers.sonarqube.entrypoints=web
         # - traefik.http.routers.sonarqube.middlewares=redirect,custom-404
         # HTTPS
+        - traefik.enable=true
         - traefik.http.routers.sonarqube-secure.rule=Host(`sonarqube.ytlabs.space`)
         - traefik.http.routers.sonarqube-secure.entrypoints=websecure
         - traefik.http.routers.sonarqube-secure.tls=true

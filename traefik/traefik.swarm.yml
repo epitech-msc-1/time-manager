@@ -21,8 +21,8 @@ certificatesResolvers:
     acme:
       email: "yassin9230@gmail.com"
       storage: "/var/traefik/certs/hostinger-acme.json"
-      # caServer: "https://acme-v02.api.letsencrypt.org/directory" # Prod
-      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory" # Dev
+      caServer: "https://acme-v02.api.letsencrypt.org/directory" # Prod
+      # caServer: "https://acme-staging-v02.api.letsencrypt.org/directory" # Dev
       dnsChallenge:
         provider: hostinger
         delayBeforeCheck: "120"
