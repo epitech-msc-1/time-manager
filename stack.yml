@@ -11,12 +11,13 @@ services:
       - ./traefik/traefik.swarm.yml:/etc/traefik/traefik.yml:ro
       - traefik-certs:/var/traefik/certs:rw
     deploy:
-      mode: global
+      replicas: 1
       placement:
         constraints:
           - node.role == manager
       labels:
         - traefik.enable=true
+        - traefik.docker.network=time-manager-net
         - traefik.http.routers.api.rule=Host(`traefik.yt-labs.space`)
         - traefik.http.routers.api.service=api@internal
         - traefik.http.routers.api.entrypoints=websecure
