@@ -74,6 +74,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl --fail --silent --show-error -H 'Accept: application/json' http://localhost:${DJANGO_PORT}/ht/"
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
+      retries: 10
     deploy:
       replicas: 1
       update_config:
