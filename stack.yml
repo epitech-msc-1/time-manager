@@ -30,19 +30,19 @@ services:
         - traefik.http.middlewares.redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.redirect.redirectscheme.permanent=true
         # Security Headers
-        - traefik.http.middlewares.security-headers.headers.sslredirect=true
-        - traefik.http.middlewares.security-headers.headers.stsseconds=315360000
-        - traefik.http.middlewares.security-headers.headers.browserxssfilter=true
-        - traefik.http.middlewares.security-headers.headers.contenttypeNosniff=true
-        - traefik.http.middlewares.security-headers.headers.forceSTSHeader=true
-        - traefik.http.middlewares.security-headers.headers.framedeny=true
+        # - traefik.http.middlewares.security-headers.headers.sslredirect=true
+        # - traefik.http.middlewares.security-headers.headers.stsseconds=315360000
+        # - traefik.http.middlewares.security-headers.headers.browserxssfilter=true
+        # - traefik.http.middlewares.security-headers.headers.contenttypeNosniff=true
+        # - traefik.http.middlewares.security-headers.headers.forceSTSHeader=true
+        # - traefik.http.middlewares.security-headers.headers.framedeny=true
         # Rate Limit
         - traefik.http.middlewares.rate-limit.ratelimit.average=100
         - traefik.http.middlewares.rate-limit.ratelimit.burst=50
         # Compression
-        - traefik.http.middlewares.compression.compress=true
+        # - traefik.http.middlewares.compression.compress=true
         # Retry
-        - traefik.http.middlewares.retry.retry.attempts=3
+        # - traefik.http.middlewares.retry.retry.attempts=3
 
   error-pages:
     image: nginx:alpine
@@ -129,7 +129,7 @@ services:
         - traefik.http.routers.backend.entrypoints=websecure
         - traefik.http.routers.backend.tls=true
         - traefik.http.routers.backend.tls.certresolver=hostinger
-        - traefik.http.routers.backend.middlewares=security-headers,rate-limit,compression,custom-404
+        - traefik.http.routers.backend.middlewares=custom-404,rate-limit
         - traefik.http.services.backend.loadbalancer.server.port=${DJANGO_PORT:-8000}
 
   frontend:
@@ -152,7 +152,7 @@ services:
         - traefik.http.routers.frontend.entrypoints=websecure
         - traefik.http.routers.frontend.tls=true
         - traefik.http.routers.frontend.tls.certresolver=hostinger
-        - traefik.http.routers.frontend.middlewares=security-headers,compression,custom-404
+        - traefik.http.routers.frontend.middlewares=custom-404,rate-limit
         - traefik.http.services.frontend.loadbalancer.server.port=${VITE_PORT:-5173}
   sonarqube:
     image: sonarqube:community
@@ -187,7 +187,7 @@ services:
         - traefik.http.routers.sonarqube-secure.entrypoints=websecure
         - traefik.http.routers.sonarqube-secure.tls=true
         - traefik.http.routers.sonarqube-secure.tls.certresolver=hostinger
-        - traefik.http.routers.sonarqube-secure.middlewares=custom-404,security-headers,rate-limit,compression,retry
+        - traefik.http.routers.sonarqube-secure.middlewares=custom-404,rate-limit
         - traefik.docker.network=time-manager-net
         - traefik.http.services.sonarqube.loadbalancer.server.port=9000
 
