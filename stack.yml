@@ -52,6 +52,7 @@ services:
       replicas: 1
       labels:
         - traefik.enable=true
+        - traefik.docker.network=time-manager-net
         - traefik.http.routers.error-pages.rule=HostRegexp(`{catchall:.*}`)
         - traefik.http.routers.error-pages.priority=1
         - traefik.http.routers.error-pages.service=error-pages
@@ -111,6 +112,7 @@ services:
         failure_action: rollback
       labels:
         - traefik.enable=true
+        - traefik.docker.network=time-manager-net
         - traefik.http.routers.backend.rule=Host(`api.ytlabs.space`)
         - traefik.http.routers.backend.entrypoints=websecure
         - traefik.http.routers.backend.tls=true
@@ -131,6 +133,7 @@ services:
         order: start-first
         failure_action: rollback
       labels:
+        - traefik.docker.network=time-manager-net
         - traefik.enable=true
         - traefik.http.routers.frontend.rule=Host(`ytlabs.space`)
         - traefik.http.routers.frontend.entrypoints=websecure
@@ -169,6 +172,7 @@ services:
         - traefik.http.routers.sonarqube-secure.tls=true
         - traefik.http.routers.sonarqube-secure.tls.certresolver=hostinger
         - traefik.http.routers.sonarqube-secure.middlewares=custom-404,security-headers,rate-limit,compression,retry
+        - traefik.docker.network=time-manager-net
         - traefik.http.services.sonarqube.loadbalancer.server.port=9000
 
 networks:
