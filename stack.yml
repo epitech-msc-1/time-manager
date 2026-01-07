@@ -167,7 +167,7 @@ services:
 
 networks:
   default:
-    name: traefik-net
+    name: time-manager-net
     driver: overlay
     attachable: true
 
