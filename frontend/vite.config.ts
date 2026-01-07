@@ -8,6 +8,7 @@ export default defineConfig(() => {
     return {
         server: {
             allowedHosts: ["localhost", "127.0.0.1", "::1", "ytlabs.space"],
+            hmr: false,
         },
         plugins: [react(), tailwindcss()],
         resolve: {

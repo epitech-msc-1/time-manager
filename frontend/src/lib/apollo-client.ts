@@ -1,7 +1,7 @@
 import { ApolloClient, ApolloLink, gql, HttpLink, InMemoryCache } from "@apollo/client";
-import { ErrorLink } from "@apollo/client/link/error";
+import { onError } from "@apollo/client/link/error";
 import { Observable } from "@apollo/client/utilities";
-import { print } from "graphql";
+import { print, GraphQLError } from "graphql";
 
 // Default GraphQL endpoint; override with Vite env var `VITE_API_URL` if provided.
 const DEFAULT_API_URL = "http://localhost:8000/graphql";
@@ -50,9 +50,9 @@ const refreshAccessToken = async (): Promise<boolean> => {
     }
 };
 
-const errorLink = new ErrorLink(({ graphQLErrors, _networkError, operation, forward }) => {
+const errorLink = onError(({ graphQLErrors, operation, forward }: { graphQLErrors?: ReadonlyArray<GraphQLError>; operation: any; forward: any }) => {
     const hasExpiredToken = !!graphQLErrors?.some(
-        (graphError) => graphError.message === "Signature has expired",
+        (graphError: GraphQLError) => graphError.message === "Signature has expired",
     );
 
     if (hasExpiredToken) {
@@ -84,7 +84,7 @@ const errorLink = new ErrorLink(({ graphQLErrors, _networkError, operation, forw
         });
     }
 
-    console.error(`[GraphQL error]: ${graphQLErrors?.map((e) => e.message).join(", ")}`);
+    console.error(`[GraphQL error]: ${graphQLErrors?.map((e: GraphQLError) => e.message).join(", ")}`);
     return;
 });
 
