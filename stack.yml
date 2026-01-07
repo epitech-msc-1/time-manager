@@ -134,7 +134,7 @@ services:
       VITE_API_URL: https://api.ytlabs.space/graphql
       VITE_PORT: ${VITE_PORT:-5173}
     deploy:
-      replicas: 2
+      replicas: 1
       update_config:
         parallelism: 1
         order: start-first
