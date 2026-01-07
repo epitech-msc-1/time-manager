@@ -143,7 +143,11 @@ jobs:
             docker service update --image ghcr.io/epitech-msc-1/time-manager-frontend:${TAG} --force time-manager_frontend
 
             # Clean up old images
-            docker image prune -f
+            # Set swarm task history limit to 2 (active + 1 previous) to reduce stopped container clutter
+            docker swarm update --task-history-limit 2
+
+            # Clean up stopped containers, unused networks, and ALL unused images (not just dangling)
+            docker system prune -a -f
 
             # Log out for security
             docker logout ghcr.io
