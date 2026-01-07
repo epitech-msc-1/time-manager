@@ -113,7 +113,7 @@ jobs:
                   ssh ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }} "mkdir -p ~/code/time-manager"
 
                   # Copy files
-                  scp -r traefik.compose.yml traefik .env ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/time-manager/
+                  scp -r stack.yml traefik .env ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/time-manager/
 
                   
 
@@ -123,14 +123,11 @@ jobs:
                   HOST_IP: ${{ secrets.HOST_IP }}
 
               run: |
-                  ssh $HOST_USER@$HOST_IP << 'EOF'
+                    ssh $HOST_USER@$HOST_IP << 'EOF'
                     cd ~/code/time-manager
 
-                    # Pull latest images
-                    docker compose -f traefik.compose.yml pull backend frontend
-
-                    # Recreate containers
-                    docker compose -f traefik.compose.yml up -d --no-deps backend frontend
+                    # Deploy stack (update services with new images)
+                    docker stack deploy -c stack.yml time-manager --prune --resolve-image always
 
                     # Clean up old images
                     docker image prune -f

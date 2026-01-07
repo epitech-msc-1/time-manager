@@ -1,6 +1,7 @@
 services:
   traefik:
     image: traefik:v3.6.4
+    container_name: traefik
     environment:
       HOSTINGER_API_TOKEN: ${HOSTINGER_API_TOKEN}
     ports:
