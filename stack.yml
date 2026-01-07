@@ -88,7 +88,7 @@ services:
         condition: on-failure
 
   backend:
-    image: ghcr.io/epitech-msc-1/time-manager-backend:latest
+    image: ghcr.io/epitech-msc-1/time-manager-backend:${TAG:-latest}
     env_file: .env
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -127,7 +127,7 @@ services:
         - traefik.http.services.backend.loadbalancer.server.port=${DJANGO_PORT:-8000}
 
   frontend:
-    image: ghcr.io/epitech-msc-1/time-manager-frontend:latest
+    image: ghcr.io/epitech-msc-1/time-manager-frontend:${TAG:-latest}
     env_file: .env
     environment:
       VITE_API_URL: https://api.ytlabs.space/graphql
