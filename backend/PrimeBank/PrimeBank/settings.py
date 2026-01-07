@@ -72,9 +72,10 @@ GRAPHQL_JWT = {
     # Refresh token
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     # Cookie settings
-    "JWT_COOKIE_SAMESITE": "Lax",  # Protection contre les attaques CSRF
+    "JWT_COOKIE_SAMESITE": "None",  # None pour permettre les requetes cross-site/subdomain fiables
     "JWT_COOKIE_NAME": "JWT",  # Nom du cookie pour le token
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-refresh-token",  # Cookie pour le refresh token
+    "JWT_REFRESH_TOKEN_COOKIE_SAMESITE": "None",
     "JWT_COOKIE_HTTPONLY": True,  # Cookie accessible uniquement via HTTP(S)
     # Custom payload handler to include extra user info in tokens
     "JWT_PAYLOAD_HANDLER": "PrimeBankApp.schema_auth.jwt_payload",
