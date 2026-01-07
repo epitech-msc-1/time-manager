@@ -12,7 +12,7 @@ USER appuser
 
 WORKDIR /app
 
-COPY . .
+COPY --chown=appuser:appuser . .
 
 RUN uv sync
 
