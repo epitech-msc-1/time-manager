@@ -188,10 +188,7 @@ class TimeClockQuery(graphene.ObjectType):
     def resolve_time_clock(self, info, user_id=None):
         if user_id:
             day = timezone.localdate()
-            tc = TimeClock.objects.filter(user_id=user_id, day=day).first()
-            if not tc:
-                raise GraphQLError(f"No entry user_id={user_id} for the {day}.")
-            return tc
+            return TimeClock.objects.filter(user_id=user_id, day=day).first()
 
     def resolve_user_team_presence(self, info, period=None):
         request_user = info.context.user
