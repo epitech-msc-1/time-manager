@@ -22,6 +22,3 @@ Dockerfile
 .gitignore
 LICENSE
 README.md
-
-# Certs
-traefik/certs/hostinger-acme.json
