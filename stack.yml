@@ -6,7 +6,6 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/traefik.swarm.yml:/etc/traefik/traefik.yml:ro
@@ -23,7 +22,24 @@ services:
         - traefik.http.routers.api.entrypoints=websecure
         - traefik.http.routers.api.tls=true
         - traefik.http.routers.api.tls.certresolver=hostinger
-        - traefik.http.services.api.loadbalancer.server.port=8080
+        # Global Middlewares Definitions
+        # Redirect to HTTPS
+        - traefik.http.middlewares.redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.redirect.redirectscheme.permanent=true
+        # Security Headers
+        - traefik.http.middlewares.security-headers.headers.sslredirect=true
+        - traefik.http.middlewares.security-headers.headers.stsseconds=315360000
+        - traefik.http.middlewares.security-headers.headers.browserxssfilter=true
+        - traefik.http.middlewares.security-headers.headers.contenttypeNosniff=true
+        - traefik.http.middlewares.security-headers.headers.forceSTSHeader=true
+        - traefik.http.middlewares.security-headers.headers.framedeny=true
+        # Rate Limit
+        - traefik.http.middlewares.rate-limit.ratelimit.average=100
+        - traefik.http.middlewares.rate-limit.ratelimit.burst=50
+        # Compression
+        - traefik.http.middlewares.compression.compress=true
+        # Retry
+        - traefik.http.middlewares.retry.retry.attempts=3
 
   error-pages:
     image: nginx:alpine
@@ -71,18 +87,18 @@ services:
       DJANGO_PORT: ${DJANGO_PORT:-8000}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       VITE_PORT: ${VITE_PORT:-5173}
-    depends_on:
-      - db
     healthcheck:
       test:
         - CMD-SHELL
         - "curl --fail --silent --show-error -H 'Accept: application/json' http://localhost:${DJANGO_PORT}/ht/"
       interval: 5s
       timeout: 5s
-      start_period: 10s
+      start_period: 60s
       retries: 10
     deploy:
-      replicas: 1
+      replicas: 2
+      restart_policy:
+        condition: on-failure
       update_config:
         parallelism: 1
         order: start-first
@@ -103,7 +119,7 @@ services:
       VITE_API_URL: https://api.yt-labs.space/graphql
       VITE_PORT: ${VITE_PORT:-5173}
     deploy:
-      replicas: 1
+      replicas: 2
       update_config:
         parallelism: 1
         order: start-first
@@ -136,23 +152,6 @@ services:
     deploy:
       replicas: 1
       labels:
-        # Middlewares
-        - traefik.http.middlewares.redirect.redirectscheme.scheme=https
-        - traefik.http.middlewares.redirect.redirectscheme.permanent=true
-        # Security Headers
-        - traefik.http.middlewares.security-headers.headers.sslredirect=true
-        - traefik.http.middlewares.security-headers.headers.stsseconds=315360000
-        - traefik.http.middlewares.security-headers.headers.browserxssfilter=true
-        - traefik.http.middlewares.security-headers.headers.contenttypeNosniff=true
-        - traefik.http.middlewares.security-headers.headers.forceSTSHeader=true
-        - traefik.http.middlewares.security-headers.headers.framedeny=true
-        # Rate Limit
-        - traefik.http.middlewares.rate-limit.ratelimit.average=100
-        - traefik.http.middlewares.rate-limit.ratelimit.burst=50
-        # Compression
-        - traefik.http.middlewares.compression.compress=true
-        # Retry
-        - traefik.http.middlewares.retry.retry.attempts=3
         # HTTP
         - traefik.enable=true
         - traefik.http.routers.sonarqube.rule=Host(`sonarqube.yt-labs.space`)

@@ -115,8 +115,6 @@ jobs:
                   # Copy files
                   scp -r stack.yml traefik .env ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/time-manager/
 
-                  
-
             - name: Deploy to Server
               env:
                   HOST_USER: ${{ secrets.HOST_USER }}
@@ -130,7 +128,7 @@ jobs:
                     export $(cat .env)
 
                     # Deploy stack (update services with new images)
-                    docker stack deploy -c stack.yml time-manager --prune --resolve-image always
+                    docker stack deploy --compose-file traefik.compose.yml time-manager --prune --resolve-image always
 
                     # Clean up old images
                     docker image prune -f
