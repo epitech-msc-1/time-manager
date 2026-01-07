@@ -19,8 +19,9 @@ node_modules/
 Dockerfile
 
 # Repo
-assets/
-docs/
 .gitignore
 LICENSE
 README.md
+
+# Certs
+traefik/certs/hostinger-acme.json
