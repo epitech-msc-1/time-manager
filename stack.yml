@@ -67,7 +67,6 @@ services:
 
   db:
     image: postgres:16-alpine
-    env_file: .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -89,7 +88,6 @@ services:
 
   backend:
     image: ghcr.io/epitech-msc-1/time-manager-backend:${TAG:-latest}
-    env_file: .env
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-PrimeBank.settings}
@@ -134,7 +132,6 @@ services:
 
   frontend:
     image: ghcr.io/epitech-msc-1/time-manager-frontend:${TAG:-latest}
-    env_file: .env
     environment:
       VITE_API_URL: https://api.ytlabs.space/graphql
       VITE_PORT: ${VITE_PORT:-5173}
