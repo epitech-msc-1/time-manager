@@ -142,9 +142,7 @@ jobs:
             # Deploy stack (update services with new images)
             docker stack deploy -c stack.yml time-manager --prune --resolve-image always --with-registry-auth
 
-            # Force update backend and frontend services to pull new images
-            docker service update --image ghcr.io/epitech-msc-1/time-manager-backend:${TAG} --force time-manager_backend
-            docker service update --image ghcr.io/epitech-msc-1/time-manager-frontend:${TAG} --force time-manager_frontend
+            # Old explicit updates removed to allow zero-downtime rolling updates
 
             # Clean up old images
             # Set swarm task history limit to 2 (active + 1 previous) to reduce stopped container clutter
