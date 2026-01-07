@@ -112,7 +112,7 @@ services:
       start_period: 60s
       retries: 10
     deploy:
-      replicas: 1
+      replicas: 2
       restart_policy:
         condition: on-failure
       update_config:
@@ -136,7 +136,7 @@ services:
       VITE_API_URL: https://api.ytlabs.space/graphql
       VITE_PORT: ${VITE_PORT:-5173}
     deploy:
-      replicas: 1
+      replicas: 2
       update_config:
         parallelism: 1
         order: start-first
