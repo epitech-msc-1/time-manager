@@ -132,6 +132,9 @@ services:
     environment:
       VITE_API_URL: https://api.ytlabs.space/graphql
       VITE_PORT: ${VITE_PORT:-5173}
+      VITE_HMR_HOST: ytlabs.space
+      VITE_HMR_PROTOCOL: wss
+      VITE_HMR_PORT: 443
     deploy:
       replicas: 2
       update_config:
