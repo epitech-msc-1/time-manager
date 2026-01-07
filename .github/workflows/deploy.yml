@@ -128,7 +128,7 @@ jobs:
                     export $(cat .env)
 
                     # Deploy stack (update services with new images)
-                    docker stack deploy --compose-file traefik.compose.yml time-manager --prune --resolve-image always
+                    docker stack deploy -c stack.yml time-manager --prune --resolve-image always
 
                     # Clean up old images
                     docker image prune -f
