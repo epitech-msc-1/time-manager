@@ -15,10 +15,6 @@ wheels/
 # Node
 node_modules/
 
-.env.example
-Dockerfile
-
 # Repo
-.gitignore
 LICENSE
 README.md

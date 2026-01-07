@@ -132,9 +132,8 @@ services:
 
   frontend:
     image: ghcr.io/epitech-msc-1/time-manager-frontend:${TAG:-latest}
-    environment:
-      VITE_API_URL: https://api.ytlabs.space/graphql
-      VITE_PORT: ${VITE_PORT:-5173}
+      # Env vars are baked in at build time
+      # VITE_API_URL: https://api.ytlabs.space/graphql
     deploy:
       replicas: 2
       update_config:
@@ -150,7 +149,7 @@ services:
         - traefik.http.routers.frontend.tls=true
         - traefik.http.routers.frontend.tls.certresolver=hostinger
         - traefik.http.routers.frontend.middlewares=custom-404,rate-limit
-        - traefik.http.services.frontend.loadbalancer.server.port=${VITE_PORT:-5173}
+        - traefik.http.services.frontend.loadbalancer.server.port=80
   sonarqube:
     image: sonarqube:community
     # ports:
