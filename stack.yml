@@ -116,6 +116,7 @@ services:
         parallelism: 1
         order: start-first
         failure_action: rollback
+        delay: 10s
       labels:
         - traefik.enable=true
         - traefik.docker.network=time-manager-net
@@ -138,6 +139,7 @@ services:
         parallelism: 1
         order: start-first
         failure_action: rollback
+        delay: 10s
       labels:
         - traefik.docker.network=time-manager-net
         - traefik.enable=true
