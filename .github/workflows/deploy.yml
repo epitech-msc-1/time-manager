@@ -1,135 +1,141 @@
 name: Build and Deploy
 
 on:
-    push:
-        branches: ["prod"]
-    workflow_dispatch:
+  push:
+    branches: ["prod"]
+  workflow_dispatch:
 
 env:
-    REGISTRY: ghcr.io
-    IMAGE_NAME: ${{ github.repository }}
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-    build-and-push:
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read
-            packages: write
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
-        strategy:
-            matrix:
-                service: [backend, frontend]
+    strategy:
+      matrix:
+        service: [backend, frontend]
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Log in to the Container registry
-              uses: docker/login-action@v3
-              with:
-                  registry: ${{ env.REGISTRY }}
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Extract metadata (tags, labels) for Docker
-              id: meta
-              uses: docker/metadata-action@v5
-              with:
-                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}
-                  tags: |
-                      type=raw,value=latest
-                      type=sha,prefix={{date 'YYYYMMDD'}}-
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix={{date 'YYYYMMDD'}}-
 
-            - name: Build and push Docker image
-              uses: docker/build-push-action@v5
-              with:
-                  context: ./${{ matrix.service }}
-                  push: true
-                  tags: ${{ steps.meta.outputs.tags }}
-                  labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-    deploy:
-        needs: build-and-push
-        runs-on: ubuntu-latest
-        if: success()
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: success()
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Validate Secrets
-              run: |
-                  if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
-                    echo "Error: SSH_PRIVATE_KEY is missing"
-                    exit 1
-                  fi
-                  if [ -z "${{ secrets.HOST_IP }}" ]; then
-                    echo "Error: HOST_IP is missing"
-                    exit 1
-                  fi
-                  if [ -z "${{ secrets.HOST_USER }}" ]; then
-                    echo "Error: HOST_USER is missing"
-                    exit 1
-                  fi
-                  if [ -z "${{ secrets.HOSTINGER_API_TOKEN }}" ]; then
-                    echo "Error: HOSTINGER_API_TOKEN is missing"
-                    exit 1
-                  fi
-                  if [ -z "${{ secrets.POSTGRES_DB }}" ]; then
-                    echo "Error: POSTGRES_DB is missing"
-                    exit 1
-                  fi
-                  if [ -z "${{ secrets.POSTGRES_USER }}" ]; then
-                    echo "Error: POSTGRES_USER is missing"
-                    exit 1
-                  fi
-                  if [ -z "${{ secrets.POSTGRES_PASSWORD }}" ]; then
-                    echo "Error: POSTGRES_PASSWORD is missing"
-                    exit 1
-                  fi
-                  if [ -z "${{ secrets.DJANGO_SECRET_KEY }}" ]; then
-                    echo "Error: DJANGO_SECRET_KEY is missing"
-                    exit 1
-                  fi
+      - name: Validate Secrets
+        run: |
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "Error: SSH_PRIVATE_KEY is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.HOST_IP }}" ]; then
+            echo "Error: HOST_IP is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.HOST_USER }}" ]; then
+            echo "Error: HOST_USER is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.HOSTINGER_API_TOKEN }}" ]; then
+            echo "Error: HOSTINGER_API_TOKEN is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.POSTGRES_DB }}" ]; then
+            echo "Error: POSTGRES_DB is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.POSTGRES_USER }}" ]; then
+            echo "Error: POSTGRES_USER is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.POSTGRES_PASSWORD }}" ]; then
+            echo "Error: POSTGRES_PASSWORD is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DJANGO_SECRET_KEY }}" ]; then
+            echo "Error: DJANGO_SECRET_KEY is missing"
+            exit 1
+          fi
 
-            - name: Setup SSH
-              run: |
-                  mkdir -p ~/.ssh/
-                  echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-                  chmod 600 ~/.ssh/id_rsa
-                  ssh-keyscan -H ${{ secrets.HOST_IP }} >> ~/.ssh/known_hosts
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.HOST_IP }} >> ~/.ssh/known_hosts
 
-            - name: Create .env file
-              run: |
-                  echo "HOSTINGER_API_TOKEN=${{ secrets.HOSTINGER_API_TOKEN }}" >> .env
-                  echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-                  echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-                  echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-                  echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
+      - name: Create .env file
+        run: |
+          echo "HOSTINGER_API_TOKEN=${{ secrets.HOSTINGER_API_TOKEN }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
 
-            - name: Copy files to server
-              run: |
-                  # Create directory
-                  ssh ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }} "mkdir -p ~/code/time-manager"
+      - name: Copy files to server
+        run: |
+          # Create directory
+          ssh ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }} "mkdir -p ~/code/time-manager"
 
-                  # Copy files
-                  scp -r stack.yml traefik .env ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/time-manager/
+          # Copy files
+          scp -r stack.yml traefik .env ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:~/code/time-manager/
 
-            - name: Deploy to Server
-              env:
-                  HOST_USER: ${{ secrets.HOST_USER }}
-                  HOST_IP: ${{ secrets.HOST_IP }}
+      - name: Deploy to Server
+        env:
+          HOST_USER: ${{ secrets.HOST_USER }}
+          HOST_IP: ${{ secrets.HOST_IP }}
 
-              run: |
-                  ssh $HOST_USER@$HOST_IP << 'EOF'
-                    cd ~/code/time-manager
+        run: |
+          # Login to GHCR on the remote server
+          ssh $HOST_USER@$HOST_IP "echo ${{ secrets.GIT_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin"
 
-                    # Load environment variables
-                    export $(cat .env)
+          ssh $HOST_USER@$HOST_IP << 'EOF'
+            cd ~/code/time-manager
 
-                    # Deploy stack (update services with new images)
-                    docker stack deploy -c stack.yml time-manager --prune --resolve-image always
+            # Load environment variables
+            export $(cat .env)
 
-                    # Clean up old images
-                    docker image prune -f
-                  EOF
+            # Deploy stack (update services with new images)
+            docker stack deploy -c stack.yml time-manager --prune --resolve-image always --with-registry-auth
+
+            # Clean up old images
+            docker image prune -f
+
+            # Log out for security
+            docker logout ghcr.io
+          EOF
