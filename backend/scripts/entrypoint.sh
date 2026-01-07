@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Helper function to wait for the database
 wait_for_db() {
@@ -12,5 +13,8 @@ wait_for_db() {
 
 wait_for_db
 
+echo "Applying migrations..."
 uv run PrimeBank/manage.py migrate
-uv run PrimeBank/manage.py runserver 0.0.0.0:${DJANGO_PORT}
+
+echo "Starting server on 0.0.0.0:${DJANGO_PORT}..."
+exec uv run PrimeBank/manage.py runserver 0.0.0.0:${DJANGO_PORT}

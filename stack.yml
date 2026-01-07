@@ -89,11 +89,12 @@ services:
       DJANGO_PORT: ${DJANGO_PORT:-8000}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       VITE_PORT: ${VITE_PORT:-5173}
+      PYTHONUNBUFFERED: 1
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "curl --fail --silent --show-error -H 'Accept: application/json' http://localhost:${DJANGO_PORT}/ht/",
+          "curl --fail --silent --show-error -H 'Accept: application/json' http://127.0.0.1:${DJANGO_PORT:-8000}/ht/",
         ]
       interval: 5s
       timeout: 5s
