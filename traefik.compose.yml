@@ -10,7 +10,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./traefik/certs:/var/traefik/certs:rw
+      - traefik-certs:/var/traefik/certs:rw
 
   error-pages:
     image: nginx:alpine
@@ -143,3 +143,4 @@ volumes:
   sonarqube_extensions:
   sonarqube_logs:
   db_data:
+  traefik-certs:
