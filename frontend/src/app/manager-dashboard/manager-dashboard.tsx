@@ -19,16 +19,17 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+// Badge removed: status will be represented by a single colored dot
 import { MoreHorizontal } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+} from "@/components/ui/dropdown-menu";
+import { Trash2, Eye } from "lucide-react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import type { CSSProperties } from "react";
@@ -208,18 +209,16 @@ export default function ManagerDashboard(): React.JSX.Element {
                           <TableCell className="text-sm">
                             <div className="flex items-center gap-2">
                               <span
+                                title={
+                                  req.newClockIn ? "Présent" : "En attente"
+                                }
                                 className={
-                                  "size-2 rounded-full " +
+                                  "size-2 rounded-full inline-block " +
                                   (req.newClockIn
                                     ? "bg-emerald-500"
                                     : "bg-slate-400")
                                 }
                               />
-                              <Badge
-                                variant={req.newClockIn ? "default" : "outline"}
-                              >
-                                {req.newClockIn ? "Présent" : "En attente"}
-                              </Badge>
                             </div>
                           </TableCell>
                           <TableCell className="text-sm text-right">
@@ -239,20 +238,26 @@ export default function ManagerDashboard(): React.JSX.Element {
                                     variant="ghost"
                                     size="icon"
                                     aria-label="More"
+                                    className="hover:bg-accent/10"
                                   >
                                     <MoreHorizontal />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
+                                <DropdownMenuContent
+                                  align="end"
+                                  className="w-48"
+                                >
                                   <DropdownMenuItem
                                     data-variant="destructive"
                                     onClick={() => handleRefuse(req.id)}
                                   >
+                                    <Trash2 className="size-4 text-destructive mr-2" />
                                     Refuser
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => openDetails(req)}
                                   >
+                                    <Eye className="size-4 mr-2 text-muted-foreground" />
                                     Détails de la demande
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>

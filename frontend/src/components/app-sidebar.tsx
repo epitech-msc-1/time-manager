@@ -7,6 +7,7 @@ import {
 } from "@tabler/icons-react";
 import type * as React from "react";
 import { useEffect, useState } from "react";
+import PopUpRaiseRequest from "@/components/ui/PopUpRaiseRequest";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -27,6 +28,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = auth.user;
   const { theme } = useTheme();
   const [isLightTheme, setIsLightTheme] = useState(false);
+  const [showRaisePopup, setShowRaisePopup] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -135,6 +137,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
+
+        <div className="mt-2 px-3">
+          <button
+            type="button"
+            onClick={() => setShowRaisePopup(true)}
+            className="w-full inline-flex items-center justify-center rounded-md bg-muted/60 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            Open Raise Request (test)
+          </button>
+        </div>
+
+        {showRaisePopup && (
+          <PopUpRaiseRequest onClose={() => setShowRaisePopup(false)} />
+        )}
       </SidebarFooter>
     </Sidebar>
   );
