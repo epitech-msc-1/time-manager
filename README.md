@@ -8,13 +8,6 @@
 
 ## badges
 
-### General
-
-![GitHub last commit](https://img.shields.io/github/last-commit/epitech-msc-1/time-manager)
-![GitHub issues](https://img.shields.io/github/issues/epitech-msc-1/time-manager)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/epitech-msc-1/time-manager)
-![GitHub license](https://img.shields.io/github/license/epitech-msc-1/time-manager)
-
 ### Frontend
 
 ![React](https://img.shields.io/badge/React-19-blue?logo=react)
