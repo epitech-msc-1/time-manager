@@ -3,11 +3,12 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-from PrimeBankApp.models import CustomUser, Team
-from PrimeBankApp.schema_time_clock import (
-    DAYS_PER_WEEK,
-    DEFAULT_DAILY_WORK_HOURS,
-)
+from typing import Any
+
+# Keep small numeric constants local so this module can be imported in
+# unit tests without pulling in Graphene/Django at import time.
+DAYS_PER_WEEK = 7
+DEFAULT_DAILY_WORK_HOURS = 7
 
 
 def _calculate_expected_hours(hour_contract, period_days):
@@ -49,7 +50,7 @@ def _aggregate_timeclock_entries(entries):
     return total_seconds, worked_days, totals
 
 
-def _determine_team_for_user(user):
+def _determine_team_for_user(user: Any):
     managed_team = getattr(user, "team_managed", None)
     if managed_team:
         return managed_team
@@ -57,7 +58,7 @@ def _determine_team_for_user(user):
     return getattr(user, "team", None)
 
 
-def _collect_team_members(team: Team):
+def _collect_team_members(team: Any):
     members = list(team.members.all())
     manager = getattr(team, "team_manager", None)
     if manager:
@@ -70,7 +71,7 @@ def _collect_team_members(team: Team):
     )
 
 
-def _calculate_presence_score(user: CustomUser, period_days: int, days_present: int) -> int:
+def _calculate_presence_score(user: Any, period_days: int, days_present: int) -> int:
     expected_hours = _calculate_expected_hours(user.hour_contract, period_days)
     expected_work_days = _calculate_expected_work_days(expected_hours, period_days)
     denominator = expected_work_days or period_days
