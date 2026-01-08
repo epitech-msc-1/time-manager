@@ -86,12 +86,10 @@ jobs:
 
       - name: Test with Pytest-Django
         working-directory: backend
+        env:
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
         run: |
           uv run pytest --cov=PrimeBankApp
-
-      - name: Pytest
-        working-directory: backend
-        run: |
 
   sonarqube:
     name: Sonarqube
