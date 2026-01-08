@@ -4,8 +4,8 @@ from PrimeBankApp.schema_team import SetTeamManager, AddUserToTeam
 
 
 def make_info_admin():
-    # requester is authenticated and admin
-    # include is_superuser to match production user attributes used by is_admin()
+    # Le requérant est authentifié et admin
+    # Inclut is_superuser pour coller aux attributs utilisés en prod par is_admin()
     return SimpleNamespace(
         context=SimpleNamespace(
             user=SimpleNamespace(is_authenticated=True, is_admin=True, is_superuser=False)
@@ -14,8 +14,8 @@ def make_info_admin():
 
 
 def make_info_manager(team_id: int):
-    # requester is authenticated and manages team_id
-    # include is_superuser to match production user attributes used by is_admin()
+    # Le requérant est authentifié et manager de l'équipe team_id
+    # Inclut is_superuser pour coller aux attributs utilisés en prod par is_admin()
     return SimpleNamespace(
         context=SimpleNamespace(
             user=SimpleNamespace(is_authenticated=True, is_admin=False, is_superuser=False, team_managed_id=team_id)
@@ -24,11 +24,11 @@ def make_info_manager(team_id: int):
 
 
 def test_set_team_manager_by_admin(mocker):
-    # Patch models used in the module under test
+    # Patch les modèles utilisés dans le module testé
     mock_team_class = mocker.patch("PrimeBankApp.schema_team.Team")
     mock_user_class = mocker.patch("PrimeBankApp.schema_team.CustomUser")
 
-    # Prepare a team with an existing current manager
+    # Prépare une équipe avec un manager actuel
     current_manager = mocker.Mock()
     current_manager.id = 5
     current_manager.team_managed = mocker.Mock()
@@ -36,11 +36,11 @@ def test_set_team_manager_by_admin(mocker):
 
     mock_team = mocker.Mock()
     mock_team.id = 10
-    # team.team_manager returns the current manager
+    # team.team_manager retourne le manager actuel
     mock_team.team_manager = current_manager
     mock_team_class.objects.get.return_value = mock_team
 
-    # Prepare the new manager
+    # Prépare le nouveau manager
     new_manager = mocker.Mock()
     new_manager.id = 2
     new_manager.save = mocker.Mock()
@@ -48,59 +48,59 @@ def test_set_team_manager_by_admin(mocker):
 
     info = make_info_admin()
 
-    # Call mutation
+    # Appel de la mutation
     result = SetTeamManager.mutate(None, info, team_id=mock_team.id, manager_user_id=new_manager.id)
 
-    # Check return values
+    # Vérifie les valeurs de retour
     assert result.ok is True
     assert result.team_id_out == mock_team.id
     assert result.manager_user_id_out == new_manager.id
 
-    # previous manager should have been unset and saved
+    # L'ancien manager doit être unset et sauvegardé
     assert current_manager.team_managed is None
     current_manager.save.assert_called_once()
 
-    # new manager should have team_managed set to the team and saved
+    # Le nouveau manager doit avoir team_managed défini sur l'équipe et être sauvegardé
     assert new_manager.team_managed is mock_team
     new_manager.save.assert_called_once()
 
 
 def test_add_user_to_team_by_admin_and_manager(mocker):
-    # Patch models used in the module under test
+    # Patch les modèles utilisés dans le module testé
     mock_user_class = mocker.patch("PrimeBankApp.schema_team.CustomUser")
     mock_team_class = mocker.patch("PrimeBankApp.schema_team.Team")
 
-    # Prepare the user to add
+    # Prépare l'utilisateur à ajouter
     user_to_add = mocker.Mock()
     user_to_add.is_admin = False
-    # initially user has no team
+    # Au départ, l'utilisateur n'a pas d'équipe
     user_to_add.team_id = None
     user_to_add.save = mocker.Mock()
     mock_user_class.objects.get.return_value = user_to_add
 
-    # Prepare the team
+    # Prépare l'équipe
     mock_team = mocker.Mock()
-    # members.count() should return a number; simulate 3 members after add
+    # members.count() doit retourner un nombre ; on simule 3 membres après ajout
     mock_team.members.count.return_value = 3
     mock_team_class.objects.get.return_value = mock_team
 
-    # --- Admin adds the user ---
+    # --- Admin ajoute l'utilisateur ---
     info_admin = make_info_admin()
     result_admin = AddUserToTeam.mutate(None, info_admin, user_id=1, team_id=10)
 
-    # The mutation should return the team object
+    # La mutation doit retourner l'objet équipe
     assert result_admin.team is mock_team
-    # user.team should have been set and save called
+    # user.team doit être défini et save appelé
     assert user_to_add.team is mock_team
     user_to_add.save.assert_called()
-    # nr_members should be set from members.count()
+    # nr_members doit être défini à partir de members.count()
     assert getattr(mock_team, "nr_members", None) == mock_team.members.count.return_value
 
-    # Reset mocks for manager case
+    # Reset des mocks pour le cas manager
     user_to_add.save.reset_mock()
     mock_team.nr_members = None
 
-    # --- Manager (manages team 10) adds the user ---
+    # --- Manager (manager de l'équipe 10) ajoute l'utilisateur ---
     info_manager = make_info_manager(team_id=10)
     result_manager = AddUserToTeam.mutate(None, info_manager, user_id=1, team_id=10)
 

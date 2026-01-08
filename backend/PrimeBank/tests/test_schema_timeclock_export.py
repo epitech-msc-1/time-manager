@@ -1,4 +1,4 @@
-"""Unit tests for `schema_timeclock_export.py` resolver."""
+"""Tests unitaires pour le resolver de `schema_timeclock_export.py`."""
 import json
 from datetime import date
 
@@ -9,6 +9,7 @@ import PrimeBankApp.schema_timeclock_export as schema_timeclock_export
 
 
 def make_info(user):
+    # Fabrique un objet info simulant le contexte GraphQL avec un user donné
     class Ctx:
         pass
 
@@ -23,6 +24,7 @@ def make_info(user):
 
 
 def test_resolve_export_time_clock_csv_requires_auth():
+    # Vérifie qu'une authentification est requise pour exporter le CSV
     q = schema_timeclock_export.TimeClockExportQuery()
     info = make_info(None)
     with pytest.raises(GraphQLError):
@@ -30,6 +32,7 @@ def test_resolve_export_time_clock_csv_requires_auth():
 
 
 def test_resolve_export_time_clock_csv_user_not_found(monkeypatch):
+    # Vérifie que l'erreur est levée si l'utilisateur n'est pas trouvé
     q = schema_timeclock_export.TimeClockExportQuery()
 
     class U:
@@ -49,6 +52,7 @@ def test_resolve_export_time_clock_csv_user_not_found(monkeypatch):
 
 
 def test_resolve_export_time_clock_csv_not_authorized(monkeypatch):
+    # Vérifie que l'accès non autorisé lève une erreur
     q = schema_timeclock_export.TimeClockExportQuery()
 
     class Req:

@@ -1,4 +1,4 @@
-"""Unit tests for `schema_time_clock.py` mutations (moved to central tests folder)."""
+"""Tests unitaires pour les mutations de `schema_time_clock.py` (déplacé dans le dossier central des tests)."""
 from datetime import date, time
 
 import pytest
@@ -17,6 +17,7 @@ from PrimeBankApp import schema_time_clock
 
 
 class FakeTC:
+    # Faux modèle TimeClock pour les tests
     def __init__(self, user_id=None, day=None, clock_in=None, clock_out=None):
         self.user_id = user_id
         self.day = day
@@ -28,6 +29,7 @@ class FakeTC:
 
 
 class FakeManager:
+    # Faux manager pour simuler les requêtes ORM
     def __init__(self, objs=None, exists=False, first_obj=None):
         self._map = {getattr(o, 'user_id', None): o for o in (objs or [])}
         self._exists = exists
@@ -52,6 +54,7 @@ class FakeManager:
 
 
 def make_info(user):
+    # Fabrique un objet info simulant le contexte GraphQL avec un user donné
     class Ctx:
         pass
 

@@ -1,4 +1,4 @@
-"""Unit tests for KPI helper functions (moved to central tests folder)."""
+"""Tests unitaires pour les fonctions utilitaires KPI (déplacé dans le dossier central des tests)."""
 from datetime import date, time
 
 import pytest
@@ -14,29 +14,29 @@ from PrimeBankApp.kpi_functions.kpi_functions import (
 
 
 def test_calculate_expected_hours_and_work_days_edge_cases():
-    # invalid inputs
+    # Entrées invalides
     assert _calculate_expected_hours(None, 7) is None
     assert _calculate_expected_hours(35, 0) is None
     assert _calculate_expected_hours(-1, 7) is None
 
-    # normal case: 35 hours/week for 14 days -> 35 * (14/7) = 70
+    # Cas normal : 35h/semaine sur 14 jours -> 35 * (14/7) = 70
     assert _calculate_expected_hours(35, 14) == 70
 
-    # expected work days: with default daily 7 hours, 70 / 7 = 10 days
+    # Jours de travail attendus : avec 7h/jour par défaut, 70 / 7 = 10 jours
     assert _calculate_expected_work_days(70, 14) == 10
 
 
 def test_aggregate_timeclock_entries_normal_and_overnight():
+    # Teste une entrée normale sur une journée : 9h -> 17h = 8h
     class Entry:
         def __init__(self, day, clock_in, clock_out):
             self.day = day
             self.clock_in = clock_in
             self.clock_out = clock_out
 
-    # normal single-day entry: 9:00 -> 17:00 => 8 hours
     e1 = Entry(date(2025, 1, 1), time(9, 0, 0), time(17, 0, 0))
 
-    # overnight: 22:00 -> 02:00 next day => 4 hours
+    # Teste une entrée de nuit : 22h -> 2h (lendemain) = 4h
     e2 = Entry(date(2025, 1, 2), time(22, 0, 0), time(2, 0, 0))
 
     total_seconds, worked_days, totals = _aggregate_timeclock_entries([e1, e2])
@@ -46,13 +46,13 @@ def test_aggregate_timeclock_entries_normal_and_overnight():
 
 
 def test_determine_team_for_user_and_collect_members():
+    # Teste la priorité de l'équipe managée par l'utilisateur et la collecte des membres
     class User:
         def __init__(self, id_, first_name, last_name):
             self.id = id_
             self.first_name = first_name
             self.last_name = last_name
 
-    # user managed team takes precedence
     manager = User(1, "Anna", "Smith")
     member = User(2, "Bob", "Jones")
 

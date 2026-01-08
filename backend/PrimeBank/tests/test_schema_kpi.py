@@ -1,4 +1,4 @@
-"""Unit tests for `schema_kpi.py` error and guard branches."""
+"""Tests unitaires pour les branches d'erreur et de garde de `schema_kpi.py`."""
 import pytest
 
 from graphql import GraphQLError
@@ -7,6 +7,7 @@ import PrimeBankApp.schema_kpi as schema_kpi
 
 
 def make_info(user):
+    # Fabrique un objet info simulant le contexte GraphQL avec un user donné
     class Ctx:
         pass
 
@@ -21,6 +22,7 @@ def make_info(user):
 
 
 def test_resolve_kpi_clock_invalid_period():
+    # Vérifie qu'une période invalide lève une erreur
     q = schema_kpi.TimeClockQuery()
     info = make_info(None)
     with pytest.raises(GraphQLError):
@@ -28,6 +30,7 @@ def test_resolve_kpi_clock_invalid_period():
 
 
 def test_resolve_kpi_clock_period_too_long():
+    # Vérifie qu'une période trop longue lève une erreur
     q = schema_kpi.TimeClockQuery()
     info = make_info(None)
     with pytest.raises(GraphQLError):
@@ -35,6 +38,7 @@ def test_resolve_kpi_clock_period_too_long():
 
 
 def test_resolve_kpi_clock_requires_auth_if_no_user_id():
+    # Vérifie qu'une authentification est requise si user_id n'est pas fourni
     q = schema_kpi.TimeClockQuery()
     info = make_info(None)
     with pytest.raises(GraphQLError):
@@ -42,13 +46,14 @@ def test_resolve_kpi_clock_requires_auth_if_no_user_id():
 
 
 def test_resolve_kpi_clock_user_does_not_exist(monkeypatch):
+    # Vérifie que l'erreur est levée si l'utilisateur n'existe pas
     q = schema_kpi.TimeClockQuery()
     class U:
         id = 1
         is_authenticated = True
 
     info = make_info(U)
-    # force CustomUser.objects.get to raise
+    # Force CustomUser.objects.get à lever une exception
     class M:
         def get(self, pk):
             raise schema_kpi.CustomUser.DoesNotExist

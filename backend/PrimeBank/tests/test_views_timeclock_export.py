@@ -1,4 +1,4 @@
-"""Unit tests for `views_timeclock_export.py` helpers and view."""
+"""Tests unitaires pour les helpers et la vue de `views_timeclock_export.py`."""
 from datetime import date, time
 
 import json
@@ -17,12 +17,12 @@ def test_duration_seconds_normal_and_overnight():
     t2 = time(17, 0)
     assert views_export._duration_seconds(d, t1, t2) == 8 * 3600
 
-    # overnight: clock_out earlier -> add one day
+    # Nuit : clock_out plus tôt -> on ajoute un jour
     t_in = time(22, 0)
     t_out = time(6, 0)
     assert views_export._duration_seconds(d, t_in, t_out) == 8 * 3600
 
-    # missing times
+    # Heures manquantes
     assert views_export._duration_seconds(d, None, t_out) == 0.0
 
 
@@ -31,7 +31,7 @@ def test_authenticate_request_with_jwt_monkeypatched(monkeypatch):
         META = {"HTTP_AUTHORIZATION": "JWT sometoken"}
         COOKIES = {}
 
-    # monkeypatch get_payload & get_user_by_payload to return a fake user
+    # monkeypatch get_payload & get_user_by_payload pour retourner un faux user
     fake_user = type("U", (), {"id": 1, "is_authenticated": True})()
     monkeypatch.setattr(views_export, "get_payload", lambda token, context=None: {"user_id": 1})
     monkeypatch.setattr(views_export, "get_user_by_payload", lambda payload: fake_user)
@@ -39,7 +39,7 @@ def test_authenticate_request_with_jwt_monkeypatched(monkeypatch):
     res = views_export._authenticate_request_with_jwt(Req)
     assert res is fake_user
 
-    # no auth header and no cookie -> None
+    # Pas d'en-tête auth et pas de cookie -> None
     class Req2:
         META = {}
         COOKIES = {}
@@ -48,7 +48,7 @@ def test_authenticate_request_with_jwt_monkeypatched(monkeypatch):
 
 
 def test_export_timeclock_csv_bad_token_and_target(monkeypatch):
-    # prepare a request with authenticated user
+    # Prépare une requête avec un utilisateur authentifié
     class U:
         id = 1
         is_authenticated = True
@@ -56,15 +56,15 @@ def test_export_timeclock_csv_bad_token_and_target(monkeypatch):
     req = type("R", (), {"user": U(), "COOKIES": {}, "META": {}})()
 
     signer = views_export.TimestampSigner()
-    # bad json payload -> signature ok but payload invalid
+    # Payload JSON invalide -> signature ok mais payload non décodable
     bad_payload = "not a json"
     token = signer.sign(bad_payload)
 
     resp = views_export.export_timeclock_csv(req, token)
-    # JSON decode error -> BadRequest
+    # Erreur de décodage JSON -> BadRequest
     assert isinstance(resp, HttpResponseBadRequest)
 
-    # now create a valid payload but target missing
+    # Crée maintenant un payload valide mais cible manquante
     payload = {
         "requester_id": "1",
         "target_user_id": "99",

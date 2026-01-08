@@ -1,4 +1,4 @@
-"""Unit tests for KPI helper functions (consolidated filename to avoid import collisions)."""
+"""Tests unitaires pour les fonctions utilitaires KPI (nom de fichier consolidé pour éviter les collisions d'import)."""
 from datetime import date, time
 
 import pytest
@@ -14,6 +14,7 @@ from PrimeBankApp.kpi_functions.kpi_functions import (
 
 
 def test_calculate_expected_hours_and_work_days_edge_cases():
+    # Cas limites pour le calcul des heures et jours attendus
     assert _calculate_expected_hours(None, 7) is None
     assert _calculate_expected_hours(35, 0) is None
     assert _calculate_expected_hours(-1, 7) is None
@@ -22,6 +23,7 @@ def test_calculate_expected_hours_and_work_days_edge_cases():
 
 
 def test_aggregate_timeclock_entries_normal_and_overnight():
+    # Teste l'agrégation d'entrées normales et de nuit
     class Entry:
         def __init__(self, day, clock_in, clock_out):
             self.day = day
@@ -37,6 +39,7 @@ def test_aggregate_timeclock_entries_normal_and_overnight():
 
 
 def test_determine_team_for_user_and_collect_members():
+    # Teste la détermination de l'équipe d'un utilisateur et la collecte des membres
     class User:
         def __init__(self, id_, first_name, last_name):
             self.id = id_
