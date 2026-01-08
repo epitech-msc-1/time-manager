@@ -84,17 +84,17 @@ jobs:
         working-directory: backend
         run: uv run ruff check .
 
-      - name: Run Django tests
+      - name: Test with Pytest-Django
         working-directory: backend
         env:
           DATABASE_URL: postgres://django:django@localhost:5432/test_db
           DJANGO_SETTINGS_MODULE: PrimeBank.settings
         run: |
-          python manage.py migrate --noinput
-          python manage.py test --verbosity=2
+          python PrimeBank/manage.py migrate --noinput
+          python PrimeBank/manage.py test --verbosity=2
 
   sonarqube:
-    name: Sonarqube analyze
+    name: Sonarqube
     runs-on: ubuntu-latest
 
     steps:
