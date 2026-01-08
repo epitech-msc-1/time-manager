@@ -8,7 +8,7 @@ on:
 
 jobs:
   frontend:
-    name: Frontend (Bun + Vite + React)
+    name: Frontend
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +45,7 @@ jobs:
         run: bun test || echo "No tests found"
 
   backend:
-    name: Backend (Django + GraphQL + uv)
+    name: Backend
     runs-on: ubuntu-latest
 
     services:
@@ -88,7 +88,7 @@ jobs:
         working-directory: backend
         env:
           DATABASE_URL: postgres://django:django@localhost:5432/test_db
-          DJANGO_SETTINGS_MODULE: backend.settings
+          DJANGO_SETTINGS_MODULE: PrimeBank.settings
         run: |
           python manage.py migrate --noinput
           python manage.py test --verbosity=2
