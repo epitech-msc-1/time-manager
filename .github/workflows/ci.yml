@@ -86,12 +86,12 @@ jobs:
 
       - name: Test with Pytest-Django
         working-directory: backend
-        env:
-          DATABASE_URL: postgres://django:django@localhost:5432/test_db
-          DJANGO_SETTINGS_MODULE: PrimeBank.settings
         run: |
-          python PrimeBank/manage.py migrate --noinput
-          python PrimeBank/manage.py test --verbosity=2
+          uv run pytest --cov=PrimeBankApp
+
+      - name: Pytest
+        working-directory: backend
+        run: |
 
   sonarqube:
     name: Sonarqube
