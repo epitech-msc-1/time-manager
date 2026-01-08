@@ -6,6 +6,9 @@ dist/
 wheels/
 *.egg-info
 
+# Pytest
+backend/.coverage
+
 # Virtual environments
 .venv
 
@@ -14,14 +17,3 @@ wheels/
 
 # Node
 node_modules/
-
-.env.example
-Dockerfile
-
-# Repo
-assets/
-.github/
-docs/
-.gitignore
-LICENSE
-README.md
