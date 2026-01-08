@@ -18,8 +18,8 @@ const httpLink = new HttpLink({
 });
 
 const REFRESH_TOKEN_MUTATION = gql`
-    mutation RefreshToken {
-        refreshToken {
+    mutation RefreshToken($refreshToken: String) {
+        refreshToken(refreshToken: $refreshToken) {
             token
             payload
         }
@@ -28,10 +28,16 @@ const REFRESH_TOKEN_MUTATION = gql`
 
 const refreshAccessToken = async (): Promise<boolean> => {
     try {
+        const storedRefreshToken = sessionStorage.getItem("refreshToken");
+        const variables = storedRefreshToken ? { refreshToken: storedRefreshToken } : {};
+
         const response = await fetch(apiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: print(REFRESH_TOKEN_MUTATION) }),
+            body: JSON.stringify({
+                query: print(REFRESH_TOKEN_MUTATION),
+                variables,
+            }),
             credentials: "include",
         });
 

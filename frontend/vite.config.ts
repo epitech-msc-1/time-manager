@@ -6,6 +6,9 @@ import { defineConfig } from "vite";
 // https://vite.dev/config/
 export default defineConfig(() => {
     return {
+        build: {
+            sourcemap: true,
+        },
         server: {
             allowedHosts: ["localhost", "127.0.0.1", "::1", "ytlabs.space"],
             hmr: false,
