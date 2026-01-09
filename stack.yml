@@ -16,33 +16,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-      labels:
-        - traefik.enable=true
-        - traefik.docker.network=time-manager-net
-        - traefik.http.routers.api.rule=Host(`traefik.ytlabs.space`)
-        - traefik.http.routers.api.service=api@internal
-        - traefik.http.routers.api.entrypoints=websecure
-        - traefik.http.routers.api.tls=true
-        - traefik.http.routers.api.tls.certresolver=hostinger
-        # Dummy service port to satisfy Traefik requirements
-        - traefik.http.services.traefik.loadbalancer.server.port=8080
-        # Global Middlewares Definitions
-        # Redirect to HTTPS
-        - traefik.http.middlewares.redirect.redirectscheme.scheme=https
-        - traefik.http.middlewares.redirect.redirectscheme.permanent=true
-        # Security Headers
-        # - traefik.http.middlewares.security-headers.headers.sslredirect=true
-        # - traefik.http.middlewares.security-headers.headers.stsseconds=315360000
-        # - traefik.http.middlewares.security-headers.headers.browserxssfilter=true
-        # - traefik.http.middlewares.security-headers.headers.contenttypeNosniff=true
-        # - traefik.http.middlewares.security-headers.headers.forceSTSHeader=true
-        # - traefik.http.middlewares.security-headers.headers.framedeny=true
-        # Rate Limit
-        # Moved to dynamic.yml
-        # Compression
-        # - traefik.http.middlewares.compression.compress=true
-        # Retry
-        # - traefik.http.middlewares.retry.retry.attempts=3
 
   error-pages:
     image: nginx:alpine
@@ -53,17 +26,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-      labels:
-        - traefik.enable=true
-        - traefik.docker.network=time-manager-net
-        - traefik.http.routers.error-pages.rule=HostRegexp(`{catchall:.*}`)
-        - traefik.http.routers.error-pages.priority=1
-        - traefik.http.routers.error-pages.service=error-pages
-        - traefik.http.services.error-pages.loadbalancer.server.port=80
-        # Middleware check
-        - traefik.http.middlewares.custom-404.errors.status=404
-        - traefik.http.middlewares.custom-404.errors.service=error-pages
-        - traefik.http.middlewares.custom-404.errors.query=/404.html
 
   db:
     image: postgres:16-alpine
@@ -120,15 +82,6 @@ services:
         order: start-first
         failure_action: rollback
         delay: 10s
-      labels:
-        - traefik.enable=true
-        - traefik.docker.network=time-manager-net
-        - traefik.http.routers.backend.rule=Host(`api.ytlabs.space`)
-        - traefik.http.routers.backend.entrypoints=websecure
-        - traefik.http.routers.backend.tls=true
-        - traefik.http.routers.backend.tls.certresolver=hostinger
-        - traefik.http.routers.backend.middlewares=custom-404,rate-limit@file
-        - traefik.http.services.backend.loadbalancer.server.port=${DJANGO_PORT:-8000}
 
   frontend:
     image: ghcr.io/epitech-msc-1/time-manager-frontend:${TAG:-latest}
@@ -141,15 +94,6 @@ services:
         order: start-first
         failure_action: rollback
         delay: 10s
-      labels:
-        - traefik.docker.network=time-manager-net
-        - traefik.enable=true
-        - traefik.http.routers.frontend.rule=Host(`ytlabs.space`)
-        - traefik.http.routers.frontend.entrypoints=websecure
-        - traefik.http.routers.frontend.tls=true
-        - traefik.http.routers.frontend.tls.certresolver=hostinger
-        - traefik.http.routers.frontend.middlewares=custom-404,rate-limit@file
-        - traefik.http.services.frontend.loadbalancer.server.port=80
   sonarqube:
     image: sonarqube:community
     volumes:
@@ -169,15 +113,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.sonarqube-secure.rule=Host(`sonarqube.ytlabs.space`)
-        - traefik.http.routers.sonarqube-secure.entrypoints=websecure
-        - traefik.http.routers.sonarqube-secure.tls=true
-        - traefik.http.routers.sonarqube-secure.tls.certresolver=hostinger
-        - traefik.http.routers.sonarqube-secure.middlewares=custom-404,rate-limit@file
-        - traefik.docker.network=time-manager-net
-        - traefik.http.services.sonarqube.loadbalancer.server.port=9000
 
   mkdocs:
     image: ghcr.io/epitech-msc-1/time-manager-mkdocs:${TAG:-latest}
@@ -187,15 +122,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.mkdocs.rule=Host(`docs.ytlabs.space`)
-      - traefik.http.routers.mkdocs.entrypoints=websecure
-      - traefik.http.routers.mkdocs.tls=true
-      - traefik.http.routers.mkdocs.tls.certresolver=hostinger
-      - traefik.http.routers.mkdocs.middlewares=custom-404,rate-limit@file
-      - traefik.docker.network=time-manager-net
-      - traefik.http.services.mkdocs.loadbalancer.server.port=7000
 
 networks:
   default:
