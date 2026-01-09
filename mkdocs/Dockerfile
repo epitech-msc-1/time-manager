@@ -15,6 +15,8 @@ COPY --chown=appuser:appuser . .
 
 RUN uv sync
 
+RUN uv run mkdocs build
+
 # Production stage
 FROM nginx:alpine
 
