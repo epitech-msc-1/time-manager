@@ -180,7 +180,7 @@ services:
         - traefik.http.services.sonarqube.loadbalancer.server.port=9000
 
   mkdocs:
-    image: ghcr.io/epitech-msc-1/time-manager-backend:${TAG:-latest}
+    image: ghcr.io/epitech-msc-1/time-manager-mkdocs:${TAG:-latest}
     restart: unless-stopped
     deploy:
       replicas: 1
