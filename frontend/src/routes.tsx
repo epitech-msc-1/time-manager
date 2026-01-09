@@ -66,7 +66,7 @@ const routes: RouteObject[] = [
       {
         path: "manager-dashboard",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requireManager>
             <ManagerDashboard />
           </ProtectedRoute>
         ),
