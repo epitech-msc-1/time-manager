@@ -135,6 +135,22 @@ services:
       - traefik.http.routers.sonarqube-secure.tls.certresolver=hostinger
       - traefik.http.routers.sonarqube-secure.middlewares=custom-404,security-headers,rate-limit,compression,retry
 
+    mkdocs:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      image: docs:1.0.0
+      container_name: docs
+      restart: unless-stopped
+      ports:
+        - 7000:7000
+      labels:
+        - traefik.http.routers.sonarqube-secure.rule=Host(`docs.ytlabs.space`)
+        - traefik.http.routers.sonarqube-secure.entrypoints=websecure
+        - traefik.http.routers.sonarqube-secure.tls=true
+        - traefik.http.routers.sonarqube-secure.tls.certresolver=hostinger
+        - traefik.http.routers.sonarqube-secure.middlewares=custom-404,rate-limit,retry
+
 networks:
   default:
     name: traefik-net

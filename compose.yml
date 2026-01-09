@@ -103,6 +103,16 @@ services:
       sonarqube:
         condition: service_healthy
 
+  mkdocs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: docs:1.0.0
+    container_name: docs
+    restart: unless-stopped
+    ports:
+      - 7000:7000
+
 volumes:
   db_data:
   sonarqube_data:
