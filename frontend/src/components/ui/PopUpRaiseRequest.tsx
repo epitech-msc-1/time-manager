@@ -172,13 +172,13 @@ export function PopUpRaiseRequest({ onClose }: { onClose?: () => void }) {
   console.log("matchedEntry:", matchedEntry);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[2147483647] flex items-center justify-center px-4">
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={() => onClose?.()}
       />
 
-      <Card className="w-full max-w-3xl mx-auto z-10 shadow-2xl border-2 border-slate-200/50 dark:border-slate-700/50 max-h-[90vh] flex flex-col overflow-hidden">
+      <Card className="w-full max-w-3xl mx-auto relative z-10 shadow-2xl border-2 border-slate-200/50 dark:border-slate-700/50 max-h-[90vh] flex flex-col overflow-hidden">
         <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

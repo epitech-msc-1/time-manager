@@ -49,17 +49,17 @@ services:
       start_period: 10s
       retries: 10
 
-  # frontend:
-  #   build:
-  #     context: frontend/
-  #     dockerfile: Dockerfile
-  #   image: frontend:1.0.0
-  #   container_name: frontend
-  #   ports:
-  #     - 5173:5173
-  #   depends_on:
-  #     backend:
-  #       condition: service_healthy
+  frontend:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    image: frontend:1.0.0
+    container_name: frontend
+    ports:
+      - 5173:5173
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   db_data:

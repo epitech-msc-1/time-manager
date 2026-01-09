@@ -30,6 +30,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [isLightTheme, setIsLightTheme] = useState(false);
   const [showRaisePopup, setShowRaisePopup] = useState(false);
 
+  // Block body scroll when popup is open
+  useEffect(() => {
+    if (showRaisePopup) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showRaisePopup]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 

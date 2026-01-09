@@ -124,6 +124,18 @@ export default function ManagerDashboard(): React.JSX.Element {
 
   const [selected, setSelected] = React.useState<RequestItem | null>(null);
 
+  // Block body scroll when popup is open
+  React.useEffect(() => {
+    if (selected) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selected]);
+
   function handleValidate(id: string) {
     void acceptRequest({ variables: { requestId: id, accepted: true } });
   }
@@ -264,12 +276,12 @@ export default function ManagerDashboard(): React.JSX.Element {
             </Card>
 
             {selected && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+              <div className="fixed inset-0 z-[2147483647] flex items-center justify-center px-4">
                 <div
-                  className="absolute inset-0 bg-black/60"
+                  className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                   onClick={closeDetails}
                 />
-                <Card className="w-full max-w-2xl mx-auto z-10">
+                <Card className="w-full max-w-2xl mx-auto relative z-10">
                   <CardHeader className="text-center">
                     <CardTitle>Request #{selected.id}</CardTitle>
                   </CardHeader>
