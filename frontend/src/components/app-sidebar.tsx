@@ -136,17 +136,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
-
-        <div className="mt-2 px-3">
+        {/* Raise Request Button - Simple style */}
+        <div className="px-3 pb-3">
           <button
             type="button"
             onClick={() => setShowRaisePopup(true)}
-            className="w-full inline-flex items-center justify-center rounded-md bg-muted/60 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-muted px-3 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
           >
-            Open Raise Request (test)
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Raise Request
           </button>
         </div>
+
+        <NavUser user={data.user} />
 
         {showRaisePopup && (
           <PopUpRaiseRequest onClose={() => setShowRaisePopup(false)} />

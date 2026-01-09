@@ -316,26 +316,32 @@ export function PopUpRaiseRequest({ onClose }: { onClose?: () => void }) {
                     <Label className="text-xs text-green-900 dark:text-green-100 mb-2">
                       Clock In
                     </Label>
-                    <Input
-                      type="time"
-                      value={newClockIn}
-                      onChange={(e) => setNewClockIn(e.target.value)}
-                      className="h-10 font-mono text-base border-green-300 dark:border-green-700"
-                      placeholder="HH:MM"
-                    />
+                    <div className="relative">
+                      <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white z-10 pointer-events-none" />
+                      <Input
+                        type="time"
+                        value={newClockIn}
+                        onChange={(e) => setNewClockIn(e.target.value)}
+                        className="h-10 font-mono text-base border-green-300 dark:border-green-700 pl-10"
+                        placeholder="HH:MM"
+                      />
+                    </div>
                   </div>
 
                   <div>
                     <Label className="text-xs text-green-900 dark:text-green-100 mb-2">
                       Clock Out
                     </Label>
-                    <Input
-                      type="time"
-                      value={newClockOut}
-                      onChange={(e) => setNewClockOut(e.target.value)}
-                      className="h-10 font-mono text-base border-green-300 dark:border-green-700"
-                      placeholder="HH:MM"
-                    />
+                    <div className="relative">
+                      <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white z-10 pointer-events-none" />
+                      <Input
+                        type="time"
+                        value={newClockOut}
+                        onChange={(e) => setNewClockOut(e.target.value)}
+                        className="h-10 font-mono text-base border-green-300 dark:border-green-700 pl-10"
+                        placeholder="HH:MM"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -344,16 +350,26 @@ export function PopUpRaiseRequest({ onClose }: { onClose?: () => void }) {
 
           {/* Description Section */}
           <div className="space-y-3">
-            <Label className="text-base font-semibold flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Description
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Description
+              </Label>
+              <span className="text-xs text-muted-foreground">
+                {description.length}/500
+              </span>
+            </div>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value.length <= 500) {
+                  setDescription(e.target.value);
+                }
+              }}
               placeholder="Explain the reason for this time modification request..."
               className="w-full resize-y rounded-lg border-2 border-slate-200 dark:border-slate-700 px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               rows={4}
+              maxLength={500}
             />
           </div>
         </div>

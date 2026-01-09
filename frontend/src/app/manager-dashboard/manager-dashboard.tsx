@@ -29,7 +29,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Trash2, Eye } from "lucide-react";
+import { Eye, Check, X, Trash2 } from "lucide-react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import type { CSSProperties } from "react";
@@ -183,7 +183,6 @@ export default function ManagerDashboard(): React.JSX.Element {
                         <TableHead>Date_request</TableHead>
                         <TableHead>Clock_In</TableHead>
                         <TableHead>Clock_Out</TableHead>
-                        <TableHead>Status</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -206,30 +205,16 @@ export default function ManagerDashboard(): React.JSX.Element {
                           <TableCell className="text-sm">
                             {req.oldClockOut ?? "-"}
                           </TableCell>
-                          <TableCell className="text-sm">
-                            <div className="flex items-center gap-2">
-                              <span
-                                title={
-                                  req.newClockIn ? "Présent" : "En attente"
-                                }
-                                className={
-                                  "size-2 rounded-full inline-block " +
-                                  (req.newClockIn
-                                    ? "bg-emerald-500"
-                                    : "bg-slate-400")
-                                }
-                              />
-                            </div>
-                          </TableCell>
                           <TableCell className="text-sm text-right">
                             <div className="flex items-center justify-end gap-3">
                               <Button
                                 size="sm"
-                                variant="outline"
                                 disabled={acceptLoading}
                                 onClick={() => handleValidate(req.id)}
+                                className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm hover:shadow-md transition-all"
                               >
-                                Valider
+                                <Check className="h-4 w-4 mr-1.5" />
+                                Approve
                               </Button>
 
                               <DropdownMenu>
@@ -252,13 +237,13 @@ export default function ManagerDashboard(): React.JSX.Element {
                                     onClick={() => handleRefuse(req.id)}
                                   >
                                     <Trash2 className="size-4 text-destructive mr-2" />
-                                    Refuser
+                                    Reject
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => openDetails(req)}
                                   >
                                     <Eye className="size-4 mr-2 text-muted-foreground" />
-                                    Détails de la demande
+                                    Request Details
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -332,24 +317,27 @@ export default function ManagerDashboard(): React.JSX.Element {
                     </div>
                   </CardContent>
                   <CardFooter className="justify-center">
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <Button
                         variant="destructive"
                         onClick={() => {
                           handleRefuse(selected.id);
                           closeDetails();
                         }}
+                        className="shadow-md hover:shadow-lg transition-all"
                       >
-                        Refuser
+                        <X className="h-4 w-4 mr-2" />
+                        Reject
                       </Button>
                       <Button
-                        variant="default"
                         onClick={() => {
                           handleValidate(selected.id);
                           closeDetails();
                         }}
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-md hover:shadow-lg transition-all"
                       >
-                        Valider
+                        <Check className="h-4 w-4 mr-2" />
+                        Approve
                       </Button>
                       <Button variant="outline" onClick={closeDetails}>
                         Close
