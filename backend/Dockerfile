@@ -2,8 +2,8 @@ FROM python:3.12-slim-trixie
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Install curl to support docker healthchecks and other scripts
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends curl \
+RUN apt update \
+	&& apt install -y --no-install-recommends curl \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN useradd --system --create-home --shell /bin/sh appuser
