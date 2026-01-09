@@ -1,8 +1,8 @@
-FROM python:3.12-slim-trixie
+FROM python:3.12-slim-trixie as builder
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 RUN apt update \
-	&& apt install -y --no-install-recommends curl git \
+	&& apt install -y --no-install-recommends curl \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN useradd --system --create-home --shell /bin/sh appuser
@@ -15,6 +15,12 @@ COPY --chown=appuser:appuser . .
 
 RUN uv sync
 
-CMD [ "uv", "run", "mkdocs", "serve", "--dev-addr",  "0.0.0.0:7000"]
+# Production stage
+FROM nginx:alpine
 
-EXPOSE 7000
+COPY --from=builder /app/site /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+CMD ["nginx", "-g", "daemon off;"]
+
+EXPOSE 80

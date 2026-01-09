@@ -93,4 +93,4 @@ http:
     mkdocs:
       loadBalancer:
         servers:
-          - url: "http://mkdocs:7000"
+          - url: "http://mkdocs:80"
