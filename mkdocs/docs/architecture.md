@@ -80,26 +80,32 @@ erDiagram
 
 ### Backend
 
--   **Language**: Python 3.12
--   **Framework**: Django 5.2
--   **API**: GraphQL (Graphene-Django) & REST
--   **Database**: PostgreSQL
--   **Auth**: JWT (JSON Web Tokens)
--   **Package Manager**: `uv`
+| Component | Technology | Description |
+|:----------|:-----------|:------------|
+| **Language** | Python 3.12 | Core programming language |
+| **Framework** | Django 5.2 | Web framework |
+| **API** | GraphQL & REST | Graphene-Django for GraphQL |
+| **Database** | PostgreSQL | Relational database |
+| **Auth** | JWT | JSON Web Tokens |
+| **Package Manager** | uv | Fast Python package installer |
 
 ### Frontend
 
--   **Framework**: React 19
--   **Build Tool**: Vite (Rolldown)
--   **Styling**: TailwindCSS 4
--   **Components**: Radix UI
--   **State/Data**: Apollo Client (GraphQL)
--   **Linting/Formatter**: Biome
+| Component | Technology | Description |
+|:----------|:-----------|:------------|
+| **Framework** | React 19 | UI library |
+| **Build Tool** | Vite (Rolldown) | Next-gen bundler |
+| **Styling** | TailwindCSS 4 | Utility-first CSS |
+| **Components** | Radix UI | Headless component library |
+| **State/Data** | Apollo Client | GraphQL client |
+| **Linting/Formatter** | Biome | Fast code quality tool |
 
 ### DevOps
 
--   **Containerization**: Docker
--   **Orchestration**: Docker Swarm
--   **Reverse Proxy**: Traefik
--   **CI/CD**: GitHub Actions
--   **Quality**: SonarQube
+| Component | Technology | Description |
+|:----------|:-----------|:------------|
+| **Containerization** | Docker | Application containers |
+| **Orchestration** | Docker Swarm | Container orchestration |
+| **Reverse Proxy** | Traefik | HTTP reverse proxy |
+| **CI/CD** | GitHub Actions | Automated workflows |
+| **Quality** | SonarQube | Code quality analysis |

@@ -6,10 +6,10 @@ This guide will help you set up the **Time Manager** project on your local machi
 
 Ensure you have the following tools installed on your system:
 
--   **Docker Engine** & **Docker Compose**
--   **Node.js** (v18+ recommended) & **npm** (or `pnpm`/`yarn`)
--   **Python** (v3.12+ recommended)
--   **Git**
+- **Docker Engine** & **Docker Compose**
+- **Node.js** (v18+ recommended) & **npm** (or `pnpm`/`yarn`)
+- **Python** (v3.12+ recommended)
+- **Git**
 
 ## :material-rocket-launch: Installation
 
@@ -40,9 +40,10 @@ docker compose up -d --build
 ```
 
 This will start:
--   **Backend API** at `http://localhost:8000`
--   **Frontend App** at `http://localhost:5173` (or configured port)
--   **PostgreSQL Database**
+
+- **Backend API** at `http://localhost:8000`
+- **Frontend App** at `http://localhost:5173` (or configured port)
+- **PostgreSQL Database**
 
 ### 4. Verify Installation
 
@@ -58,80 +59,89 @@ You should see all services `Up` and healthy.
 
 If you prefer to run services individually without Docker:
 
-=== "Backend (Django)"
+### Backend (Django)
 
-    Navigate to the backend directory:
+Navigate to the backend directory:
+
+```bash
+cd backend
+```
+
+**Create a virtual environment and install dependencies:**
+
+=== "uv (Recommended)"
     ```bash
-    cd backend
+    uv sync
+    source .venv/bin/activate
     ```
 
-    Create a virtual environment and install dependencies:
-    
-    === "uv (Recommended)"
-        ```bash
-        uv sync
-        source .venv/bin/activate
-        ```
-    === "python"
-        ```bash
-        python -m venv .venv
-        source .venv/bin/activate
-        pip install -r requirements.txt
-        ```
-    === "python3"
-        ```bash
-        python3 -m venv .venv
-        source .venv/bin/activate
-        pip install -r requirements.txt
-        ```
-
-    Run migrations and start server:
-
-    === "uv"
-        ```bash
-        uv run manage.py migrate
-        uv run manage.py runserver
-        ```
-    === "python"
-        ```bash
-        python manage.py migrate
-        python manage.py runserver
-        ```
-    === "python3"
-        ```bash
-        python3 manage.py migrate
-        python3 manage.py runserver
-        ```
-
-=== "Frontend (React)"
-
-    Navigate to the frontend directory:
+=== "python"
     ```bash
-    cd frontend
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
     ```
 
-    Install dependencies and start dev server:
+=== "python3"
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    ```
 
-    === "npm"
-        ```bash
-        npm install
-        npm run dev
-        ```
-    === "pnpm"
-        ```bash
-        pnpm install
-        pnpm dev
-        ```
-    === "yarn"
-        ```bash
-        yarn install
-        yarn dev
-        ```
-    === "bun"
-        ```bash
-        bun install
-        bun dev
-        ```
+**Run migrations and start server:**
+
+=== "uv"
+    ```bash
+    uv run manage.py migrate
+    uv run manage.py runserver
+    ```
+
+=== "python"
+    ```bash
+    python manage.py migrate
+    python manage.py runserver
+    ```
+
+=== "python3"
+    ```bash
+    python3 manage.py migrate
+    python3 manage.py runserver
+    ```
+
+### Frontend (React)
+
+Navigate to the frontend directory:
+
+```bash
+cd frontend
+```
+
+**Install dependencies and start dev server:**
+
+=== "npm"
+    ```bash
+    npm install
+    npm run dev
+    ```
+
+=== "pnpm"
+    ```bash
+    pnpm install
+    pnpm dev
+    ```
+
+=== "yarn"
+    ```bash
+    yarn install
+    yarn dev
+    ```
+
+=== "bun"
+    ```bash
+    bun install
+    bun dev
+    ```
 
 ## :material-bug: Troubleshooting
 

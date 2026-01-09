@@ -18,7 +18,8 @@
     --time-chart-5: oklch(0.4241 0.0952 264.0306);
 
     /* Shadows for light mode */
-    --md-shadow-z1: 0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --md-shadow-z1: 0 1px 3px 0 hsl(0 0% 0% / 0.1),
+        0 1px 2px -1px hsl(0 0% 0% / 0.1);
 
     /* ========================================================================
    MKDocs Material Variable Mapping
@@ -28,9 +29,10 @@
     /* Use Primary for Primary FG */
     --md-primary-fg-color: var(--time-primary);
     --md-primary-fg-color--light: oklch(from var(--time-primary) l c h / 0.7);
-    --md-primary-fg-color--dark: oklch(from var(--time-primary) l c h / 1.0);
+    --md-primary-fg-color--dark: oklch(from var(--time-primary) l c h / 1);
 
     --md-accent-fg-color: var(--time-primary);
+
     /* Use primary as accent */
 
     /* Syntax Highlighting (Global/Light defaults) */
@@ -50,11 +52,11 @@
 /* Light Mode Specifics */
 [data-md-color-scheme="default"] {
     --md-default-bg-color: var(--time-background);
-
     /* Soften the default text color to muted-foreground for a integrated look */
     --md-default-fg-color: var(--time-muted-foreground);
-    --md-default-fg-color--light: oklch(from var(--time-muted-foreground) l c h / 0.7);
-
+    --md-default-fg-color--light: oklch(
+        from var(--time-muted-foreground) l c h / 0.7
+    );
     /* Keep explicit headings/bold text sharp with main foreground */
     --md-typeset-color: var(--time-foreground);
     --md-typeset-a-color: var(--time-primary);
@@ -88,11 +90,15 @@
 
     /* Apply Mappings */
     --md-default-bg-color: var(--time-background);
-    --md-default-bg-color--light: oklch(from var(--time-background) l c h / 0.7);
+    --md-default-bg-color--light: oklch(
+        from var(--time-background) l c h / 0.7
+    );
 
     /* Soften dark mode text */
     --md-default-fg-color: var(--time-muted-foreground);
-    --md-default-fg-color--light: oklch(from var(--time-muted-foreground) l c h / 0.7);
+    --md-default-fg-color--light: oklch(
+        from var(--time-muted-foreground) l c h / 0.7
+    );
 
     --md-typeset-color: var(--time-foreground);
     --md-typeset-a-color: var(--time-primary);
@@ -121,7 +127,21 @@
 }
 
 /* User's Specific Request (Specificity Boost) */
-:root>* {
+
+/* Background for HTML-based labels */
+.edgeLabel span,
+.edgeLabel p,
+.edgeLabel div {
+    background-color: transparent !important;
+    color: var(--time-foreground) !important;
+}
+
+.md-search__output {
+    box-shadow: none !important;
+}
+
+:root > * {
+    /* Set label background color variable */
     /* Ensure these stick if overridden elsewhere */
     --md-code-hl-string-color: var(--time-chart-1);
     --md-code-hl-keyword-color: var(--time-primary);
@@ -199,13 +219,17 @@ body,
     /* Clip corners */
 }
 
-.md-typeset pre>code {
+.md-typeset pre > code {
     border-radius: 0 !important;
     /* Let container handle radius to prevent double-rounding artifacts */
 }
 
 .md-typeset .admonition {
     border-radius: var(--time-radius) !important;
+}
+
+.admonition-title {
+    border-radius: var(--time-radius) var(--time-radius) 0 0 !important;
 }
 
 .md-footer__inner {
@@ -296,7 +320,9 @@ body,
 .md-typeset .tabbed-labels {
     box-shadow: none !important;
     border-bottom: 1px solid var(--md-default-fg-color--lightest);
-    background-color: oklch(from var(--md-default-bg-color) l c h / 0.5) !important;
+    background-color: oklch(
+        from var(--md-default-bg-color) l c h / 0.5
+    ) !important;
     /* Slightly distinct header bg */
     padding: 0 0.5rem;
 }
@@ -340,12 +366,12 @@ body,
 }
 
 /* If there are multiple blocks, separate them nicely */
-.md-typeset .tabbed-content .highlight+.highlight {
+.md-typeset .tabbed-content .highlight + .highlight {
     margin-top: 1em !important;
 }
 
 /* Ensure proper coloring for seamless integration */
-.md-typeset .tabbed-content pre>code {
+.md-typeset .tabbed-content pre > code {
     background-color: transparent !important;
 }
 
