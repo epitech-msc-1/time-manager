@@ -1,285 +1,235 @@
 <!DOCTYPE html>
-<html lang="fr">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Non Trouvée - 404</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-            background: #1a1a2e;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            flex-direction: column;
-        }
-
-        .container {
-            text-align: center;
-            position: relative;
-        }
-
-        h1 {
-            font-size: 15rem;
-            margin: 0;
-            background: linear-gradient(135deg, #e94560 0%, #0f3460 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 10px 10px 0px rgba(0, 0, 0, 0.2);
-            line-height: 0.8;
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin-top: 20px;
-            color: #e94560;
-        }
-
-        p {
-            font-size: 1.2rem;
-            color: #a8a8b3;
-            margin-bottom: 40px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 15px 30px;
-            background: #e94560;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: transform 0.3s ease, background 0.3s ease;
-            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            background: #ff5e78;
-        }
-
-        /* Glitch effect based on pure CSS */
-        .glitch-wrapper {
-            position: relative;
-        }
-
-        .glitch-wrapper::before,
-        .glitch-wrapper::after {
-            content: "404";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #1a1a2e;
-        }
-
-        .glitch-wrapper::before {
-            left: 2px;
-            text-shadow: -1px 0 #00fff9;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-
-        .glitch-wrapper::after {
-            left: -2px;
-            text-shadow: -1px 0 #ff00c1;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim2 5s infinite linear alternate-reverse;
-        }
-
-        @keyframes glitch-anim {
-            0% {
-                clip: rect(2px, 9999px, 86px, 0);
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Page Not Found - 404</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                /* Copied from project dark theme */
+                --background: oklch(0.2598 0.0306 262.6666);
+                --foreground: oklch(0.9219 0 0);
+                --card: oklch(0.3106 0.0301 268.6365);
+                --card-foreground: oklch(0.9219 0 0);
+                --primary: oklch(0.6397 0.172 36.4421);
+                --primary-foreground: oklch(1 0 0);
+                --secondary: oklch(0.3095 0.0266 266.7132);
+                --muted: oklch(0.3095 0.0266 266.7132);
+                --muted-foreground: oklch(0.7155 0 0);
+                --radius: 0.75rem;
             }
 
-            5% {
-                clip: rect(48px, 9999px, 49px, 0);
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
             }
 
-            10% {
-                clip: rect(74px, 9999px, 83px, 0);
+            body {
+                font-family: "Inter", sans-serif;
+                background-color: var(--background);
+                color: var(--foreground);
+                height: 100vh;
+                width: 100vw;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
             }
 
-            15% {
-                clip: rect(3px, 9999px, 5px, 0);
+            /* Ambient Background blobs */
+            .ambient-light {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                z-index: -1;
             }
 
-            20% {
-                clip: rect(69px, 9999px, 16px, 0);
+            .blob {
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(80px);
+                opacity: 0.6;
+                animation: float 20s infinite alternate ease-in-out;
             }
 
-            25% {
-                clip: rect(98px, 9999px, 7px, 0);
+            .blob-1 {
+                width: 50vw;
+                height: 50vw;
+                background: var(--primary);
+                top: -10%;
+                left: -10%;
+                animation-delay: 0s;
             }
 
-            30% {
-                clip: rect(2px, 9999px, 52px, 0);
+            .blob-2 {
+                width: 40vw;
+                height: 40vw;
+                background: oklch(
+                    0.338 0.0589 267.5867
+                ); /* sidebar-accent from theme */
+                bottom: -10%;
+                right: -10%;
+                animation-delay: -5s;
             }
 
-            35% {
-                clip: rect(81px, 9999px, 57px, 0);
+            .blob-3 {
+                width: 30vw;
+                height: 30vw;
+                background: var(--secondary);
+                top: 40%;
+                left: 40%;
+                animation-delay: -10s;
+                opacity: 0.4;
             }
 
-            40% {
-                clip: rect(66px, 9999px, 2px, 0);
+            @keyframes float {
+                0% {
+                    transform: translate(0, 0) scale(1);
+                }
+
+                50% {
+                    transform: translate(30px, 40px) scale(1.1);
+                }
+
+                100% {
+                    transform: translate(-20px, -30px) scale(0.9);
+                }
             }
 
-            45% {
-                clip: rect(28px, 9999px, 20px, 0);
+            /* Glass Card */
+            .glass-panel {
+                background: rgba(43, 45, 66, 0.05);
+                /* Fallback for --card with opacity */
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.015),
+                    rgba(255, 255, 255, 0.005)
+                );
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: var(--radius);
+                padding: 4rem 3rem;
+                text-align: center;
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+                max-width: 500px;
+                width: 90%;
+                position: relative;
+                transform: translateY(20px);
+                opacity: 0;
+                animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1)
+                    forwards;
             }
 
-            50% {
-                clip: rect(13px, 9999px, 95px, 0);
+            @keyframes slideUpFade {
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
             }
 
-            55% {
-                clip: rect(31px, 9999px, 87px, 0);
+            /* Text Styles */
+            h1 {
+                font-size: 8rem;
+                font-weight: 800;
+                line-height: 1;
+                margin-bottom: 0.5rem;
+                background: linear-gradient(135deg, var(--primary), #ffffff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                letter-spacing: -0.05em;
+                position: relative;
+                display: inline-block;
             }
 
-            60% {
-                clip: rect(46px, 9999px, 44px, 0);
+            /* Subtle glow behind text */
+            h1::after {
+                content: "404";
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background: inherit;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                filter: blur(20px);
+                opacity: 0.5;
+                z-index: -1;
             }
 
-            65% {
-                clip: rect(89px, 9999px, 11px, 0);
+            h2 {
+                font-size: 2rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: var(--foreground);
+                letter-spacing: -0.02em;
             }
 
-            70% {
-                clip: rect(92px, 9999px, 57px, 0);
+            p {
+                font-size: 1.1rem;
+                color: var(--muted-foreground);
+                margin-bottom: 2.5rem;
+                line-height: 1.6;
             }
 
-            75% {
-                clip: rect(96px, 9999px, 48px, 0);
+            /* Button */
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.75rem 2rem;
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--primary-foreground);
+                background-color: var(--primary);
+                text-decoration: none;
+                border-radius: calc(var(--radius) - 2px);
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.2);
+                position: relative;
+                overflow: hidden;
             }
 
-            80% {
-                clip: rect(4px, 9999px, 81px, 0);
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+                filter: brightness(1.1);
             }
 
-            85% {
-                clip: rect(74px, 9999px, 35px, 0);
+            .btn:active {
+                transform: translateY(0);
             }
+        </style>
+    </head>
 
-            90% {
-                clip: rect(32px, 9999px, 66px, 0);
-            }
-
-            95% {
-                clip: rect(23px, 9999px, 14px, 0);
-            }
-
-            100% {
-                clip: rect(54px, 9999px, 82px, 0);
-            }
-        }
-
-        @keyframes glitch-anim2 {
-            0% {
-                clip: rect(20px, 9999px, 65px, 0);
-            }
-
-            5% {
-                clip: rect(87px, 9999px, 2px, 0);
-            }
-
-            10% {
-                clip: rect(77px, 9999px, 78px, 0);
-            }
-
-            15% {
-                clip: rect(55px, 9999px, 19px, 0);
-            }
-
-            20% {
-                clip: rect(95px, 9999px, 13px, 0);
-            }
-
-            25% {
-                clip: rect(59px, 9999px, 35px, 0);
-            }
-
-            30% {
-                clip: rect(52px, 9999px, 86px, 0);
-            }
-
-            35% {
-                clip: rect(12px, 9999px, 94px, 0);
-            }
-
-            40% {
-                clip: rect(59px, 9999px, 40px, 0);
-            }
-
-            45% {
-                clip: rect(80px, 9999px, 87px, 0);
-            }
-
-            50% {
-                clip: rect(20px, 9999px, 29px, 0);
-            }
-
-            55% {
-                clip: rect(39px, 9999px, 65px, 0);
-            }
-
-            60% {
-                clip: rect(97px, 9999px, 92px, 0);
-            }
-
-            65% {
-                clip: rect(8px, 9999px, 59px, 0);
-            }
-
-            70% {
-                clip: rect(22px, 9999px, 10px, 0);
-            }
-
-            75% {
-                clip: rect(44px, 9999px, 22px, 0);
-            }
-
-            80% {
-                clip: rect(6px, 9999px, 82px, 0);
-            }
-
-            85% {
-                clip: rect(72px, 9999px, 66px, 0);
-            }
-
-            90% {
-                clip: rect(13px, 9999px, 19px, 0);
-            }
-
-            95% {
-                clip: rect(58px, 9999px, 97px, 0);
-            }
-
-            100% {
-                clip: rect(11px, 9999px, 84px, 0);
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <div class="glitch-wrapper">
-            <h1>404</h1>
+    <body>
+        <div class="ambient-light">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
         </div>
-        <h2>Oops! Page Introuvable</h2>
-        <p>Il semble que vous vous soyez perdu dans l'espace...</p>
-        <a href="/" class="btn">Retour à la base</a>
-    </div>
-</body>
 
+        <div class="glass-panel">
+            <h1>404</h1>
+            <h2>Page Not Found</h2>
+            <p>
+                It looks like you've drifted a bit too far. <br />This page does
+                not exist or has been moved.
+            </p>
+            <a href="/" class="btn">Back to Home</a>
+        </div>
+    </body>
 </html>
