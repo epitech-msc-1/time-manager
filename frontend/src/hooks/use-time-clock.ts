@@ -86,7 +86,7 @@ function formatClockMoment(entry: TimeClockEntry, key: "clockIn" | "clockOut") {
         return timeValue;
     }
 
-    return parsed.toLocaleTimeString("fr-FR", {
+    return parsed.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
     });
