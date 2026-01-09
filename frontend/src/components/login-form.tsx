@@ -19,7 +19,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
     const emailId = useId();
     const passwordId = useId();
 
-    // Mutation Apollo pour le login
+    // Apollo Mutation for login
     const [loginMutation, { loading }] = useMutation<{
         tokenAuth: {
             token: string;
@@ -28,38 +28,38 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
         };
     }>(LOGIN_MUTATION, {
         onCompleted: (data) => {
-            // Extraire token et payload de la réponse
-            // Le refreshToken est automatiquement stocké dans un cookie httpOnly par Django
+            // Extract token and payload from the response
+            // The refreshToken is automatically stored in an httpOnly cookie by Django
             const { token, payload, refreshToken } = data.tokenAuth || {};
 
             if (token && payload) {
-                // Décoder le payload pour extraire les infos utilisateur
+                // Decode the payload to extract user info
                 const user = decodeJWTPayload(payload);
 
-                // Sauvegarder l'utilisateur (le token JWT est déjà dans un cookie httpOnly)
-                // On passe le token juste pour la signature, il n'est pas utilisé
+                // Save the user (JWT token is already in an httpOnly cookie)
+                // We pass the token just for the signature, it is not used
                 login(token, user, payload, refreshToken ?? null);
 
-                // Note : refreshToken est aussi placé en cookie httpOnly, on le conserve côté client
-                // uniquement pour déclencher la révocation lors d'une déconnexion volontaire
+                // Note: refreshToken is also placed in an httpOnly cookie, we keep it client-side
+                // only to trigger revocation upon voluntary logout
 
-                // Afficher un message de succès
-                toast.success(`Bienvenue ${user.firstName} ${user.lastName}!`);
+                // Show success message
+                toast.success(`Welcome ${user.firstName} ${user.lastName}!`);
 
-                // Rediriger vers le dashboard
+                // Redirect to dashboard
                 navigate("/dashboard");
             }
         },
         onError: (error) => {
-            console.error("Erreur de connexion:", error);
-            toast.error("Erreur de connexion. Vérifiez vos identifiants.");
+            console.error("Connection error:", error);
+            toast.error("Connection error. Please check your credentials.");
         },
     });
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!email || !password) {
-            toast.error("Veuillez remplir tous les champs");
+            toast.error("Please fill in all fields");
             return;
         }
 
@@ -71,7 +71,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                 },
             });
         } catch (error) {
-            // L'erreur est déjà gérée dans onError
+            // The error is already handled in onError
             console.error(error);
         }
     };
@@ -80,9 +80,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle>Connexion à votre compte</CardTitle>
+                    <CardTitle>Sign in to your account</CardTitle>
                     <CardDescription>
-                        Entrez votre email et mot de passe pour vous connecter
+                        Enter your email and password to sign in
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -93,7 +93,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                                 <Input
                                     id={emailId}
                                     type="email"
-                                    placeholder="votre@email.com"
+                                    placeholder="your@email.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
@@ -101,7 +101,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                                 />
                             </Field>
                             <Field>
-                                <FieldLabel htmlFor={passwordId}>Mot de passe</FieldLabel>
+                                <FieldLabel htmlFor={passwordId}>Password</FieldLabel>
                                 <Input
                                     id={passwordId}
                                     type="password"
@@ -114,7 +114,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                             </Field>
                             <Field>
                                 <Button type="submit" disabled={loading}>
-                                    {loading ? "Connexion..." : "Se connecter"}
+                                    {loading ? "Signing in..." : "Sign in"}
                                 </Button>
                             </Field>
                         </FieldGroup>
