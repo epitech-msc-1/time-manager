@@ -2,7 +2,7 @@ FROM python:3.12-slim-trixie as builder
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 RUN apt update \
-	&& apt install -y --no-install-recommends curl \
+	&& apt install -y --no-install-recommends curl git\
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN useradd --system --create-home --shell /bin/sh appuser
