@@ -54,16 +54,13 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:${DJANGO_PORT}/graphql
     image: frontend:1.0.0
     container_name: frontend
     restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      VITE_API_URL: http://localhost:${DJANGO_PORT}/graphql
-      VITE_PORT: ${VITE_PORT}
     ports:
-      - ${VITE_PORT}:${VITE_PORT}
+      - ${VITE_PORT}:80
     depends_on:
       backend:
         condition: service_healthy
