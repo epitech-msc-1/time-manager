@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [backend, frontend]
+        service: [backend, frontend, mkdocs]
 
     steps:
       - name: Checkout repository
@@ -48,7 +48,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-             VITE_API_URL=https://api.ytlabs.space/graphql
+            VITE_API_URL=https://api.ytlabs.space/graphql
 
   deploy:
     needs: build-and-push
@@ -112,7 +112,6 @@ jobs:
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
           echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
-          echo "VITE_PORT=${{ secrets.VITE_PORT }}" >> .env
           echo "VITE_API_URL=${{ vars.VITE_API_URL }}" >> .env
           echo "TAG=${{ github.sha }}" >> .env
 
