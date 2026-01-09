@@ -1,12 +1,14 @@
 # Build stage
 FROM oven/bun:latest as builder
 
+RUN useradd --system --create-home --shell /bin/sh appuser
+
+USER appuser
+
 WORKDIR /app
 
-# Copy all files
-COPY . .
+COPY --chown=appuser:appuser . .
 
-# Install dependencies and build
 RUN bun install
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
