@@ -7,74 +7,92 @@ import UsersDashboard from "@/app/users-dashboard/users-dashboard";
 import App from "./App";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useAuth } from "./contexts/AuthContext";
+import { PopUpRequest } from "./components/ui/PopUpRequest";
+import ManagerDashboard from "@/app/manager-dashboard/manager-dashboard";
 
 const NotFoundPage = () => <div>Page non trouvée</div>;
 
 const DefaultRoute = () => {
-    const { hasAttemptedRefresh, isAuthenticated, isLoading } = useAuth();
+  const { hasAttemptedRefresh, isAuthenticated, isLoading } = useAuth();
 
-    if (isLoading || !hasAttemptedRefresh) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto" />
-                    <p className="mt-4 text-gray-600">Chargement...</p>
-                </div>
-            </div>
-        );
-    }
+  if (isLoading || !hasAttemptedRefresh) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto" />
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
-    if (isAuthenticated) {
-        return <Navigate to="/dashboard" replace />;
-    }
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
-    return <Navigate to="/login" replace />;
+  return <Navigate to="/login" replace />;
 };
 
 const routes: RouteObject[] = [
-    {
-        path: "/",
-        element: <App />,
-        children: [
-            {
-                index: true,
-                element: <DefaultRoute />,
-            },
-            {
-                path: "login",
-                element: <Page />,
-            },
-            // Routes protégées
-            {
-                path: "dashboard",
-                element: (
-                    <ProtectedRoute>
-                        <Dashboard />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: "team-dashboard",
-                element: (
-                    <ProtectedRoute requireAdmin>
-                        <TeamDashboard />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: "users-dashboard",
-                element: (
-                    <ProtectedRoute requireAdmin>
-                        <UsersDashboard />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: "*",
-                element: <NotFoundPage />,
-            },
-        ],
-    },
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        index: true,
+        element: <DefaultRoute />,
+      },
+      {
+        path: "login",
+        element: <Page />,
+      },
+      // Routes protégées
+      {
+        path: "dashboard",
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "team-dashboard",
+        element: (
+          <ProtectedRoute requireAdmin>
+            <TeamDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "manager-dashboard",
+        element: (
+          <ProtectedRoute requireManager>
+            <ManagerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "users-dashboard",
+        element: (
+          <ProtectedRoute requireAdmin>
+            <UsersDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "popup-request",
+        element: (
+          <ProtectedRoute>
+            <PopUpRequest />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "*",
+        element: <NotFoundPage />,
+      },
+    ],
+  },
 ];
 
 export default routes;
