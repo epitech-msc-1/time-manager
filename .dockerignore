@@ -11,3 +11,20 @@ wheels/
 
 # Secrets
 .env
+
+# Node
+node_modules/
+
+.env.example
+Dockerfile
+
+# Repo
+assets/
+.github/
+docs/
+.gitignore
+LICENSE
+README.md
+
+# Certs
+traefik/certs

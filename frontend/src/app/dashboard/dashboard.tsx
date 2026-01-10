@@ -333,6 +333,7 @@ export default function Page() {
                                 teamId={targetTeamId}
                                 onTeamUpdated={handleTeamRefresh}
                                 currentUserIsAdmin={Boolean(user?.isAdmin)}
+                                currentUserId={user?.id ?? null}
                             />
                             {error ? (
                                 <p className="px-4 text-sm text-destructive lg:px-6">

@@ -1,0 +1,33 @@
+global:
+  sendAnonymousUsage: false
+
+api:
+  insecure: false
+  dashboard: false
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+providers:
+  swarm:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+  file:
+    filename: /etc/traefik/dynamic.yml
+
+certificatesResolvers:
+  hostinger:
+    acme:
+      email: "yassin9230@gmail.com"
+      storage: "/var/traefik/certs/hostinger-acme.json"
+      caServer: "https://acme-v02.api.letsencrypt.org/directory" # Prod
+      # caServer: "https://acme-staging-v02.api.letsencrypt.org/directory" # Dev
+      dnsChallenge:
+        provider: hostinger
+        delayBeforeCheck: "120"
+        resolvers:
+          - "1.1.1.1:53"
+          - "8.8.8.8:53"

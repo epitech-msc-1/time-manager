@@ -33,8 +33,8 @@ export function NavUser({
 
     const handleLogout = async () => {
         await auth.logout({ revoke: true });
-        toast.success("Déconnexion réussie", {
-            description: "À bientôt !",
+        toast.success("Logout successful", {
+            description: "See you soon!",
         });
         navigate("/login");
     };

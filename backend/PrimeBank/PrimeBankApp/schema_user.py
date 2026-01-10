@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 
-from PrimeBankApp.roles import is_admin, is_manager, require_auth
+from .roles import is_admin, is_manager, require_auth
 
 # Get the user model, here the CustomUser
 User = get_user_model()

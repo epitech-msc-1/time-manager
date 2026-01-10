@@ -4,9 +4,14 @@ import { useAuth } from "@/contexts/AuthContext";
 interface ProtectedRouteProps {
     children?: React.ReactNode;
     requireAdmin?: boolean;
+    requireManager?: boolean;
 }
 
-export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+export function ProtectedRoute({
+    children,
+    requireAdmin = false,
+    requireManager = false,
+}: ProtectedRouteProps) {
     const { isAuthenticated, isLoading, hasAttemptedRefresh, user } = useAuth();
 
     // Pendant le chargement, afficher un loader
@@ -15,7 +20,7 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto" />
-                    <p className="mt-4 text-gray-600">Chargement...</p>
+                    <p className="mt-4 text-gray-600">Loading...</p>
                 </div>
             </div>
         );
@@ -27,6 +32,10 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
     }
 
     if (requireAdmin && !user?.isAdmin) {
+        return <Navigate to="/dashboard" replace />;
+    }
+
+    if (requireManager && !user?.isManager && !user?.isAdmin) {
         return <Navigate to="/dashboard" replace />;
     }
 

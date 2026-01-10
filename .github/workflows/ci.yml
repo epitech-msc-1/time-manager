@@ -2,9 +2,9 @@ name: CI - Time Manager
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   frontend:
@@ -43,7 +43,6 @@ jobs:
       - name: Run tests
         working-directory: frontend
         run: bun test || echo "No tests found"
-
 
   backend:
     name: Backend (Django + GraphQL + uv)
@@ -93,3 +92,22 @@ jobs:
         run: |
           python manage.py migrate --noinput
           python manage.py test --verbosity=2
+
+  sonarqube:
+    name: Sonarqube analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

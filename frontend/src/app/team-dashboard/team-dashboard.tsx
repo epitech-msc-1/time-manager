@@ -603,7 +603,7 @@ export default function TeamDashboard() {
                                         disabled={isBusy}
                                         className="shrink-0"
                                     >
-                                        <IconPlus className="mr-2 size-4" />
+                                        <IconPlus className="size-4" />
                                         Create Team
                                     </Button>
                                 </div>
@@ -810,9 +810,9 @@ export default function TeamDashboard() {
                         </Button>
                         <Button onClick={handleCreateTeam} disabled={isCreating}>
                             {isCreating ? (
-                                <IconLoader2 className="mr-2 size-4 animate-spin" />
+                                <IconLoader2 className="size-4 animate-spin" />
                             ) : (
-                                <IconPlus className="mr-2 size-4" />
+                                <IconPlus className="size-4" />
                             )}
                             Save
                         </Button>
@@ -850,9 +850,9 @@ export default function TeamDashboard() {
                         </Button>
                         <Button onClick={handleUpdateTeam} disabled={isUpdating}>
                             {isUpdating ? (
-                                <IconLoader2 className="mr-2 size-4 animate-spin" />
+                                <IconLoader2 className="size-4 animate-spin" />
                             ) : (
-                                <IconPencil className="mr-2 size-4" />
+                                <IconPencil className="size-4" />
                             )}
                             Save changes
                         </Button>
@@ -884,9 +884,9 @@ export default function TeamDashboard() {
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             {isDeleting ? (
-                                <IconLoader2 className="mr-2 size-4 animate-spin" />
+                                <IconLoader2 className="size-4 animate-spin" />
                             ) : (
-                                <IconTrash className="mr-2 size-4" />
+                                <IconTrash className="size-4" />
                             )}
                             Delete
                         </AlertDialogAction>

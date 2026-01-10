@@ -128,14 +128,20 @@ export function NavMain({ items }: { items: NavItem[] }) {
     }, [userId, isClockedIn, isClockedOut, clockIn, clockOut]);
 
     const clockDescription = useMemo(() => {
+        const now = new Date();
+        const currentTime = now.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
         if (isClockedIn) {
             const formatted = formatClockInTime();
             return formatted
-                ? `You are currently clocked in since ${formatted}.`
-                : "You are currently clocked in.";
+                ? `You are currently clocked in since ${formatted}. Confirm to clock out at ${currentTime}.`
+                : `You are currently clocked in. Confirm to clock out at ${currentTime}.`;
         }
 
-        return "Confirm the action to save your clock in/out.";
+        return `Confirm the action to clock in at ${currentTime}.`;
     }, [isClockedIn, formatClockInTime]);
 
     const isButtonDisabled = !isAuthenticated || isProcessing || isClockedOut;

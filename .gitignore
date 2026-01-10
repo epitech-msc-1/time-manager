@@ -1,8 +1,22 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.venv/
+
 # Secrets
 .env
 
-# Docs
-frontend/docs/
+# Node
+node_modules/
+bun.lock
+bun.lockb
 
 # VSCode
 .vscode/
+
+# MkDocs
+site/

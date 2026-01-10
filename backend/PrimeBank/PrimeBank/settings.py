@@ -16,6 +16,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,17 +26,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-w14q8fvdlz&!6k4b$d3v&sic8z5m17pwt87w!=b_3bu(j==u1s"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
 
-# CORS Configuration
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://localhost:5174"]
+FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://localhost:" + os.getenv("VITE_PORT", "5173")
 
-CORS_ALLOW_CREDENTIALS = True
+# ALLOWED_HOSTS is defined lower down
 
 # Application definition
 
@@ -62,8 +62,8 @@ GRAPHENE = {
 }
 
 GRAPHQL_JWT = {
-    "JWT_COOKIE": True,  # Active l'utilisation des cookies
-    "JWT_COOKIE_SECURE": False,  # ! False en développement, True en production
+    "JWT_COOKIE": True,
+    "JWT_COOKIE_SECURE": True,
     "JWT_VERIFY_EXPIRATION": True,
     # Acces token
     "JWT_EXPIRATION_DELTA": timedelta(minutes=15),
@@ -72,8 +72,10 @@ GRAPHQL_JWT = {
     # Refresh token
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     # Cookie settings
-    "JWT_COOKIE_SAMESITE": "Lax",  # Protection contre les attaques CSRF
+    "JWT_COOKIE_SAMESITE": "None",  # None pour permettre les requetes cross-site/subdomain fiables
     "JWT_COOKIE_NAME": "JWT",  # Nom du cookie pour le token
+    "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-refresh-token",  # Cookie pour le refresh token
+    "JWT_REFRESH_TOKEN_COOKIE_SAMESITE": "None",
     "JWT_COOKIE_HTTPONLY": True,  # Cookie accessible uniquement via HTTP(S)
     # Custom payload handler to include extra user info in tokens
     "JWT_PAYLOAD_HANDLER": "PrimeBankApp.schema_auth.jwt_payload",
@@ -86,7 +88,6 @@ AUTHENTICATION_BACKENDS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -96,23 +97,26 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://localhost:5174"]
-
-# CORS_ALLOW_HEADERS = [
-#     "authorization",
-#     "content-type",
-#     "x-csrftoken",
-#     "accept",
-#     "origin",
-#     "cookie",
-# ]
-
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://ytlabs.space",
+    "https://api.ytlabs.space",  # Sometimes self-requests or dev tools
+]
+if FRONTEND_URL:
+    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://ytlabs.space",
+    "https://api.ytlabs.space",
     "http://localhost:5173",
-    "http://localhost:5174",
+    "http://127.0.0.1:5173",
 ]
+if FRONTEND_URL:
+    CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL)
+
+ALLOWED_HOSTS = ["*"]
 
 
 ROOT_URLCONF = "PrimeBank.urls"
@@ -137,8 +141,6 @@ WSGI_APPLICATION = "PrimeBank.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-load_dotenv()  # permet de charger les variables d'environnement depuis le fichier .env
 
 DATABASES = {
     "default": {
@@ -176,7 +178,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True
 
