@@ -13,6 +13,10 @@ dependencies = [
     "graphene-django>=3.2.3",
     "psycopg[binary]>=3.2.10",
     "pyjwt>=2.10.1",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-django>=4.11.1",
+    "pytest-mock>=3.15.1",
     "python-dotenv>=1.1.1",
     "gunicorn>=23.0.0",
     "weasyprint>=61.1",
@@ -21,3 +25,8 @@ dependencies = [
 
 [dependency-groups]
 dev = ["ruff>=0.14.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["PrimeBank"]
+DJANGO_SETTINGS_MODULE = "PrimeBank.settings"
+python_files = ["test_*.py"]
