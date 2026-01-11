@@ -6,6 +6,7 @@ dist/
 wheels/
 *.egg-info
 .venv/
+uv.lock
 
 # Secrets
 .env
