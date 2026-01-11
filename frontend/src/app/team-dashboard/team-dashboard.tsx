@@ -297,6 +297,8 @@ export default function TeamDashboard() {
             .sort((a, b) => a.fullName.localeCompare(b.fullName));
     }, [usersData?.users]);
 
+    const totalMembers = usersData?.users.length ?? 0;
+
     const isBusy = isCreating || isUpdating || isDeleting;
 
     const refetchAll = useCallback(async () => {
@@ -522,12 +524,17 @@ export default function TeamDashboard() {
         >
             <AppSidebar variant="inset" />
             <SidebarInset>
-                <SiteHeader title="Team Dashboard" />
+                <div className="flex items-center gap-2 px-4 py-2 border-b lg:px-6">
+                    <SiteHeader title="Team Dashboard" />
+                    <Badge variant="outline" className="ml-auto">
+                        Total Members: {totalMembers}
+                    </Badge>
+                </div>
                 <div className="flex flex-1 flex-col">
                     <div className="flex flex-1 flex-col gap-4 py-4 sm:gap-6 sm:py-6">
                         <Card className="mx-4 sm:mx-6">
                             <CardHeader>
-                                <CardTitle>Teams</CardTitle>
+                                <CardTitle>Teams ({teamSummaries.length})</CardTitle>
                                 <CardDescription>
                                     Create, edit, and delete teams. Members are unassigned
                                     automatically when a team is removed.
@@ -667,15 +674,23 @@ export default function TeamDashboard() {
                                                                     No members
                                                                 </span>
                                                             ) : (
-                                                                <div className="flex flex-wrap gap-1.5">
-                                                                    {team.members.map((member) => (
-                                                                        <Badge
-                                                                            key={member.id}
-                                                                            variant="outline"
-                                                                        >
-                                                                            {member.fullName}
-                                                                        </Badge>
-                                                                    ))}
+                                                                <div className="flex flex-col gap-1.5">
+                                                                    <span className="text-muted-foreground text-xs">
+                                                                        {team.members.length}{" "}
+                                                                        {team.members.length === 1
+                                                                            ? "member"
+                                                                            : "members"}
+                                                                    </span>
+                                                                    <div className="flex flex-wrap gap-1.5">
+                                                                        {team.members.map((member) => (
+                                                                            <Badge
+                                                                                key={member.id}
+                                                                                variant="outline"
+                                                                            >
+                                                                                {member.fullName}
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                         </TableCell>
@@ -752,7 +767,7 @@ export default function TeamDashboard() {
                         </Card>
                         <Card className="mx-4 sm:mx-6">
                             <CardHeader>
-                                <CardTitle>Unassigned Members</CardTitle>
+                                <CardTitle>Unassigned Members ({unassignedMembers.length})</CardTitle>
                                 <CardDescription>Users without a team assignment.</CardDescription>
                             </CardHeader>
                             <CardContent>

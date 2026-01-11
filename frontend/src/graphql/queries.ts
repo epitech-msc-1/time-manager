@@ -107,6 +107,14 @@ export const GET_ME = gql`
             firstName
             lastName
             isAdmin
+            team {
+                id
+                description
+            }
+            teamManaged {
+                id
+                description
+            }
         }
     }
 `;

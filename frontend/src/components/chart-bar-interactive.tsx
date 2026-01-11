@@ -165,7 +165,7 @@ export function ChartAreaInteractive({
                                 axisLine={false}
                                 tickFormatter={(value) => {
                                     const date = new Date(value);
-                                    return date.toLocaleDateString("us-US", {
+                                    return date.toLocaleDateString("en-US", {
                                         month: "short",
                                         day: "numeric",
                                         weekday: "long",
@@ -177,7 +177,7 @@ export function ChartAreaInteractive({
                                 content={
                                     <ChartTooltipContent
                                         labelFormatter={(value) => {
-                                            return new Date(value).toLocaleDateString("us-US", {
+                                            return new Date(value).toLocaleDateString("en-US", {
                                                 month: "short",
                                                 day: "numeric",
                                                 weekday: "long",
