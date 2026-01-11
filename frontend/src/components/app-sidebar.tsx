@@ -161,10 +161,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuItem>
                             <SidebarMenuButton
                                 onClick={() => setShowRaisePopup(true)}
-                                tooltip="Raise a time modification request"
+                                tooltip="Request a change to your time logs"
                             >
                                 <IconMessagePlus />
-                                <span>Raise Request</span>
+                                <span>Request Time Modification</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>

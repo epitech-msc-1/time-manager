@@ -409,6 +409,7 @@ interface DataTableProps {
     currentUserIsAdmin?: boolean;
     currentUserId?: string | null;
     className?: string;
+    title?: string;
 }
 
 export function DataTable({
@@ -420,6 +421,7 @@ export function DataTable({
     currentUserIsAdmin = false,
     currentUserId = null,
     className,
+    title,
 }: DataTableProps) {
     const [data, setData] = React.useState(() => initialData);
 
@@ -428,6 +430,8 @@ export function DataTable({
     }, [initialData]);
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+    const [isBulkDeleteConfirmOpen, setIsBulkDeleteConfirmOpen] = React.useState(false);
+    const [isBulkDeleting, setIsBulkDeleting] = React.useState(false);
     const [emailCandidate, setEmailCandidate] = React.useState("");
     const [lastRequestedEmail, setLastRequestedEmail] = React.useState("");
     const [selectedUser, setSelectedUser] = React.useState<UserLookupResult | null>(null);
@@ -687,207 +691,230 @@ export function DataTable({
             defaultValue="outline"
             className={cn("flex w-full flex-col justify-start gap-6", className)}
         >
-            <div className="flex items-center justify-between px-4 lg:px-6">
-                <div className="flex items-center relative gap-2">
-                    <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Search team members..."
-                        value={(table.getColumn("firstname")?.getFilterValue() as string) ?? ""}
-                        onChange={(event) =>
-                            table.getColumn("firstname")?.setFilterValue(event.target.value)
-                        }
-                        className="max-w-md h-9 pl-9 bg-muted/20 border-border focus-visible:ring-primary/20"
-                    />
-                </div>
-                <div className="flex items-center gap-2">
-                    {onTeamUpdated && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onTeamUpdated()}
-                            disabled={isLoading}
-                            title="Refresh dashboard"
-                        >
-                            <IconRefresh className={cn("size-4", isLoading && "animate-spin")} />
-                            <span className="hidden lg:inline">Refresh</span>
-                        </Button>
-                    )}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                <IconLayoutColumns />
-                                <span className="hidden lg:inline">Customize Columns</span>
-                                <span className="lg:hidden">Columns</span>
-                                <IconChevronDown />
+            <div className="flex flex-col gap-4 px-4 lg:px-6">
+                {title ? (
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+                    </div>
+                ) : null}
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center relative gap-2">
+                        <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search team members..."
+                            value={(table.getColumn("firstname")?.getFilterValue() as string) ?? ""}
+                            onChange={(event) =>
+                                table.getColumn("firstname")?.setFilterValue(event.target.value)
+                            }
+                            className="max-w-md h-9 pl-9 bg-muted/20 border-border focus-visible:ring-primary/20"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {table.getFilteredSelectedRowModel().rows.length > 0 && canManageMembers ? (
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => setIsBulkDeleteConfirmOpen(true)}
+                            >
+                                <IconUserMinus className="size-4" />
+                                <span className="hidden lg:inline">
+                                    Remove ({table.getFilteredSelectedRowModel().rows.length})
+                                </span>
                             </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                            {table
-                                .getAllColumns()
-                                .filter(
-                                    (column) =>
-                                        typeof column.accessorFn !== "undefined" &&
-                                        column.getCanHide(),
-                                )
-                                .map((column) => {
-                                    return (
-                                        <DropdownMenuCheckboxItem
-                                            key={column.id}
-                                            className="capitalize"
-                                            checked={column.getIsVisible()}
-                                            onCheckedChange={(value) =>
-                                                column.toggleVisibility(!!value)
-                                            }
-                                        >
-                                            {column.id}
-                                        </DropdownMenuCheckboxItem>
-                                    );
-                                })}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    {canManageMembers ? (
-                        <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-                            <DialogTrigger asChild>
+                        ) : null}
+                        {onTeamUpdated && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onTeamUpdated()}
+                                disabled={isLoading}
+                                title="Refresh dashboard"
+                            >
+                                <IconRefresh
+                                    className={cn("size-4", isLoading && "animate-spin")}
+                                />
+                                <span className="hidden lg:inline">Refresh</span>
+                            </Button>
+                        )}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm">
-                                    <IconUserPlus />
-                                    <span className="hidden lg:inline">Add Member</span>
-                                    <span className="lg:hidden">Add</span>
+                                    <IconLayoutColumns />
+                                    <span className="hidden lg:inline">Customize Columns</span>
+                                    <span className="lg:hidden">Columns</span>
+                                    <IconChevronDown />
                                 </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle className="flex items-center gap-2 text-xl">
-                                        <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                                            <IconUserPlus className="size-5" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                                {table
+                                    .getAllColumns()
+                                    .filter(
+                                        (column) =>
+                                            typeof column.accessorFn !== "undefined" &&
+                                            column.getCanHide(),
+                                    )
+                                    .map((column) => {
+                                        return (
+                                            <DropdownMenuCheckboxItem
+                                                key={column.id}
+                                                className="capitalize"
+                                                checked={column.getIsVisible()}
+                                                onCheckedChange={(value) =>
+                                                    column.toggleVisibility(!!value)
+                                                }
+                                            >
+                                                {column.id}
+                                            </DropdownMenuCheckboxItem>
+                                        );
+                                    })}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        {canManageMembers ? (
+                            <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm">
+                                        <IconUserPlus />
+                                        <span className="hidden lg:inline">Add Member</span>
+                                        <span className="lg:hidden">Add</span>
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle className="flex items-center gap-2 text-xl">
+                                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                                                <IconUserPlus className="size-5" />
+                                            </div>
+                                            Add a new member
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            Search by email to add an existing user to this team.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor={emailFieldId}>Member email</Label>
+                                            <Input
+                                                id={emailFieldId}
+                                                type="email"
+                                                value={emailCandidate}
+                                                onChange={(event) =>
+                                                    handleEmailChange(event.target.value)
+                                                }
+                                                placeholder="member@email.com"
+                                                autoComplete="off"
+                                            />
+                                            {isSearchingUser ? (
+                                                <p className="text-muted-foreground text-xs">
+                                                    Searching user...
+                                                </p>
+                                            ) : searchErrorMessage ? (
+                                                <p className="text-destructive text-xs">
+                                                    {searchErrorMessage}
+                                                </p>
+                                            ) : null}
                                         </div>
-                                        Add a new member
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        Search by email to add an existing user to this team.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor={emailFieldId}>Member email</Label>
-                                        <Input
-                                            id={emailFieldId}
-                                            type="email"
-                                            value={emailCandidate}
-                                            onChange={(event) =>
-                                                handleEmailChange(event.target.value)
-                                            }
-                                            placeholder="member@email.com"
-                                            autoComplete="off"
-                                        />
-                                        {isSearchingUser ? (
-                                            <p className="text-muted-foreground text-xs">
-                                                Searching user...
-                                            </p>
-                                        ) : searchErrorMessage ? (
+                                        {selectedUser ? (
+                                            <div className="space-y-2 rounded-md border p-3 text-sm">
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div>
+                                                        <p className="font-medium">
+                                                            {selectedUser.firstName}{" "}
+                                                            {selectedUser.lastName}
+                                                        </p>
+                                                        <p className="text-muted-foreground text-xs">
+                                                            {selectedUser.email}
+                                                        </p>
+                                                    </div>
+                                                    {selectedUserRoleLabel ? (
+                                                        <Badge
+                                                            variant={
+                                                                selectedUser.isAdmin
+                                                                    ? "destructive"
+                                                                    : "secondary"
+                                                            }
+                                                        >
+                                                            {selectedUserRoleLabel}
+                                                        </Badge>
+                                                    ) : null}
+                                                </div>
+                                                {selectedUser.team?.description ? (
+                                                    <p className="text-muted-foreground text-xs">
+                                                        Current team:{" "}
+                                                        {selectedUser.team.description}
+                                                    </p>
+                                                ) : null}
+                                                {selectedUser.teamManaged?.description ? (
+                                                    <p className="text-muted-foreground text-xs">
+                                                        Manages:{" "}
+                                                        {selectedUser.teamManaged.description}
+                                                    </p>
+                                                ) : null}
+                                                {assignmentWarningMessage ? (
+                                                    <p className="text-destructive text-xs">
+                                                        {assignmentWarningMessage}
+                                                    </p>
+                                                ) : null}
+                                                {cannotAssignSelectedUser ? (
+                                                    <p className="text-destructive text-xs">
+                                                        You need admin rights to add an admin user.
+                                                    </p>
+                                                ) : null}
+                                            </div>
+                                        ) : null}
+                                        {showTeamWarning ? (
                                             <p className="text-destructive text-xs">
-                                                {searchErrorMessage}
+                                                Target team is unknown. Contact an administrator.
                                             </p>
                                         ) : null}
                                     </div>
-                                    {selectedUser ? (
-                                        <div className="space-y-2 rounded-md border p-3 text-sm">
-                                            <div className="flex items-start justify-between gap-3">
-                                                <div>
-                                                    <p className="font-medium">
-                                                        {selectedUser.firstName}{" "}
-                                                        {selectedUser.lastName}
-                                                    </p>
-                                                    <p className="text-muted-foreground text-xs">
-                                                        {selectedUser.email}
-                                                    </p>
-                                                </div>
-                                                {selectedUserRoleLabel ? (
-                                                    <Badge
-                                                        variant={
-                                                            selectedUser.isAdmin
-                                                                ? "destructive"
-                                                                : "secondary"
-                                                        }
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button variant="outline">Cancel</Button>
+                                        </DialogClose>
+                                        <AlertDialog
+                                            open={isConfirmOpen}
+                                            onOpenChange={setIsConfirmOpen}
+                                        >
+                                            <AlertDialogTrigger asChild>
+                                                <Button disabled={isAddActionDisabled}>
+                                                    {isAddingMember ? "Adding..." : "Add member"}
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle className="flex items-center gap-2 text-xl">
+                                                        <div className="p-2 rounded-lg bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+                                                            <IconAlertTriangle className="size-5" />
+                                                        </div>
+                                                        Confirm member addition
+                                                    </AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This will add {selectedUser?.firstName}{" "}
+                                                        {selectedUser?.lastName} to your team. You
+                                                        can remove members later if needed.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel disabled={isAddingMember}>
+                                                        Cancel
+                                                    </AlertDialogCancel>
+                                                    <AlertDialogAction
+                                                        disabled={isAddingMember}
+                                                        onClick={(event) => {
+                                                            event.preventDefault();
+                                                            void handleConfirmAddition();
+                                                        }}
                                                     >
-                                                        {selectedUserRoleLabel}
-                                                    </Badge>
-                                                ) : null}
-                                            </div>
-                                            {selectedUser.team?.description ? (
-                                                <p className="text-muted-foreground text-xs">
-                                                    Current team: {selectedUser.team.description}
-                                                </p>
-                                            ) : null}
-                                            {selectedUser.teamManaged?.description ? (
-                                                <p className="text-muted-foreground text-xs">
-                                                    Manages: {selectedUser.teamManaged.description}
-                                                </p>
-                                            ) : null}
-                                            {assignmentWarningMessage ? (
-                                                <p className="text-destructive text-xs">
-                                                    {assignmentWarningMessage}
-                                                </p>
-                                            ) : null}
-                                            {cannotAssignSelectedUser ? (
-                                                <p className="text-destructive text-xs">
-                                                    You need admin rights to add an admin user.
-                                                </p>
-                                            ) : null}
-                                        </div>
-                                    ) : null}
-                                    {showTeamWarning ? (
-                                        <p className="text-destructive text-xs">
-                                            Target team is unknown. Contact an administrator.
-                                        </p>
-                                    ) : null}
-                                </div>
-                                <DialogFooter>
-                                    <DialogClose asChild>
-                                        <Button variant="outline">Cancel</Button>
-                                    </DialogClose>
-                                    <AlertDialog
-                                        open={isConfirmOpen}
-                                        onOpenChange={setIsConfirmOpen}
-                                    >
-                                        <AlertDialogTrigger asChild>
-                                            <Button disabled={isAddActionDisabled}>
-                                                {isAddingMember ? "Adding..." : "Add member"}
-                                            </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle className="flex items-center gap-2 text-xl">
-                                                    <div className="p-2 rounded-lg bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
-                                                        <IconAlertTriangle className="size-5" />
-                                                    </div>
-                                                    Confirm member addition
-                                                </AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    This will add {selectedUser?.firstName}{" "}
-                                                    {selectedUser?.lastName} to your team. You can
-                                                    remove members later if needed.
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel disabled={isAddingMember}>
-                                                    Cancel
-                                                </AlertDialogCancel>
-                                                <AlertDialogAction
-                                                    disabled={isAddingMember}
-                                                    onClick={(event) => {
-                                                        event.preventDefault();
-                                                        void handleConfirmAddition();
-                                                    }}
-                                                >
-                                                    {isAddingMember ? "Working..." : "Confirm"}
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    ) : null}
+                                                        {isAddingMember ? "Working..." : "Confirm"}
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        ) : null}
+                    </div>
                 </div>
             </div>
             <TabsContent
@@ -1042,9 +1069,67 @@ export function DataTable({
             <TabsContent value="key-personnel" className="flex flex-col px-4 lg:px-6">
                 <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
             </TabsContent>
-            <TabsContent value="focus-documents" className="flex flex-col px-4 lg:px-6">
-                <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-            </TabsContent>
+            <AlertDialog open={isBulkDeleteConfirmOpen} onOpenChange={setIsBulkDeleteConfirmOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 text-xl">
+                            <div className="p-2 rounded-lg bg-destructive/10 text-destructive">
+                                <IconUserMinus className="size-5" />
+                            </div>
+                            Remove team members
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to remove{" "}
+                            <strong>
+                                {table.getFilteredSelectedRowModel().rows.length} members
+                            </strong>{" "}
+                            from this team? This action can be reverted by adding them back later.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            disabled={isBulkDeleting}
+                            variant="destructive"
+                            onClick={async (e) => {
+                                e.preventDefault();
+                                setIsBulkDeleting(true);
+                                try {
+                                    const selectedRows = table.getFilteredSelectedRowModel().rows;
+                                    await Promise.all(
+                                        selectedRows.map((row) =>
+                                            updateUser({
+                                                variables: {
+                                                    id: String(row.original.id),
+                                                    teamId: null,
+                                                },
+                                            }),
+                                        ),
+                                    );
+                                    toast.success(
+                                        `${selectedRows.length} members have been removed from the team.`,
+                                    );
+                                    setRowSelection({});
+                                    if (onTeamUpdated) {
+                                        await onTeamUpdated();
+                                    }
+                                    setIsBulkDeleteConfirmOpen(false);
+                                } catch (error) {
+                                    const message =
+                                        error instanceof Error
+                                            ? error.message
+                                            : "Failed to remove some members from the team.";
+                                    toast.error(message);
+                                } finally {
+                                    setIsBulkDeleting(false);
+                                }
+                            }}
+                        >
+                            {isBulkDeleting ? "Removing..." : "Remove"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Tabs>
     );
 }

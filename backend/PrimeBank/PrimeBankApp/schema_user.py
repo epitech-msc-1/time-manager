@@ -79,7 +79,11 @@ class UserQuery(graphene.ObjectType):
 
         # If requester is manager, target must be in their team OR be themselves
         is_self = str(requester.id) == str(target_user.id)
-        if not (is_self or is_manager_of(requester, target_user.team_id)):
+        if not (
+            is_self
+            or is_manager_of(requester, target_user.team_id)
+            or target_user.team_id is None
+        ):
             raise GraphQLError("Access denied: User is not in your team.")
 
         return target_user

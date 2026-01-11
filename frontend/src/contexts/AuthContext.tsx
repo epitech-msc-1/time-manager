@@ -19,6 +19,14 @@ export interface User {
     teamId?: string;
     teamManagedId?: string;
     hourContract?: number;
+    team?: {
+        id: string;
+        description?: string;
+    };
+    teamManaged?: {
+        id: string;
+        description?: string;
+    };
 }
 
 type StoredUserShape = Omit<User, "isManager"> & { isManager?: boolean };

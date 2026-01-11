@@ -249,6 +249,17 @@ export default function Page() {
     const canManageMembers = Boolean(user?.isAdmin || isManager);
     const targetTeamId = user?.teamManagedId ?? user?.teamId ?? null;
 
+    const teamTitle = useMemo(() => {
+        if (!user) return undefined;
+        if (canManageMembers && user.teamManaged?.description) {
+            return user.teamManaged.description;
+        }
+        if (user.team?.description) {
+            return user.team.description;
+        }
+        return "Team Members";
+    }, [user, canManageMembers]);
+
     useEffect(() => {
         if (!user?.id) {
             return;
@@ -337,6 +348,7 @@ export default function Page() {
                                 currentUserIsAdmin={Boolean(user?.isAdmin)}
                                 currentUserId={user?.id ?? null}
                                 className="flex-1 min-h-0"
+                                title={teamTitle}
                             />
                             {error ? (
                                 <p className="px-4 text-sm text-destructive lg:px-6">
