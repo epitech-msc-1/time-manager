@@ -76,7 +76,7 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      VITE_API_URL: https://api.ytlabs.space/graphql
+      VITE_API_URL: /api/graphql
       VITE_PORT: ${VITE_PORT:-5173}
     labels:
       - traefik.enable=true
