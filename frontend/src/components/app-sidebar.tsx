@@ -1,182 +1,198 @@
 import {
-  type Icon,
-  IconBuilding,
-  IconDashboard,
-  IconUserCog,
-  IconUsersGroup,
+    type Icon,
+    IconCheckupList,
+    IconDashboard,
+    IconFileChart,
+    IconMessagePlus,
+    IconUserCog,
+    IconUsersGroup,
 } from "@tabler/icons-react";
 import type * as React from "react";
 import { useEffect, useState } from "react";
-import PopUpRaiseRequest from "@/components/ui/PopUpRaiseRequest";
-
+import { ExportDialog } from "@/components/export-dialog";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { useTheme } from "@/components/theme-provider";
+import PopUpRaiseRequest from "@/components/ui/PopUpRaiseRequest";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const auth = useAuth();
-  const user = auth.user;
-  const { theme } = useTheme();
-  const [isLightTheme, setIsLightTheme] = useState(false);
-  const [showRaisePopup, setShowRaisePopup] = useState(false);
+    const auth = useAuth();
+    const user = auth.user;
+    const { theme } = useTheme();
+    const [isLightTheme, setIsLightTheme] = useState(false);
+    const [showRaisePopup, setShowRaisePopup] = useState(false);
+    const [showExportDialog, setShowExportDialog] = useState(false);
 
-  // Block body scroll when popup is open
-  useEffect(() => {
-    if (showRaisePopup) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    // Block body scroll when popup is open
+    useEffect(() => {
+        if (showRaisePopup) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [showRaisePopup]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        const root = window.document.documentElement;
+        const resolvedTheme =
+            theme === "system" ? (root.classList.contains("dark") ? "dark" : "light") : theme;
+
+        setIsLightTheme(resolvedTheme === "light");
+    }, [theme]);
+
+    type SidebarNavItem = {
+        title: string;
+        url: string;
+        icon: Icon;
+        disabled?: boolean;
+    };
+
+    const data = {
+        user: {
+            name: "Loading",
+            email: "Loding",
+            initials: "L",
+        },
+        navMain: [
+            {
+                title: "My Dashboard",
+                url: "/dashboard",
+                icon: IconDashboard,
+            },
+        ] as SidebarNavItem[],
+    };
+
+    if (user?.isAdmin || user?.isManager) {
+        data.navMain.push({
+            title: "Manager Dashboard",
+            url: "/manager-dashboard",
+            icon: IconCheckupList,
+        });
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [showRaisePopup]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (user?.isAdmin) {
+        data.navMain.push({
+            title: "Team Dashboard",
+            url: "/team-dashboard",
+            icon: IconUsersGroup,
+        });
+        data.navMain.push({
+            title: "Users Dashboard",
+            url: "/users-dashboard",
+            icon: IconUserCog,
+        });
+    }
 
-    const root = window.document.documentElement;
-    const resolvedTheme =
-      theme === "system"
-        ? root.classList.contains("dark")
-          ? "dark"
-          : "light"
-        : theme;
+    if (user) {
+        data.user = {
+            name: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+            initials: `${user.firstName[0]}${user.lastName[0]}`,
+        };
+    }
 
-    setIsLightTheme(resolvedTheme === "light");
-  }, [theme]);
+    return (
+        <Sidebar collapsible="offcanvas" {...props}>
+            <SidebarHeader>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton
+                            asChild
+                            className="data-[slot=sidebar-menu-button]:!p-1.5"
+                        >
+                            <a href="/">
+                                {isLightTheme ? (
+                                    <span
+                                        role="img"
+                                        aria-label="PrimeBank Logo"
+                                        className="!size-6 rounded-sm bg-ring transition-colors"
+                                        style={{
+                                            maskImage: "url('/primebank-logo.png')",
+                                            maskSize: "contain",
+                                            maskRepeat: "no-repeat",
+                                            maskPosition: "center",
+                                            WebkitMaskImage: "url('/primebank-logo.png')",
+                                            WebkitMaskSize: "contain",
+                                            WebkitMaskRepeat: "no-repeat",
+                                            WebkitMaskPosition: "center",
+                                        }}
+                                    />
+                                ) : (
+                                    <img
+                                        src="primebank-logo.png"
+                                        alt="PrimeBank Logo"
+                                        className="!size-6"
+                                    />
+                                )}
+                                <span className="text-base font-semibold">PrimeBank</span>
+                            </a>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarHeader>
+            <SidebarContent>
+                <NavMain items={data.navMain} />
+            </SidebarContent>
+            <SidebarFooter>
+                <div className="space-y-2">
+                    <div className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Quick Actions
+                    </div>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                onClick={() => setShowRaisePopup(true)}
+                                tooltip="Raise a time modification request"
+                            >
+                                <IconMessagePlus />
+                                <span>Raise Request</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                onClick={() => setShowExportDialog(true)}
+                                tooltip="Export your time report"
+                            >
+                                <IconFileChart />
+                                <span>Export Report</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </div>
 
-  type SidebarNavItem = {
-    title: string;
-    url: string;
-    icon: Icon;
-    disabled?: boolean;
-  };
+                <div className="border-t" />
 
-  const data = {
-    user: {
-      name: "Loading",
-      email: "Loding",
-      initials: "L",
-    },
-    navMain: [
-      {
-        title: "My Dashboard",
-        url: "/dashboard",
-        icon: IconDashboard,
-      },
-    ] as SidebarNavItem[],
-  };
+                <NavUser user={data.user} />
 
-  if (user?.isAdmin) {
-    data.navMain.push({
-      title: "Team Dashboard",
-      url: "/team-dashboard",
-      icon: IconUsersGroup,
-    });
-    data.navMain.push({
-      title: "Users Dashboard",
-      url: "/users-dashboard",
-      icon: IconUserCog,
-    });
-  }
+                <ExportDialog
+                    isOpen={showExportDialog}
+                    onClose={() => setShowExportDialog(false)}
+                    defaultStartDate={startOfMonth}
+                    defaultEndDate={endOfMonth}
+                    userId={user?.id}
+                />
 
-  data.navMain.push({
-    title: "Manager Dashboard",
-    url: "/manager-dashboard",
-    icon: IconBuilding,
-  });
-
-  if (user) {
-    data.user = {
-      name: `${user.firstName} ${user.lastName}`,
-      email: user.email,
-      initials: `${user.firstName[0]}${user.lastName[0]}`,
-    };
-  }
-
-  return (
-    <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a href="/">
-                {isLightTheme ? (
-                  <span
-                    role="img"
-                    aria-label="PrimeBank Logo"
-                    className="!size-6 rounded-sm bg-ring transition-colors"
-                    style={{
-                      maskImage: "url('/primebank-logo.png')",
-                      maskSize: "contain",
-                      maskRepeat: "no-repeat",
-                      maskPosition: "center",
-                      WebkitMaskImage: "url('/primebank-logo.png')",
-                      WebkitMaskSize: "contain",
-                      WebkitMaskRepeat: "no-repeat",
-                      WebkitMaskPosition: "center",
-                    }}
-                  />
-                ) : (
-                  <img
-                    src="primebank-logo.png"
-                    alt="PrimeBank Logo"
-                    className="!size-6"
-                  />
-                )}
-                <span className="text-base font-semibold">PrimeBank</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-      </SidebarContent>
-      <SidebarFooter>
-        {/* Raise Request Button - Simple style */}
-        <div className="px-3 pb-3">
-          <button
-            type="button"
-            onClick={() => setShowRaisePopup(true)}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-muted px-3 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Raise Request
-          </button>
-        </div>
-
-        <NavUser user={data.user} />
-
-        {showRaisePopup && (
-          <PopUpRaiseRequest onClose={() => setShowRaisePopup(false)} />
-        )}
-      </SidebarFooter>
-    </Sidebar>
-  );
+                {showRaisePopup && <PopUpRaiseRequest onClose={() => setShowRaisePopup(false)} />}
+            </SidebarFooter>
+        </Sidebar>
+    );
 }

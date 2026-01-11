@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
 import type { GraphQLError } from "graphql";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -134,9 +134,13 @@ export function useTimeClock(userId?: string) {
         });
     }, [error]);
 
+    const client = useApolloClient();
+
     const [runClockIn, { loading: clockInLoading }] = useMutation<ClockInData, TimeClockVariables>(
         CLOCK_IN_MUTATION,
         {
+            refetchQueries: ["KpiClock", "UserTeamPresence", "TimeClock"],
+            awaitRefetchQueries: true,
             onCompleted: (data) => {
                 const entry = data.clockIn?.timeClock;
 
@@ -162,6 +166,8 @@ export function useTimeClock(userId?: string) {
         ClockOutData,
         TimeClockVariables
     >(CLOCK_OUT_MUTATION, {
+        refetchQueries: ["KpiClock", "UserTeamPresence", "TimeClock"],
+        awaitRefetchQueries: true,
         onCompleted: (data) => {
             const entry = data.clockOut?.timeClock;
 
@@ -201,8 +207,11 @@ export function useTimeClock(userId?: string) {
         }
 
         const result = await runClockIn({ variables: { userId } });
+        await client.refetchQueries({
+            include: ["KpiClock", "UserTeamPresence"],
+        });
         return result.data?.clockIn.timeClock ?? null;
-    }, [runClockIn, userId]);
+    }, [runClockIn, userId, client]);
 
     const clockOut = useCallback(async () => {
         if (!userId) {
@@ -211,8 +220,11 @@ export function useTimeClock(userId?: string) {
         }
 
         const result = await runClockOut({ variables: { userId } });
+        await client.refetchQueries({
+            include: ["KpiClock", "UserTeamPresence"],
+        });
         return result.data?.clockOut.timeClock ?? null;
-    }, [runClockOut, userId]);
+    }, [runClockOut, userId, client]);
 
     const refreshStatus = useCallback(async () => {
         if (!userId) {

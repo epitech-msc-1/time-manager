@@ -14,7 +14,6 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
     const { isAuthenticated, isLoading, hasAttemptedRefresh, user } = useAuth();
 
-    // Pendant le chargement, afficher un loader
     if (isLoading || !hasAttemptedRefresh) {
         return (
             <div className="flex items-center justify-center min-h-screen">

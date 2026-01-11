@@ -1,409 +1,319 @@
-import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardFooter } from "./card";
-import { Label } from "./label";
-import { Button } from "./button";
-import { Input } from "./input";
-import { Badge } from "./badge";
-import { useAuth } from "@/contexts/AuthContext";
+"use client";
+
 import { gql } from "@apollo/client";
-import { useMutation, useLazyQuery } from "@apollo/client/react";
+import { useLazyQuery, useMutation } from "@apollo/client/react";
+import { format } from "date-fns";
+import { CalendarIcon, Check, FileText, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Calendar, Clock, X, Check, FileText, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { TimePicker } from "@/components/ui/time-picker";
+import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 
-export function PopUpRaiseRequest({ onClose }: { onClose?: () => void }) {
-  const { user } = useAuth();
-
-  const [day, setDay] = useState("");
-  const [newClockIn, setNewClockIn] = useState("");
-  const [newClockOut, setNewClockOut] = useState("");
-  const [description, setDescription] = useState("");
-
-  // Helper: normalize server times
-  const normalizeTime = (t?: string | null) => {
-    if (!t) return "";
-    const parts = t.split(":");
-    if (parts.length >= 2)
-      return `${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}`;
-    return t;
-  };
-
-  const normalizeDay = (d?: string | null) => {
-    if (!d) return "";
-    // strip time part if present (e.g. 2026-01-08T00:00:00)
-    return d.split("T")[0];
-  };
-
-  const GET_TIME_CLOCKS_QUERY = gql`
-    query TimeClocks {
-      timeClocks {
+const GET_TIME_CLOCKS_QUERY = gql`
+  query TimeClocks {
+    timeClocks {
+      id
+      user {
         id
-        user {
-          id
-        }
-        day
-        clockIn
-        clockOut
       }
+      day
+      clockIn
+      clockOut
     }
-  `;
+  }
+`;
 
-  const CREATE_REQUEST_MUTATION = gql`
-    mutation CreateRequest(
-      $day: Date!
-      $description: String
-      $newClockIn: Time!
-      $newClockOut: Time!
+const CREATE_REQUEST_MUTATION = gql`
+  mutation CreateRequest(
+    $day: Date!
+    $description: String
+    $newClockIn: Time!
+    $newClockOut: Time!
+  ) {
+    createRequestModifyTimeClock(
+      day: $day
+      description: $description
+      newClockIn: $newClockIn
+      newClockOut: $newClockOut
     ) {
-      createRequestModifyTimeClock(
-        day: $day
-        description: $description
-        newClockIn: $newClockIn
-        newClockOut: $newClockOut
-      ) {
-        request {
-          id
-        }
+      request {
+        id
       }
     }
-  `;
+  }
+`;
 
-  type TimeClockEntry = {
+type TimeClockEntry = {
     id: string;
     user: { id: string };
     day: string; // serialized date YYYY-MM-DD
     clockIn?: string | null;
     clockOut?: string | null;
-  };
+};
 
-  type TimeClocksData = {
+type TimeClocksData = {
     timeClocks: TimeClockEntry[];
-  };
+};
 
-  // lazy query to fetch time clock entries (we'll filter client-side by user and day)
-  const [
-    fetchTimeClocks,
-    { data: timeClocksData, loading: timeClocksLoading },
-  ] = useLazyQuery<TimeClocksData>(GET_TIME_CLOCKS_QUERY, {
-    fetchPolicy: "network-only",
-  });
+export default function PopUpRaiseRequest({ onClose }: { onClose?: () => void }) {
+    const { user } = useAuth();
+    const [date, setDate] = useState<Date | undefined>();
+    const [newClockIn, setNewClockIn] = useState("");
+    const [newClockOut, setNewClockOut] = useState("");
+    const [description, setDescription] = useState("");
+    const [isOpen, setIsOpen] = useState(true);
 
-  const [createRequest, { loading }] = useMutation(CREATE_REQUEST_MUTATION);
+    // Helper: normalize server times
+    const normalizeTime = (t?: string | null) => {
+        if (!t) return "";
+        const parts = t.split(":");
+        if (parts.length >= 2) return `${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}`;
+        return t;
+    };
 
-  const handleSubmit = async () => {
-    if (!user) return;
+    const normalizeDay = (d?: string | null) => {
+        if (!d) return "";
+        return d.split("T")[0];
+    };
 
-    // Ensure we have the TimeClock entry for this user/day — the server requires it.
-    const result = await fetchTimeClocks();
-    const fetched = result?.data as TimeClocksData | undefined;
-    const matching =
-      fetched?.timeClocks.find(
-        (tc) =>
-          String(tc.user?.id) === String(user.id) &&
-          normalizeDay(tc.day) === normalizeDay(day)
-      ) ?? null;
-
-    if (!matching) {
-      toast.error(
-        "No TimeClock entry found for the selected day. Cannot create a request."
-      );
-      return;
-    }
-
-    try {
-      await createRequest({
-        variables: {
-          day,
-          description,
-          newClockIn,
-          newClockOut,
-        },
-      });
-      toast.success("Request created successfully.");
-    } catch (err: any) {
-      toast.error(err?.message ?? "Failed to create request");
-      return;
-    }
-
-    setDay("");
-    setNewClockIn("");
-    setNewClockOut("");
-    setDescription("");
-    // close the popup if parent provided a handler
-    onClose?.();
-  };
-
-  // When day changes, fetch timeClocks and pick the entry for that day (if any)
-  useEffect(() => {
-    if (!day || !user) return;
-    console.log("Fetching timeClocks for day:", day, "user:", user.id);
-    void fetchTimeClocks();
-  }, [day, user, fetchTimeClocks]);
-
-  // helpful derived values for display/debug
-  useEffect(() => {
-    if (timeClocksData?.timeClocks) {
-      console.log("All timeClocks received:", timeClocksData.timeClocks);
-      console.log("Current user ID:", user?.id, "type:", typeof user?.id);
-      console.log("Selected day:", day, "normalized:", normalizeDay(day));
-
-      timeClocksData.timeClocks.forEach((tc, idx) => {
-        console.log(`TimeClock[${idx}]:`, {
-          id: tc.id,
-          userId: tc.user?.id,
-          userIdType: typeof tc.user?.id,
-          day: tc.day,
-          dayNormalized: normalizeDay(tc.day),
-          clockIn: tc.clockIn,
-          clockOut: tc.clockOut,
-          userMatch: String(tc.user?.id) === String(user?.id),
-          dayMatch: normalizeDay(tc.day) === normalizeDay(day),
+    const [fetchTimeClocks, { data: timeClocksData, loading: timeClocksLoading }] =
+        useLazyQuery<TimeClocksData>(GET_TIME_CLOCKS_QUERY, {
+            fetchPolicy: "network-only",
         });
-      });
-    }
-  }, [timeClocksData, user, day]);
 
-  const matchedEntry =
-    timeClocksData?.timeClocks.find(
-      (tc) =>
-        String(tc.user?.id) === String(user?.id) &&
-        normalizeDay(tc.day) === normalizeDay(day)
-    ) ?? null;
+    const [createRequest, { loading }] = useMutation(CREATE_REQUEST_MUTATION);
 
-  console.log("matchedEntry:", matchedEntry);
+    const handleClose = () => {
+        setIsOpen(false);
+        // Add a small delay to allow the dialog animation to finish before unmounting if dependent on external state
+        setTimeout(() => onClose?.(), 300);
+    };
 
-  return (
-    <div className="fixed inset-0 z-[2147483647] flex items-center justify-center px-4">
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        onClick={() => onClose?.()}
-      />
+    useEffect(() => {
+        if (date && user) {
+            const dayStr = format(date, "yyyy-MM-dd");
+            console.log("Fetching timeClocks for day:", dayStr, "user:", user.id);
+            void fetchTimeClocks();
+        }
+    }, [date, user, fetchTimeClocks]);
 
-      <Card className="w-full max-w-3xl mx-auto relative z-10 shadow-2xl border-2 border-slate-200/50 dark:border-slate-700/50 max-h-[90vh] flex flex-col overflow-hidden">
-        <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <FileText className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle className="text-2xl font-bold">
-                Create Time Modification Request
-              </CardTitle>
-            </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => onClose?.()}
-              className="h-8 w-8 p-0 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
+    const matchedEntry =
+        timeClocksData?.timeClocks.find((tc) => {
+            if (!date) return false;
+            const currentDayStr = format(date, "yyyy-MM-dd");
+            return (
+                String(tc.user?.id) === String(user?.id) && normalizeDay(tc.day) === currentDayStr
+            );
+        }) ?? null;
 
-        <div
-          className="p-6 space-y-6 overflow-y-auto flex-1 scrollbar-hide"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          {/* Date Selection Section */}
-          <div className="space-y-3">
-            <Label className="text-base font-semibold flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Select Date
-            </Label>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <Input
-                type="date"
-                value={day}
-                onChange={(e) => setDay(e.target.value)}
-                className="w-full sm:w-auto min-w-[200px] h-10"
-              />
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setDay(new Date().toISOString().slice(0, 10))}
-                  className="flex items-center gap-1.5"
-                >
-                  <Calendar className="h-3.5 w-3.5" />
-                  Today
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    const d = new Date();
-                    d.setDate(d.getDate() - 1);
-                    setDay(d.toISOString().slice(0, 10));
-                  }}
-                  className="flex items-center gap-1.5"
-                >
-                  <Calendar className="h-3.5 w-3.5" />
-                  Yesterday
-                </Button>
-              </div>
-            </div>
-          </div>
+    const handleSubmit = async () => {
+        if (!user || !date) return;
 
-          {/* Time Changes Section */}
-          <div className="space-y-4">
-            <Label className="text-base font-semibold flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Time Changes
-            </Label>
+        if (!matchedEntry) {
+            toast.error("No TimeClock entry found for the selected day. Cannot create a request.");
+            return;
+        }
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Old Times (read-only) */}
-              <div className="space-y-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-2 mb-3">
-                  <Badge variant="secondary" className="text-xs">
-                    Current
-                  </Badge>
-                  <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                    Original Times
-                  </span>
-                </div>
+        try {
+            await createRequest({
+                variables: {
+                    day: format(date, "yyyy-MM-dd"),
+                    description,
+                    newClockIn,
+                    newClockOut,
+                },
+            });
+            toast.success("Request created successfully.");
+            handleClose();
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : "Failed to create request");
+        }
+    };
 
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2">
-                      Clock In
-                    </Label>
-                    {timeClocksLoading ? (
-                      <div className="h-10 rounded-md bg-slate-200 dark:bg-slate-800 animate-pulse" />
-                    ) : (
-                      <Input
-                        type="text"
-                        value={normalizeTime(matchedEntry?.clockIn ?? "")}
-                        disabled
-                        placeholder="--:--"
-                        className="h-10 font-mono text-base text-center bg-slate-100 dark:bg-slate-800"
-                      />
-                    )}
-                  </div>
+    return (
+        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2 text-xl">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                            <FileText className="h-5 w-5 text-primary" />
+                        </div>
+                        Create Modification Request
+                    </DialogTitle>
+                </DialogHeader>
 
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2">
-                      Clock Out
-                    </Label>
-                    {timeClocksLoading ? (
-                      <div className="h-10 rounded-md bg-slate-200 dark:bg-slate-800 animate-pulse" />
-                    ) : (
-                      <Input
-                        type="text"
-                        value={normalizeTime(matchedEntry?.clockOut ?? "")}
-                        disabled
-                        placeholder="--:--"
-                        className="h-10 font-mono text-base text-center bg-slate-100 dark:bg-slate-800"
-                      />
-                    )}
-                  </div>
-                </div>
-              </div>
+                <div className="grid gap-6 py-4">
+                    {/* Date Selection */}
+                    <div className="space-y-3">
+                        <Label className="text-sm font-medium">Select Date</Label>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full sm:w-[240px] justify-start text-left font-normal",
+                                            !date && "text-muted-foreground",
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={setDate}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
 
-              {/* New Times (editable) */}
-              <div className="space-y-4 p-4 rounded-lg bg-green-50 dark:bg-green-950/20 border-2 border-green-200 dark:border-green-800">
-                <div className="flex items-center gap-2 mb-3">
-                  <Badge variant="default" className="text-xs bg-green-600">
-                    New
-                  </Badge>
-                  <span className="text-xs text-green-900 dark:text-green-100 font-medium uppercase tracking-wide">
-                    Requested Times
-                  </span>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-green-900 dark:text-green-100 mb-2">
-                      Clock In
-                    </Label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white z-10 pointer-events-none" />
-                      <Input
-                        type="time"
-                        value={newClockIn}
-                        onChange={(e) => setNewClockIn(e.target.value)}
-                        className="h-10 font-mono text-base border-green-300 dark:border-green-700 pl-10"
-                        placeholder="HH:MM"
-                      />
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setDate(new Date())}
+                                >
+                                    Today
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        const d = new Date();
+                                        d.setDate(d.getDate() - 1);
+                                        setDate(d);
+                                    }}
+                                >
+                                    Yesterday
+                                </Button>
+                            </div>
+                        </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <Label className="text-xs text-green-900 dark:text-green-100 mb-2">
-                      Clock Out
-                    </Label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white z-10 pointer-events-none" />
-                      <Input
-                        type="time"
-                        value={newClockOut}
-                        onChange={(e) => setNewClockOut(e.target.value)}
-                        className="h-10 font-mono text-base border-green-300 dark:border-green-700 pl-10"
-                        placeholder="HH:MM"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Current Times */}
+                        <div className="space-y-4 rounded-lg border p-4 bg-muted/40">
+                            <div className="flex items-center justify-between">
+                                <Badge variant="secondary">Current</Badge>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground">
+                                        Clock In
+                                    </Label>
+                                    {timeClocksLoading ? (
+                                        <div className="h-9 w-full rounded-md bg-muted animate-pulse" />
+                                    ) : (
+                                        <Input
+                                            value={normalizeTime(matchedEntry?.clockIn ?? "")}
+                                            disabled
+                                            className="font-mono text-center bg-background"
+                                            placeholder="--:--"
+                                        />
+                                    )}
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground">
+                                        Clock Out
+                                    </Label>
+                                    {timeClocksLoading ? (
+                                        <div className="h-9 w-full rounded-md bg-muted animate-pulse" />
+                                    ) : (
+                                        <Input
+                                            value={normalizeTime(matchedEntry?.clockOut ?? "")}
+                                            disabled
+                                            className="font-mono text-center bg-background"
+                                            placeholder="--:--"
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* New Times */}
+                        <div className="space-y-4 rounded-lg border-2 border-primary/20 bg-primary/5 p-4">
+                            <div className="flex items-center justify-between">
+                                <Badge variant="default" className="bg-primary hover:bg-primary/90">
+                                    New
+                                </Badge>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-medium text-primary">
+                                        New Clock In
+                                    </Label>
+                                    <TimePicker
+                                        value={newClockIn}
+                                        onChange={setNewClockIn}
+                                        className="border-primary/30 bg-background"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-medium text-primary">
+                                        New Clock Out
+                                    </Label>
+                                    <TimePicker
+                                        value={newClockOut}
+                                        onChange={setNewClockOut}
+                                        className="border-primary/30 bg-background"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
+
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <Label>Description</Label>
+                            <span className="text-xs text-muted-foreground">
+                                {description.length}/144
+                            </span>
+                        </div>
+                        <textarea
+                            className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                            placeholder="Reason for modification..."
+                            maxLength={144}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Description Section */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-semibold flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Description
-              </Label>
-              <span className="text-xs text-muted-foreground">
-                {description.length}/500
-              </span>
-            </div>
-            <textarea
-              value={description}
-              onChange={(e) => {
-                if (e.target.value.length <= 500) {
-                  setDescription(e.target.value);
-                }
-              }}
-              placeholder="Explain the reason for this time modification request..."
-              className="w-full resize-y rounded-lg border-2 border-slate-200 dark:border-slate-700 px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-              rows={4}
-              maxLength={500}
-            />
-          </div>
-        </div>
-
-        <CardFooter className="border-t bg-slate-50 dark:bg-slate-900/50 p-6 gap-3 flex-shrink-0">
-          <Button
-            variant="outline"
-            onClick={() => onClose?.()}
-            className="flex-1 sm:flex-none"
-          >
-            <X className="mr-2 h-4 w-4" />
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={loading || !day || !newClockIn || !newClockOut}
-            className="flex-1 sm:flex-none"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Check className="mr-2 h-4 w-4" />
-                Submit Request
-              </>
-            )}
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
-  );
+                <DialogFooter className="gap-2">
+                    <Button variant="outline" onClick={handleClose}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={loading || !date || !newClockIn || !newClockOut}
+                        className="gap-2"
+                    >
+                        {loading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <Check className="h-4 w-4" />
+                        )}
+                        Submit Request
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }
-
-export default PopUpRaiseRequest;
