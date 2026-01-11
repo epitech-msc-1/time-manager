@@ -15,6 +15,7 @@ import {
     Trash2,
     X,
 } from "lucide-react";
+import { format } from "date-fns";
 import type { CSSProperties } from "react";
 import * as React from "react";
 import { toast } from "sonner";
@@ -207,11 +208,22 @@ export default function ManagerDashboard(): React.JSX.Element {
     function formatDate(dateStr?: string | null) {
         if (!dateStr) return "-";
         try {
-            return new Date(dateStr).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-            });
+            return format(new Date(dateStr), "MMM d, yyyy");
+        } catch (_e) {
+            return dateStr;
+        }
+    }
+
+    function formatDateTime(dateStr?: string | null) {
+        if (!dateStr) return "—";
+        try {
+            // Check if it's already just a time string or a full ISO date
+            // The backend might send "YYYY-MM-DD HH:mm:ss" or ISO string
+            const date = new Date(dateStr);
+            if (Number.isNaN(date.getTime())) {
+                return dateStr;
+            }
+            return format(date, "MMM d, yyyy HH:mm");
         } catch (_e) {
             return dateStr;
         }
@@ -329,18 +341,10 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                     </TableCell>
                                                     <TableCell>{formatDate(req.day)}</TableCell>
                                                     <TableCell className="text-muted-foreground font-mono text-xs">
-                                                        {req.oldClockIn ?? (
-                                                            <span className="text-muted-foreground/50">
-                                                                -
-                                                            </span>
-                                                        )}
+                                                        {formatDateTime(req.oldClockIn)}
                                                     </TableCell>
                                                     <TableCell className="text-muted-foreground font-mono text-xs">
-                                                        {req.oldClockOut ?? (
-                                                            <span className="text-muted-foreground/50">
-                                                                -
-                                                            </span>
-                                                        )}
+                                                        {formatDateTime(req.oldClockOut)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         <div className="flex items-center justify-end gap-2">
@@ -486,7 +490,7 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                             In
                                                         </div>
                                                         <div className="font-mono text-sm">
-                                                            {selected.oldClockIn ?? "—"}
+                                                            {formatDateTime(selected.oldClockIn)}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -494,7 +498,7 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                             Out
                                                         </div>
                                                         <div className="font-mono text-sm">
-                                                            {selected.oldClockOut ?? "—"}
+                                                            {formatDateTime(selected.oldClockOut)}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -510,7 +514,7 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                             In
                                                         </div>
                                                         <div className="font-mono text-sm font-semibold">
-                                                            {selected.newClockIn ?? "—"}
+                                                            {formatDateTime(selected.newClockIn)}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -518,7 +522,7 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                             Out
                                                         </div>
                                                         <div className="font-mono text-sm font-semibold">
-                                                            {selected.newClockOut ?? "—"}
+                                                            {formatDateTime(selected.newClockOut)}
                                                         </div>
                                                     </div>
                                                 </div>

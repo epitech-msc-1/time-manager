@@ -17,5 +17,5 @@ echo "Applying migrations..."
 uv run PrimeBank/manage.py migrate
 
 echo "Starting server on 0.0.0.0:${DJANGO_PORT}..."
-exec uv run PrimeBank/manage.py runserver 0.0.0.0:${DJANGO_PORT}
-#exec uv run gunicorn --pythonpath PrimeBank PrimeBank.wsgi:application --bind 0.0.0.0:${DJANGO_PORT}
+# exec uv run PrimeBank/manage.py runserver 0.0.0.0:${DJANGO_PORT}
+exec uv run gunicorn --pythonpath PrimeBank PrimeBank.wsgi:application --bind 0.0.0.0:${DJANGO_PORT}
