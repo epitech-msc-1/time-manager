@@ -74,7 +74,7 @@ services:
       start_period: 60s
       retries: 10
     deploy:
-      replicas: 1
+      replicas: 2
       restart_policy:
         condition: on-failure
       update_config:
