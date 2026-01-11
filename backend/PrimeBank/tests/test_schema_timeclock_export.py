@@ -38,6 +38,8 @@ def test_resolve_export_time_clock_csv_user_not_found(monkeypatch):
     class U:
         id = 1
         is_authenticated = True
+        is_admin = False
+        is_superuser = False
 
     info = make_info(U)
 
@@ -58,6 +60,8 @@ def test_resolve_export_time_clock_csv_not_authorized(monkeypatch):
     class Req:
         id = 1
         is_authenticated = True
+        is_admin = False
+        is_superuser = False
 
     class Target:
         id = 2
@@ -84,6 +88,8 @@ def test_resolve_export_time_clock_csv_success_self_request():
     class U:
         id = 1
         is_authenticated = True
+        is_admin = False
+        is_superuser = False
 
     info = make_info(U)
 

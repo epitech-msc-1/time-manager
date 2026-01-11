@@ -88,6 +88,8 @@ def test_export_timeclock_csv_success_empty_qs(monkeypatch):
     class U:
         id = 1
         is_authenticated = True
+        is_admin = False
+        is_superuser = False
 
     req = type("R", (), {"user": U(), "COOKIES": {}, "META": {}})()
 
@@ -99,7 +101,9 @@ def test_export_timeclock_csv_success_empty_qs(monkeypatch):
         "sep": ";",
     }
     signer = views_export.TimestampSigner()
-    token = signer.sign(json.dumps(payload))
+    import base64
+    b64_payload = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
+    token = signer.sign(b64_payload)
 
     # target exists
     class Target:
