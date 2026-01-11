@@ -70,9 +70,8 @@ def export_timeclock_csv(request, token: str):
     # 1) Auth
     if not request.user.is_authenticated:
         user = _authenticate_request_with_jwt(request)
-        if user is None:
-            return HttpResponseForbidden("Auth required")
-        request.user = user
+        if user:
+            request.user = user
 
     # 2) Décodage token signé
     signer = TimestampSigner()
@@ -90,6 +89,13 @@ def export_timeclock_csv(request, token: str):
     start_s = data.get("start_date")
     end_s = data.get("end_date")
     sep = data.get("sep", ";")
+
+    # If user is still anonymous, rely on the signed requester_id to hydrate user
+    if not request.user.is_authenticated:
+        try:
+            request.user = CustomUser.objects.get(pk=requester_id)
+        except CustomUser.DoesNotExist:
+             return HttpResponseBadRequest("Invalid requester in token")
 
     # 3) Le caller doit être celui inscrit dans le token
     if str(request.user.id) != str(requester_id):

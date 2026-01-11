@@ -62,15 +62,16 @@ def export_timeclock_pdf(request, token: str):
     print(f"DEBUG: Request user: {request.user}")
     
     # 1) Authentication
+    # 1) Authentication
     if not request.user.is_authenticated:
         print(f"DEBUG: User not authenticated, trying JWT auth...")
         user = _authenticate_request_with_jwt(request)
         print(f"DEBUG: JWT auth result: {user}")
-        if user is None:
-            print(f"DEBUG: JWT auth failed, returning 403")
-            return HttpResponseForbidden("Auth required")
-        request.user = user
-        print(f"DEBUG: User now authenticated as: {request.user}")
+        if user:
+            request.user = user
+            print(f"DEBUG: User now authenticated as: {request.user}")
+        else:
+             print(f"DEBUG: JWT auth failed or missing, proceeding to check token signature for authentication.")
 
     # 2) Validate Token
     print(f"\nDEBUG: Starting token validation...")
@@ -108,6 +109,16 @@ def export_timeclock_pdf(request, token: str):
     print(f"  start_date: {start_s}")
     print(f"  end_date: {end_s}")
     print(f"  current request.user.id: {request.user.id}")
+
+    # If user is still anonymous, rely on the signed requester_id
+    if not request.user.is_authenticated:
+        print(f"DEBUG: Request still anonymous. Hydrating user from token requester_id: {requester_id}")
+        try:
+            request.user = CustomUser.objects.get(pk=requester_id)
+            print(f"DEBUG: User hydrated from token: {request.user}")
+        except CustomUser.DoesNotExist:
+             print(f"DEBUG: Requester ID {requester_id} not found in DB")
+             return HttpResponseBadRequest("Invalid requester in token")
 
     # 3) Check Requester
     print(f"\nDEBUG: Checking if request.user.id ({request.user.id}) == requester_id ({requester_id})")
