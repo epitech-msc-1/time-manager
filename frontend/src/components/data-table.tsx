@@ -237,86 +237,86 @@ function createBaseColumns(
         },
         ...(canManageMembers
             ? [
-                {
-                    id: "actions",
-                    cell: ({ row }) => {
-                        const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
-                            React.useState(false);
-                        const isSelfDelete = String(row.original.id) === currentUserId;
-                        const canDelete = !isSelfDelete;
+                  {
+                      id: "actions",
+                      cell: ({ row }) => {
+                          const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
+                              React.useState(false);
+                          const isSelfDelete = String(row.original.id) === currentUserId;
+                          const canDelete = !isSelfDelete;
 
-                        return (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-                                        size="icon"
-                                    >
-                                        <IconDotsVertical />
-                                        <span className="sr-only">Open menu</span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-32">
-                                    <AlertDialog
-                                        open={isDeleteConfirmOpen}
-                                        onOpenChange={setIsDeleteConfirmOpen}
-                                    >
-                                        <AlertDialogTrigger asChild>
-                                            <DropdownMenuItem
-                                                variant="destructive"
-                                                disabled={!canDelete}
-                                                onSelect={(e) => {
-                                                    e.preventDefault();
-                                                    if (canDelete) {
-                                                        setIsDeleteConfirmOpen(true);
-                                                    }
-                                                }}
-                                            >
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle className="flex items-center gap-2 text-xl">
-                                                    <div className="p-2 rounded-lg bg-destructive/10 text-destructive">
-                                                        <IconUserMinus className="size-5" />
-                                                    </div>
-                                                    Remove team member
-                                                </AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    Are you sure you want to remove{" "}
-                                                    <strong>
-                                                        {row.original.firstname}{" "}
-                                                        {row.original.lastname}
-                                                    </strong>{" "}
-                                                    from this team? This action can be reverted by
-                                                    adding them back later.
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction
-                                                    onClick={() => {
-                                                        handleRemoveUser(
-                                                            String(row.original.id),
-                                                            row.original.firstname,
-                                                            row.original.lastname,
-                                                        );
-                                                        setIsDeleteConfirmOpen(false);
-                                                    }}
-                                                >
-                                                    Remove
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        );
-                    },
-                } as ColumnDef<z.infer<typeof schema>>,
-            ]
+                          return (
+                              <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                      <Button
+                                          variant="ghost"
+                                          className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                                          size="icon"
+                                      >
+                                          <IconDotsVertical />
+                                          <span className="sr-only">Open menu</span>
+                                      </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-32">
+                                      <AlertDialog
+                                          open={isDeleteConfirmOpen}
+                                          onOpenChange={setIsDeleteConfirmOpen}
+                                      >
+                                          <AlertDialogTrigger asChild>
+                                              <DropdownMenuItem
+                                                  variant="destructive"
+                                                  disabled={!canDelete}
+                                                  onSelect={(e) => {
+                                                      e.preventDefault();
+                                                      if (canDelete) {
+                                                          setIsDeleteConfirmOpen(true);
+                                                      }
+                                                  }}
+                                              >
+                                                  Delete
+                                              </DropdownMenuItem>
+                                          </AlertDialogTrigger>
+                                          <AlertDialogContent>
+                                              <AlertDialogHeader>
+                                                  <AlertDialogTitle className="flex items-center gap-2 text-xl">
+                                                      <div className="p-2 rounded-lg bg-destructive/10 text-destructive">
+                                                          <IconUserMinus className="size-5" />
+                                                      </div>
+                                                      Remove team member
+                                                  </AlertDialogTitle>
+                                                  <AlertDialogDescription>
+                                                      Are you sure you want to remove{" "}
+                                                      <strong>
+                                                          {row.original.firstname}{" "}
+                                                          {row.original.lastname}
+                                                      </strong>{" "}
+                                                      from this team? This action can be reverted by
+                                                      adding them back later.
+                                                  </AlertDialogDescription>
+                                              </AlertDialogHeader>
+                                              <AlertDialogFooter>
+                                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                  <AlertDialogAction
+                                                      onClick={() => {
+                                                          handleRemoveUser(
+                                                              String(row.original.id),
+                                                              row.original.firstname,
+                                                              row.original.lastname,
+                                                          );
+                                                          setIsDeleteConfirmOpen(false);
+                                                      }}
+                                                  >
+                                                      Remove
+                                                  </AlertDialogAction>
+                                              </AlertDialogFooter>
+                                          </AlertDialogContent>
+                                      </AlertDialog>
+                                  </DropdownMenuContent>
+                              </DropdownMenu>
+                          );
+                      },
+                  } as ColumnDef<z.infer<typeof schema>>,
+              ]
             : []),
     ];
 }
@@ -411,7 +411,6 @@ interface DataTableProps {
     className?: string;
     title?: string;
 }
-
 
 export function DataTable({
     data: initialData,
@@ -622,14 +621,14 @@ export function DataTable({
         ? selectedUser.isAdmin
             ? "Admin"
             : selectedUser.teamManaged
-                ? "Manager"
-                : "Member"
+              ? "Manager"
+              : "Member"
         : null;
     const assignmentWarningMessage = !isUserAlreadyAssigned
         ? null
         : isSameTeamAssignment
-            ? "This member already belongs to this team."
-            : "This member already belongs to another team.";
+          ? "This member already belongs to this team."
+          : "This member already belongs to another team.";
     const showTeamWarning = !teamId;
     const [rowSelection, setRowSelection] = React.useState({});
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -731,7 +730,9 @@ export function DataTable({
                                 disabled={isLoading}
                                 title="Refresh dashboard"
                             >
-                                <IconRefresh className={cn("size-4", isLoading && "animate-spin")} />
+                                <IconRefresh
+                                    className={cn("size-4", isLoading && "animate-spin")}
+                                />
                                 <span className="hidden lg:inline">Refresh</span>
                             </Button>
                         )}
@@ -838,12 +839,14 @@ export function DataTable({
                                                 </div>
                                                 {selectedUser.team?.description ? (
                                                     <p className="text-muted-foreground text-xs">
-                                                        Current team: {selectedUser.team.description}
+                                                        Current team:{" "}
+                                                        {selectedUser.team.description}
                                                     </p>
                                                 ) : null}
                                                 {selectedUser.teamManaged?.description ? (
                                                     <p className="text-muted-foreground text-xs">
-                                                        Manages: {selectedUser.teamManaged.description}
+                                                        Manages:{" "}
+                                                        {selectedUser.teamManaged.description}
                                                     </p>
                                                 ) : null}
                                                 {assignmentWarningMessage ? (
@@ -887,8 +890,8 @@ export function DataTable({
                                                     </AlertDialogTitle>
                                                     <AlertDialogDescription>
                                                         This will add {selectedUser?.firstName}{" "}
-                                                        {selectedUser?.lastName} to your team. You can
-                                                        remove members later if needed.
+                                                        {selectedUser?.lastName} to your team. You
+                                                        can remove members later if needed.
                                                     </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
@@ -936,9 +939,9 @@ export function DataTable({
                                                     {header.isPlaceholder
                                                         ? null
                                                         : flexRender(
-                                                            header.column.columnDef.header,
-                                                            header.getContext(),
-                                                        )}
+                                                              header.column.columnDef.header,
+                                                              header.getContext(),
+                                                          )}
                                                 </TableHead>
                                             );
                                         })}
@@ -1066,10 +1069,7 @@ export function DataTable({
             <TabsContent value="key-personnel" className="flex flex-col px-4 lg:px-6">
                 <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
             </TabsContent>
-            <AlertDialog
-                open={isBulkDeleteConfirmOpen}
-                onOpenChange={setIsBulkDeleteConfirmOpen}
-            >
+            <AlertDialog open={isBulkDeleteConfirmOpen} onOpenChange={setIsBulkDeleteConfirmOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle className="flex items-center gap-2 text-xl">
@@ -1090,6 +1090,7 @@ export function DataTable({
                         <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             disabled={isBulkDeleting}
+                            variant="destructive"
                             onClick={async (e) => {
                                 e.preventDefault();
                                 setIsBulkDeleting(true);

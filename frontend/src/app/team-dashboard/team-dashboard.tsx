@@ -682,14 +682,18 @@ export default function TeamDashboard() {
                                                                             : "members"}
                                                                     </span>
                                                                     <div className="flex flex-wrap gap-1.5">
-                                                                        {team.members.map((member) => (
-                                                                            <Badge
-                                                                                key={member.id}
-                                                                                variant="outline"
-                                                                            >
-                                                                                {member.fullName}
-                                                                            </Badge>
-                                                                        ))}
+                                                                        {team.members.map(
+                                                                            (member) => (
+                                                                                <Badge
+                                                                                    key={member.id}
+                                                                                    variant="outline"
+                                                                                >
+                                                                                    {
+                                                                                        member.fullName
+                                                                                    }
+                                                                                </Badge>
+                                                                            ),
+                                                                        )}
                                                                     </div>
                                                                 </div>
                                                             )}
@@ -767,7 +771,9 @@ export default function TeamDashboard() {
                         </Card>
                         <Card className="mx-4 sm:mx-6">
                             <CardHeader>
-                                <CardTitle>Unassigned Members ({unassignedMembers.length})</CardTitle>
+                                <CardTitle>
+                                    Unassigned Members ({unassignedMembers.length})
+                                </CardTitle>
                                 <CardDescription>Users without a team assignment.</CardDescription>
                             </CardHeader>
                             <CardContent>
