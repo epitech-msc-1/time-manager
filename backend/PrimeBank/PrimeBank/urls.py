@@ -15,8 +15,8 @@ urlpatterns = [
         "graphql",
         jwt_cookie(csrf_exempt(GraphQLView.as_view(graphiql=True))),
     ),
-    path("api/export/timeclock/csv/<str:token>/", export_timeclock_csv, name="export_timeclock_csv"),
-    path("api/export/timeclock/pdf/<str:token>/", export_timeclock_pdf, name="export_timeclock_pdf"),
+    path("export/timeclock/csv/<str:token>/", export_timeclock_csv, name="export_timeclock_csv"),
+    path("export/timeclock/pdf/<str:token>/", export_timeclock_pdf, name="export_timeclock_pdf"),
 ]
 
 
