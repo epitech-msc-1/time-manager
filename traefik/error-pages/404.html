@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Page Not Found - 404</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                /* Copied from project dark theme */
+                --background: oklch(0.2598 0.0306 262.6666);
+                --foreground: oklch(0.9219 0 0);
+                --card: oklch(0.3106 0.0301 268.6365);
+                --card-foreground: oklch(0.9219 0 0);
+                --primary: oklch(0.6397 0.172 36.4421);
+                --primary-foreground: oklch(1 0 0);
+                --secondary: oklch(0.3095 0.0266 266.7132);
+                --muted: oklch(0.3095 0.0266 266.7132);
+                --muted-foreground: oklch(0.7155 0 0);
+                --radius: 0.75rem;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: "Inter", sans-serif;
+                background-color: var(--background);
+                color: var(--foreground);
+                height: 100vh;
+                width: 100vw;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            /* Ambient Background blobs */
+            .ambient-light {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                z-index: -1;
+            }
+
+            .blob {
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(80px);
+                opacity: 0.6;
+                animation: float 20s infinite alternate ease-in-out;
+            }
+
+            .blob-1 {
+                width: 50vw;
+                height: 50vw;
+                background: var(--primary);
+                top: -10%;
+                left: -10%;
+                animation-delay: 0s;
+            }
+
+            .blob-2 {
+                width: 40vw;
+                height: 40vw;
+                background: oklch(
+                    0.338 0.0589 267.5867
+                ); /* sidebar-accent from theme */
+                bottom: -10%;
+                right: -10%;
+                animation-delay: -5s;
+            }
+
+            .blob-3 {
+                width: 30vw;
+                height: 30vw;
+                background: var(--secondary);
+                top: 40%;
+                left: 40%;
+                animation-delay: -10s;
+                opacity: 0.4;
+            }
+
+            @keyframes float {
+                0% {
+                    transform: translate(0, 0) scale(1);
+                }
+
+                50% {
+                    transform: translate(30px, 40px) scale(1.1);
+                }
+
+                100% {
+                    transform: translate(-20px, -30px) scale(0.9);
+                }
+            }
+
+            /* Glass Card */
+            .glass-panel {
+                background: rgba(43, 45, 66, 0.05);
+                /* Fallback for --card with opacity */
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.015),
+                    rgba(255, 255, 255, 0.005)
+                );
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: var(--radius);
+                padding: 4rem 3rem;
+                text-align: center;
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+                max-width: 500px;
+                width: 90%;
+                position: relative;
+                transform: translateY(20px);
+                opacity: 0;
+                animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1)
+                    forwards;
+            }
+
+            @keyframes slideUpFade {
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            /* Text Styles */
+            h1 {
+                font-size: 8rem;
+                font-weight: 800;
+                line-height: 1;
+                margin-bottom: 0.5rem;
+                background: linear-gradient(135deg, var(--primary), #ffffff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                letter-spacing: -0.05em;
+                position: relative;
+                display: inline-block;
+            }
+
+            /* Subtle glow behind text */
+            h1::after {
+                content: "404";
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background: inherit;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                filter: blur(20px);
+                opacity: 0.5;
+                z-index: -1;
+            }
+
+            h2 {
+                font-size: 2rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: var(--foreground);
+                letter-spacing: -0.02em;
+            }
+
+            p {
+                font-size: 1.1rem;
+                color: var(--muted-foreground);
+                margin-bottom: 2.5rem;
+                line-height: 1.6;
+            }
+
+            /* Button */
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.75rem 2rem;
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--primary-foreground);
+                background-color: var(--primary);
+                text-decoration: none;
+                border-radius: calc(var(--radius) - 2px);
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.2);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+                filter: brightness(1.1);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="ambient-light">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+
+        <div class="glass-panel">
+            <h1>404</h1>
+            <h2>Page Not Found</h2>
+            <p>
+                It looks like you've drifted a bit too far. <br />This page does
+                not exist or has been moved.
+            </p>
+            <a href="/" class="btn">Back to Home</a>
+        </div>
+    </body>
+</html>

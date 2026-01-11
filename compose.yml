@@ -3,6 +3,7 @@ services:
   db:
     image: postgres:16-alpine
     container_name: postgres
+    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -11,7 +12,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data
-    restart: unless-stopped
     ports:
       - ${DB_PORT}:${DB_PORT}
     healthcheck:
@@ -24,14 +24,14 @@ services:
     build:
       context: backend/
       dockerfile: Dockerfile
-    restart: unless-stopped
     image: backend:1.0.0
     container_name: backend
+    restart: unless-stopped
     env_file:
       - .env
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
-      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings}
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-PrimeBank.settings}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
       DJANGO_PORT: ${DJANGO_PORT}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
@@ -52,18 +52,15 @@ services:
 
   frontend:
     build:
-      context: frontend/
+      context: frontend
       dockerfile: Dockerfile
-    restart: unless-stopped
+      args:
+        VITE_API_URL: http://localhost:${DJANGO_PORT}/graphql
     image: frontend:1.0.0
     container_name: frontend
-    env_file:
-      - .env
-    environment:
-      VITE_API_URL: http://localhost:${DJANGO_PORT}/graphql
-      VITE_PORT: ${VITE_PORT}
+    restart: unless-stopped
     ports:
-      - ${VITE_PORT}:${VITE_PORT}
+      - ${VITE_PORT}:80
     depends_on:
       backend:
         condition: service_healthy
@@ -71,8 +68,6 @@ services:
   sonarqube:
     image: sonarqube:community
     container_name: sonarqube
-    ports:
-      - ${SONAR_PORT}:9000
     restart: unless-stopped
     env_file:
       - .env
@@ -82,6 +77,8 @@ services:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - ${SONAR_PORT}:9000
     healthcheck:
       test:
         - CMD-SHELL
@@ -93,15 +90,28 @@ services:
 
   sonar-scanner:
     build:
-      context: .
-      dockerfile: sonarqube/Dockerfile
+      context: sonarqube
+      dockerfile: Dockerfile
+    image: sonar-scaner:latest
     container_name: sonar-scanner
+    env_file:
+      - .env
     environment:
       SONAR_HOST_URL: http://sonarqube:9000
       SONAR_TOKEN: ${SONAR_TOKEN}
     depends_on:
       sonarqube:
         condition: service_healthy
+
+  mkdocs:
+    build:
+      context: mkdocs
+      dockerfile: Dockerfile
+    image: docs:1.0.0
+    container_name: docs
+    restart: unless-stopped
+    ports:
+      - ${MKDOCS_PORT}:80
 
 volumes:
   db_data:

@@ -2,8 +2,11 @@ from graphql import GraphQLError
 
 
 def require_auth(user):
-    if not user or not user.is_authenticated:
-        raise GraphQLError("Authentification required.")
+    if not user:
+        raise GraphQLError(f"No user {user} found.")
+
+    if not user.is_authenticated:
+        raise GraphQLError(f"User {user} not authenticated.")
 
 
 def is_admin(user):

@@ -1,11 +1,11 @@
+import "./index.css";
 import { ApolloProvider } from "@apollo/client/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
-import { Toaster } from "sonner";
-import "./index.css";
 import { TokenRefreshProvider } from "@/components/TokenRefreshProvider";
 import { ThemeProvider } from "@/components/theme-provider.tsx";
+import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { client } from "@/lib/apollo-client";
 import routes from "./routes.tsx";

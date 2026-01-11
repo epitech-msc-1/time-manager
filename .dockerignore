@@ -25,3 +25,6 @@ docs/
 .gitignore
 LICENSE
 README.md
+
+# Certs
+traefik/certs

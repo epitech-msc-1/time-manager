@@ -2,6 +2,7 @@
 
 import csv
 import json
+import base64
 from datetime import datetime, timedelta, date
 
 from django.http import StreamingHttpResponse, HttpResponseForbidden, HttpResponseBadRequest
@@ -76,11 +77,12 @@ def export_timeclock_csv(request, token: str):
     # 2) Décodage token signé
     signer = TimestampSigner()
     try:
-        raw = signer.unsign(token, max_age=900)  # 15 minutes
-        data = json.loads(raw)
+        unsigned_b64 = signer.unsign(token, max_age=900)  # 15 minutes
+        raw_json = base64.urlsafe_b64decode(unsigned_b64).decode()
+        data = json.loads(raw_json)
     except BadSignature:
         return HttpResponseBadRequest("Invalid or expired token")
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, UnicodeDecodeError, ValueError):
         return HttpResponseBadRequest("Invalid token payload")
 
     requester_id = data.get("requester_id")
@@ -93,15 +95,16 @@ def export_timeclock_csv(request, token: str):
     if str(request.user.id) != str(requester_id):
         return HttpResponseForbidden("Unauthorized")
 
-    # 4) Cible + droits (self OU manager)
+    # 4) Cible + droits (self OU manager OU admin)
     try:
         target = CustomUser.objects.get(pk=target_user_id)
     except CustomUser.DoesNotExist:
         return HttpResponseBadRequest("Target user not found")
 
-    if str(request.user.id) != str(target_user_id) and not is_manager_of(
-        request.user, getattr(target, "team_id", None)
-    ):
+    is_self = str(request.user.id) == str(target_user_id)
+    is_admin = getattr(request.user, "is_admin", False) or request.user.is_superuser
+
+    if not (is_self or is_admin or is_manager_of(request.user, getattr(target, "team_id", None))):
         return HttpResponseForbidden("Not allowed")
 
     # 5) Dates

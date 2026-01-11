@@ -19,6 +19,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
+    IconAlertTriangle,
     IconCancel,
     IconChevronDown,
     IconChevronLeft,
@@ -29,6 +30,9 @@ import {
     IconDotsVertical,
     IconGripVertical,
     IconLayoutColumns,
+    IconRefresh,
+    IconSearch,
+    IconUserMinus,
     IconUserPlus,
 } from "@tabler/icons-react";
 import {
@@ -78,7 +82,6 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -99,8 +102,9 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { ADD_USER_TO_TEAM } from "@/graphql/mutations";
+import { ADD_USER_TO_TEAM, UPDATE_USER } from "@/graphql/mutations";
 import { GET_USER_BY_EMAIL } from "@/graphql/queries";
+import { cn } from "@/lib/utils";
 
 export const schema = z.object({
     id: z.number(),
@@ -130,128 +134,192 @@ function DragHandle({ id }: { id: number }) {
     );
 }
 
-const BASE_COLUMNS: ColumnDef<z.infer<typeof schema>>[] = [
-    {
-        id: "drag",
-        header: () => null,
-        cell: ({ row }) => <DragHandle id={row.original.id} />,
-    },
-    {
-        id: "select",
-        header: ({ table }) => (
-            <div className="flex items-center justify-center">
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
-            </div>
-        ),
-        cell: ({ row }) => (
-            <div className="flex items-center justify-center">
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
-            </div>
-        ),
-        enableSorting: true,
-        enableHiding: false,
-    },
-    {
-        accessorKey: "firstname",
-        header: "Firstname",
-        cell: ({ row }) => {
-            return <span>{row.original.firstname}</span>;
+function createBaseColumns(
+    handleRemoveUser: (userId: string, firstName: string, lastName: string) => Promise<void>,
+    currentUserId: string | null,
+    canManageMembers: boolean,
+): ColumnDef<z.infer<typeof schema>>[] {
+    return [
+        {
+            id: "drag",
+            header: () => null,
+            cell: ({ row }) => <DragHandle id={row.original.id} />,
         },
-        enableHiding: false,
-    },
-    {
-        accessorKey: "lastname",
-        header: "Lastname",
-        cell: ({ row }) => {
-            return <span>{row.original.lastname}</span>;
+        {
+            id: "select",
+            header: ({ table }) => (
+                <div className="flex items-center justify-center">
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() ||
+                            (table.getIsSomePageRowsSelected() && "indeterminate")
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                </div>
+            ),
+            cell: ({ row }) => (
+                <div className="flex items-center justify-center">
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                </div>
+            ),
+            enableSorting: true,
+            enableHiding: false,
         },
-        enableHiding: false,
-    },
-    {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => (
-            <>
-                {row.original.status === "Manager" ? (
-                    <Badge variant="secondary" className="bg-accent px-1.5">
-                        {row.original.status}
-                    </Badge>
-                ) : (
-                    <Badge variant="outline" className="text-muted-foreground px-1.5">
-                        {row.original.status}
-                    </Badge>
-                )}
-            </>
-        ),
-    },
-    {
-        accessorKey: "presence",
-        header: "Presence",
-        cell: ({ row }) => (
-            <Badge variant="outline" className="text-muted-foreground px-1.5">
-                {row.original.presence === true ? (
-                    <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-                ) : (
-                    <IconCancel />
-                )}
-                {row.original.presence}
-            </Badge>
-        ),
-    },
-    {
-        accessorKey: "score",
-        header: () => <div className="w-full">Score</div>,
-        cell: ({ row }) => (
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                }}
-            >
-                <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-                    Score
-                </Label>
-                <span defaultValue={row.original.score} id={`${row.original.id}-score`}>
-                    {row.original.score}
-                </span>
-            </form>
-        ),
-    },
-    {
-        id: "actions",
-        cell: () => (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-                        size="icon"
-                    >
-                        <IconDotsVertical />
-                        <span className="sr-only">Open menu</span>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-32">
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem>Make a copy</DropdownMenuItem>
-                    <DropdownMenuItem>Favorite</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        ),
-    },
-];
+        {
+            accessorKey: "firstname",
+            header: "Firstname",
+            cell: ({ row }) => {
+                return <span>{row.original.firstname}</span>;
+            },
+            enableHiding: false,
+        },
+        {
+            accessorKey: "lastname",
+            header: "Lastname",
+            cell: ({ row }) => {
+                return <span>{row.original.lastname}</span>;
+            },
+            enableHiding: false,
+        },
+        {
+            accessorKey: "status",
+            header: "Status",
+            cell: ({ row }) => (
+                <>
+                    {row.original.status === "Manager" ? (
+                        <Badge variant="secondary" className="bg-accent px-1.5">
+                            {row.original.status}
+                        </Badge>
+                    ) : (
+                        <Badge variant="outline" className="text-muted-foreground px-1.5">
+                            {row.original.status}
+                        </Badge>
+                    )}
+                </>
+            ),
+        },
+        {
+            accessorKey: "presence",
+            header: "Presence",
+            cell: ({ row }) => (
+                <Badge variant="outline" className="text-muted-foreground px-1.5 shrink-0">
+                    {row.original.presence === true ? (
+                        <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400 size-4" />
+                    ) : (
+                        <IconCancel className="size-4" />
+                    )}
+                </Badge>
+            ),
+        },
+        {
+            accessorKey: "score",
+            header: () => <div className="w-full">Score</div>,
+            cell: ({ row }) => (
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                    }}
+                >
+                    <Label htmlFor={`${row.original.id}-target`} className="sr-only">
+                        Score
+                    </Label>
+                    <span defaultValue={row.original.score} id={`${row.original.id}-score`}>
+                        {row.original.score}
+                    </span>
+                </form>
+            ),
+        },
+        ...(canManageMembers
+            ? [
+                  {
+                      id: "actions",
+                      cell: ({ row }) => {
+                          const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
+                              React.useState(false);
+                          const isSelfDelete = String(row.original.id) === currentUserId;
+                          const canDelete = !isSelfDelete;
+
+                          return (
+                              <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                      <Button
+                                          variant="ghost"
+                                          className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                                          size="icon"
+                                      >
+                                          <IconDotsVertical />
+                                          <span className="sr-only">Open menu</span>
+                                      </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-32">
+                                      <AlertDialog
+                                          open={isDeleteConfirmOpen}
+                                          onOpenChange={setIsDeleteConfirmOpen}
+                                      >
+                                          <AlertDialogTrigger asChild>
+                                              <DropdownMenuItem
+                                                  variant="destructive"
+                                                  disabled={!canDelete}
+                                                  onSelect={(e) => {
+                                                      e.preventDefault();
+                                                      if (canDelete) {
+                                                          setIsDeleteConfirmOpen(true);
+                                                      }
+                                                  }}
+                                              >
+                                                  Delete
+                                              </DropdownMenuItem>
+                                          </AlertDialogTrigger>
+                                          <AlertDialogContent>
+                                              <AlertDialogHeader>
+                                                  <AlertDialogTitle className="flex items-center gap-2 text-xl">
+                                                      <div className="p-2 rounded-lg bg-destructive/10 text-destructive">
+                                                          <IconUserMinus className="size-5" />
+                                                      </div>
+                                                      Remove team member
+                                                  </AlertDialogTitle>
+                                                  <AlertDialogDescription>
+                                                      Are you sure you want to remove{" "}
+                                                      <strong>
+                                                          {row.original.firstname}{" "}
+                                                          {row.original.lastname}
+                                                      </strong>{" "}
+                                                      from this team? This action can be reverted by
+                                                      adding them back later.
+                                                  </AlertDialogDescription>
+                                              </AlertDialogHeader>
+                                              <AlertDialogFooter>
+                                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                  <AlertDialogAction
+                                                      onClick={() => {
+                                                          handleRemoveUser(
+                                                              String(row.original.id),
+                                                              row.original.firstname,
+                                                              row.original.lastname,
+                                                          );
+                                                          setIsDeleteConfirmOpen(false);
+                                                      }}
+                                                  >
+                                                      Remove
+                                                  </AlertDialogAction>
+                                              </AlertDialogFooter>
+                                          </AlertDialogContent>
+                                      </AlertDialog>
+                                  </DropdownMenuContent>
+                              </DropdownMenu>
+                          );
+                      },
+                  } as ColumnDef<z.infer<typeof schema>>,
+              ]
+            : []),
+    ];
+}
 
 interface UserLookupResult {
     id: string;
@@ -339,6 +407,8 @@ interface DataTableProps {
     teamId?: string | null;
     onTeamUpdated?: () => void | Promise<void>;
     currentUserIsAdmin?: boolean;
+    currentUserId?: string | null;
+    className?: string;
 }
 
 export function DataTable({
@@ -348,6 +418,8 @@ export function DataTable({
     teamId,
     onTeamUpdated,
     currentUserIsAdmin = false,
+    currentUserId = null,
+    className,
 }: DataTableProps) {
     const [data, setData] = React.useState(() => initialData);
 
@@ -368,12 +440,56 @@ export function DataTable({
         AddUserToTeamResult,
         AddUserToTeamVariables
     >(ADD_USER_TO_TEAM);
+
+    const [updateUser] = useMutation(UPDATE_USER);
+
+    const handleRemoveUser = React.useCallback(
+        async (userId: string, userFirstName: string, userLastName: string) => {
+            if (!teamId) {
+                toast.error("Team information is missing.");
+                return;
+            }
+
+            if (userId === currentUserId) {
+                toast.error("You cannot remove yourself from the team.");
+                return;
+            }
+
+            if (!canManageMembers) {
+                toast.error("You don't have permission to remove members.");
+                return;
+            }
+
+            try {
+                await updateUser({
+                    variables: {
+                        id: userId,
+                        teamId: null,
+                    },
+                });
+                toast.success(`${userFirstName} ${userLastName} has been removed from the team.`);
+                if (onTeamUpdated) {
+                    await onTeamUpdated();
+                }
+            } catch (error) {
+                const message =
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to remove this member from the team.";
+                toast.error(message);
+            }
+        },
+        [teamId, currentUserId, canManageMembers, updateUser, onTeamUpdated],
+    );
+
     const tableColumns = React.useMemo(() => {
+        const baseColumns = createBaseColumns(handleRemoveUser, currentUserId, canManageMembers);
+
         if (canManageMembers) {
-            return BASE_COLUMNS;
+            return baseColumns;
         }
 
-        return BASE_COLUMNS.filter((column) => {
+        return baseColumns.filter((column) => {
             if ("accessorKey" in column && column.accessorKey === "score") {
                 return false;
             }
@@ -382,7 +498,7 @@ export function DataTable({
             }
             return true;
         });
-    }, [canManageMembers]);
+    }, [canManageMembers, handleRemoveUser, currentUserId]);
     const resetModalState = React.useCallback(() => {
         setEmailCandidate("");
         setLastRequestedEmail("");
@@ -567,19 +683,35 @@ export function DataTable({
     const emailFieldId = React.useId();
 
     return (
-        <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
+        <Tabs
+            defaultValue="outline"
+            className={cn("flex w-full flex-col justify-start gap-6", className)}
+        >
             <div className="flex items-center justify-between px-4 lg:px-6">
-                <div className="flex items-center">
+                <div className="flex items-center relative gap-2">
+                    <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
-                        placeholder="Filter by firstname..."
+                        placeholder="Search team members..."
                         value={(table.getColumn("firstname")?.getFilterValue() as string) ?? ""}
                         onChange={(event) =>
                             table.getColumn("firstname")?.setFilterValue(event.target.value)
                         }
-                        className="max-w-7xl h-8"
+                        className="max-w-md h-9 pl-9 bg-muted/20 border-border focus-visible:ring-primary/20"
                     />
                 </div>
                 <div className="flex items-center gap-2">
+                    {onTeamUpdated && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onTeamUpdated()}
+                            disabled={isLoading}
+                            title="Refresh dashboard"
+                        >
+                            <IconRefresh className={cn("size-4", isLoading && "animate-spin")} />
+                            <span className="hidden lg:inline">Refresh</span>
+                        </Button>
+                    )}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -624,7 +756,12 @@ export function DataTable({
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>Add a new member</DialogTitle>
+                                    <DialogTitle className="flex items-center gap-2 text-xl">
+                                        <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                                            <IconUserPlus className="size-5" />
+                                        </div>
+                                        Add a new member
+                                    </DialogTitle>
                                     <DialogDescription>
                                         Search by email to add an existing user to this team.
                                     </DialogDescription>
@@ -719,7 +856,10 @@ export function DataTable({
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
-                                                <AlertDialogTitle>
+                                                <AlertDialogTitle className="flex items-center gap-2 text-xl">
+                                                    <div className="p-2 rounded-lg bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+                                                        <IconAlertTriangle className="size-5" />
+                                                    </div>
                                                     Confirm member addition
                                                 </AlertDialogTitle>
                                                 <AlertDialogDescription>
@@ -752,9 +892,9 @@ export function DataTable({
             </div>
             <TabsContent
                 value="outline"
-                className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
+                className="relative flex flex-1 min-h-0 flex-col gap-4 px-4 lg:px-6"
             >
-                <div className="overflow-hidden rounded-lg border">
+                <div className="flex-1 min-h-0 overflow-auto rounded-lg border">
                     <DndContext
                         collisionDetection={closestCenter}
                         modifiers={[restrictToVerticalAxis]}
@@ -763,7 +903,7 @@ export function DataTable({
                         id={sortableId}
                     >
                         <Table>
-                            <TableHeader className="bg-muted sticky top-0 z-10">
+                            <TableHeader className="bg-muted sticky top-0 z-[1]">
                                 {table.getHeaderGroups().map((headerGroup) => (
                                     <TableRow key={headerGroup.id}>
                                         {headerGroup.headers.map((header) => {

@@ -1,0 +1,101 @@
+site_name: Time Manager Docs
+site_description: The documentation for Time-Manager by PrimeBank
+site_url: https://docs.ytlabs.space
+theme:
+  name: material
+  favicon: assets/images/primebank-logo.png
+  logo: assets/images/prime-bank-white.png
+  language: en
+  font:
+    code: Ubuntu Mono
+    text: Ubuntu
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # Light mode
+    - scheme: default
+      primary: deep orange
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: deep orange
+      accent: indigo
+      media: "(prefers-color-scheme: dark)"
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    # Navigation
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
+    - navigation.path
+    - navigation.prune
+    - navigation.top
+    - navigation.footer
+    - navigation.sections
+    - navigation.expand
+    # Table of content
+    # - toc.integrate
+    # Search
+    - search.suggest
+    - search.highlight
+    - search.share
+    # Header
+    - header.autohide
+    - content.code.copy
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      pygments_style: monokai
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: false
+      fallback_to_build_date: true
+
+extra_css:
+  - stylesheets/time-manager-theme.css
+
+extra:
+  generator: false
+  version:
+    default: stable
+
+nav:
+  - Project:
+      - Home: index.md
+      - Architecture: architecture.md
+  - Operations:
+      - Getting Started: getting-started.md
+      - Deployment: deployment.md
+  - Development:
+      - Frontend Guide: frontend/index.md
+      - Backend Guide: backend/index.md
+
+copyright: Copyright &copy; 2026 PrimeBank
+
+repo_name: primebank/time-manager
+repo_url: https://github.com/epitech-msc-1/time-manager

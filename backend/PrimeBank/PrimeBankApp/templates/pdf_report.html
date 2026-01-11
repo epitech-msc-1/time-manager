@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 3cm 0cm 2cm 0cm;
+
+            @top-center {
+                content: element(header);
+            }
+
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+
+        body {
+            font-family: Helvetica, sans-serif;
+            font-size: 10px;
+            color: #333;
+            margin: 0;
+            padding: 0 2cm;
+        }
+
+        /* Header */
+        header {
+            position: running(header);
+            width: 21cm; /* A4 page width */
+            margin-left: 0;
+            margin-right: 0;
+            height: 3cm;
+            background-color: {{primary_color}};
+            color: white;
+        }
+
+        .header-inner {
+            padding-top: 0.8cm;
+            padding-left: 2cm;
+            padding-right: 2cm;
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-table {
+            width: 100%;
+            border: none;
+        }
+
+        .header-table td {
+            vertical-align: middle;
+        }
+
+        .logo {
+            height: 45px;
+            width: auto;
+        }
+
+        .report-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-align: right;
+            text-transform: uppercase;
+        }
+
+        .report-meta {
+            font-size: 10px;
+            color: #eee;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        /* Footer */
+        footer {
+            position: running(footer);
+            width: 100%;
+            text-align: center;
+            font-size: 8px;
+            color: #888;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
+        }
+
+        /* Employee Info Box */
+        .info-wrapper {
+            margin-top: 20px;
+            margin-bottom: 25px;
+            background-color: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+        }
+
+        .info-table {
+            width: 100%;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #444;
+            width: 15%;
+            vertical-align: top;
+            padding-bottom: 5px;
+        }
+
+        .info-value {
+            color: #222;
+            width: 35%;
+            vertical-align: top;
+            padding-bottom: 5px;
+        }
+
+        /* KPI Section */
+        .kpi-wrapper {
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .kpi-card {
+            background-color: #ffffff;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            padding: 12px 15px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .kpi-value {
+            display: block;
+            font-size: 18px;
+            font-weight: bold;
+
+            color: {{primary_color}};
+            margin-bottom: 5px;
+        }
+
+        .kpi-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #666;
+            letter-spacing: 0.5px;
+        }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .data-table th {
+            background-color: {{primary_color}};
+            color: #ffffff;
+            padding: 8px;
+            font-weight: bold;
+            font-size: 9px;
+            text-transform: uppercase;
+
+            border: 1px solid {{primary_color}}
+
+            ;
+            text-align: left;
+        }
+
+        .data-table td {
+            padding: 8px;
+            border: 1px solid #ccc;
+            font-size: 9px;
+            color: #333;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #fdfdfd;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-inner">
+            <table class="header-table">
+                <tr>
+                    <td align="left">
+                        <img src="{{ logo_data_uri }}" class="logo" alt="Logo" />
+                    </td>
+                    <td align="right">
+                        <div class="report-title">Time Clock Report</div>
+                        <div class="report-meta">Generated: {{ generated_at.strftime('%d %B %Y') }}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </header>
+
+    <!-- Footer Content: defined as running element -->
+    <footer>
+        PrimeBank Time Management System &bull; Page <span class="pageNumber"></span>
+    </footer>
+
+    <!-- Employee Details -->
+    <div class="info-wrapper">
+        <table class="info-table">
+            <tr>
+                <td class="info-label">Employee:</td>
+                <td class="info-value">{{ user.first_name }} {{ user.last_name }}</td>
+
+                <td class="info-label">Period:</td>
+                <td class="info-value">{{ start_date.strftime('%d %b %Y') }} - {{ end_date.strftime('%d %b %Y') }}</td>
+            </tr>
+            <tr>
+                <td class="info-label">Email:</td>
+                <td class="info-value">{{ user.email }}</td>
+
+                <td class="info-label">Contract:</td>
+                <td class="info-value">{{ contract_hours if contract_hours else 'N/A' }} Hours</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-wrapper">
+        <div class="kpi-card">
+            <span class="kpi-value">{{ total_hours }}</span>
+            <span class="kpi-label">Total Hours</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-value">{{ avg_daily_hours }}</span>
+            <span class="kpi-label">Avg Hrs / Day</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-value">{{ days_worked }}</span>
+            <span class="kpi-label">Active Days</span>
+        </div>
+    </div>
+
+    <!-- Logs Table -->
+    <h3 style="font-size:12px; margin-bottom: 5px; color: #444; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+        Activity Logs</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th width="20%">Date</th>
+                <th width="20%">Clock In</th>
+                <th width="20%">Clock Out</th>
+                <th width="20%">Duration</th>
+                <th width="20%">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr>
+                <td>{{ entry.day }}</td>
+                <td>{{ entry.clock_in.strftime("%H:%M") if entry.clock_in else "-" }}</td>
+                <td>{{ entry.clock_out.strftime("%H:%M") if entry.clock_out else "-" }}</td>
+                <td>{{ entry.duration_fmt }} hrs</td>
+                <td>Present</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

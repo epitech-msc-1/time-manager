@@ -1,16 +1,19 @@
 import {
     type Icon,
-    IconBuilding,
+    IconCheckupList,
     IconDashboard,
+    IconFileChart,
+    IconMessagePlus,
     IconUserCog,
     IconUsersGroup,
 } from "@tabler/icons-react";
 import type * as React from "react";
 import { useEffect, useState } from "react";
-
+import { ExportDialog } from "@/components/export-dialog";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { useTheme } from "@/components/theme-provider";
+import PopUpRaiseRequest from "@/components/ui/PopUpRaiseRequest";
 import {
     Sidebar,
     SidebarContent,
@@ -27,6 +30,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const user = auth.user;
     const { theme } = useTheme();
     const [isLightTheme, setIsLightTheme] = useState(false);
+    const [showRaisePopup, setShowRaisePopup] = useState(false);
+    const [showExportDialog, setShowExportDialog] = useState(false);
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    // Block body scroll when popup is open
+    useEffect(() => {
+        if (showRaisePopup) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [showRaisePopup]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -60,6 +81,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ] as SidebarNavItem[],
     };
 
+    if (user?.isAdmin || user?.isManager) {
+        data.navMain.push({
+            title: "Manager Dashboard",
+            url: "/manager-dashboard",
+            icon: IconCheckupList,
+        });
+    }
+
     if (user?.isAdmin) {
         data.navMain.push({
             title: "Team Dashboard",
@@ -72,13 +101,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             icon: IconUserCog,
         });
     }
-
-    data.navMain.push({
-        title: "Company Dashboard",
-        url: "#",
-        icon: IconBuilding,
-        disabled: true,
-    });
 
     if (user) {
         data.user = {
@@ -131,7 +153,45 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <NavMain items={data.navMain} />
             </SidebarContent>
             <SidebarFooter>
+                <div className="space-y-2">
+                    <div className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Quick Actions
+                    </div>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                onClick={() => setShowRaisePopup(true)}
+                                tooltip="Raise a time modification request"
+                            >
+                                <IconMessagePlus />
+                                <span>Raise Request</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                onClick={() => setShowExportDialog(true)}
+                                tooltip="Export your time report"
+                            >
+                                <IconFileChart />
+                                <span>Export Report</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </div>
+
+                <div className="border-t" />
+
                 <NavUser user={data.user} />
+
+                <ExportDialog
+                    isOpen={showExportDialog}
+                    onClose={() => setShowExportDialog(false)}
+                    defaultStartDate={startOfMonth}
+                    defaultEndDate={endOfMonth}
+                    userId={user?.id}
+                />
+
+                {showRaisePopup && <PopUpRaiseRequest onClose={() => setShowRaisePopup(false)} />}
             </SidebarFooter>
         </Sidebar>
     );

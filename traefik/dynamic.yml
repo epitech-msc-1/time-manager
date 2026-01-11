@@ -1,0 +1,96 @@
+http:
+  middlewares:
+    rate-limit:
+      ratelimit:
+        average: 100
+        burst: 50
+    redirect:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    custom-404:
+      errors:
+        status:
+          - "404"
+        service: error-pages
+        query: "/404.html"
+
+  routers:
+    api:
+      rule: "Host(`traefik.ytlabs.space`)"
+      service: "api@internal"
+      entryPoints:
+        - "websecure"
+      tls:
+        certResolver: "hostinger"
+
+    error-pages:
+      rule: "HostRegexp(`{catchall:.*}`)"
+      priority: 1
+      service: "error-pages"
+
+    backend:
+      rule: "Host(`api.ytlabs.space`)"
+      service: "backend"
+      entryPoints:
+        - "websecure"
+      tls:
+        certResolver: "hostinger"
+      middlewares:
+        - "custom-404"
+        - "rate-limit"
+
+    frontend:
+      rule: "Host(`ytlabs.space`)"
+      service: "frontend"
+      entryPoints:
+        - "websecure"
+      tls:
+        certResolver: "hostinger"
+      middlewares:
+        - "custom-404"
+        - "rate-limit"
+
+    sonarqube:
+      rule: "Host(`sonarqube.ytlabs.space`)"
+      service: "sonarqube"
+      entryPoints:
+        - "websecure"
+      tls:
+        certResolver: "hostinger"
+      middlewares:
+        - "custom-404"
+        - "rate-limit"
+
+    mkdocs:
+      rule: "Host(`docs.ytlabs.space`)"
+      service: "mkdocs"
+      entryPoints:
+        - "websecure"
+      tls:
+        certResolver: "hostinger"
+      middlewares:
+        - "custom-404"
+        - "rate-limit"
+
+  services:
+    error-pages:
+      loadBalancer:
+        servers:
+          - url: "http://error-pages:80"
+    backend:
+      loadBalancer:
+        servers:
+          - url: "http://backend:8000"
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:80"
+    sonarqube:
+      loadBalancer:
+        servers:
+          - url: "http://sonarqube:9000"
+    mkdocs:
+      loadBalancer:
+        servers:
+          - url: "http://mkdocs:80"

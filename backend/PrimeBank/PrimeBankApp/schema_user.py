@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 
-from .roles import is_admin, is_manager, require_auth
+from .roles import is_admin, is_manager, is_manager_of, require_auth
 
 # Get the user model, here the CustomUser
 User = get_user_model()
@@ -45,6 +45,13 @@ class UserQuery(graphene.ObjectType):
     users = graphene.List(UserType)
     user = graphene.Field(UserType, id=graphene.ID(required=True))
     user_by_email = graphene.Field(UserType, email=graphene.String(required=True))
+    me = graphene.Field(UserType)
+
+    def resolve_me(self, info):
+        user = info.context.user
+        if user.is_anonymous:
+            raise GraphQLError("Not logged in")
+        return user
 
     def resolve_users(self, info):
         return User.objects.all().order_by("id")
@@ -64,8 +71,16 @@ class UserQuery(graphene.ObjectType):
         except User.DoesNotExist:
             raise GraphQLError("User not found.")
 
-        if target_user.is_admin and not is_admin(requester):
+        if is_admin(requester):
+            return target_user
+
+        if target_user.is_admin:
             raise GraphQLError("Managers cannot target admin users.")
+
+        # If requester is manager, target must be in their team OR be themselves
+        is_self = str(requester.id) == str(target_user.id)
+        if not (is_self or is_manager_of(requester, target_user.team_id)):
+            raise GraphQLError("Access denied: User is not in your team.")
 
         return target_user
 

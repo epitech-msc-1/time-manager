@@ -1,0 +1,394 @@
+:root {
+    /* ========================================================================
+     Frontend Palette Copy (from src/index.css)
+     ======================================================================== */
+
+    /* Light Mode Base Colors */
+    --time-background: oklch(0.9383 0.0042 236.4993);
+    --time-foreground: oklch(0.3211 0 0);
+    --time-primary: oklch(0.6397 0.172 36.4421);
+    --time-muted: oklch(0.9846 0.0017 247.8389);
+    --time-muted-foreground: oklch(0.551 0.0234 264.3637);
+
+    /* Charts (Light) */
+    --time-chart-1: oklch(0.7156 0.0605 248.6845);
+    --time-chart-2: oklch(0.7875 0.0917 35.9616);
+    --time-chart-3: oklch(0.5778 0.0759 254.1573);
+    --time-chart-4: oklch(0.5016 0.0849 259.4902);
+    --time-chart-5: oklch(0.4241 0.0952 264.0306);
+
+    /* Shadows for light mode */
+    --md-shadow-z1: 0 1px 3px 0 hsl(0 0% 0% / 0.1),
+        0 1px 2px -1px hsl(0 0% 0% / 0.1);
+
+    /* ========================================================================
+   MKDocs Material Variable Mapping
+   ======================================================================== */
+
+    /* Global Overrides (Light Mode) */
+    /* Use Primary for Primary FG */
+    --md-primary-fg-color: var(--time-primary);
+    --md-primary-fg-color--light: oklch(from var(--time-primary) l c h / 0.7);
+    --md-primary-fg-color--dark: oklch(from var(--time-primary) l c h / 1);
+
+    --md-accent-fg-color: var(--time-primary);
+
+    /* Use primary as accent */
+
+    /* Syntax Highlighting (Global/Light defaults) */
+    --md-code-hl-keyword-color: var(--time-primary);
+    --md-code-hl-function-color: var(--time-chart-3);
+    --md-code-hl-string-color: var(--time-chart-1);
+    --md-code-hl-number-color: var(--time-chart-2);
+    --md-code-hl-special-color: var(--time-chart-4);
+    --md-code-hl-operator-color: var(--time-muted-foreground);
+    --md-code-hl-punctuation-color: var(--time-muted-foreground);
+    --md-code-hl-comment-color: var(--time-muted-foreground);
+    --md-code-hl-name-color: var(--time-foreground);
+    --md-code-hl-variable-color: var(--time-foreground);
+    --md-code-hl-generic-color: var(--time-foreground);
+}
+
+/* Light Mode Specifics */
+[data-md-color-scheme="default"] {
+    --md-default-bg-color: var(--time-background);
+    /* Soften the default text color to muted-foreground for a integrated look */
+    --md-default-fg-color: var(--time-muted-foreground);
+    --md-default-fg-color--light: oklch(
+        from var(--time-muted-foreground) l c h / 0.7
+    );
+    /* Keep explicit headings/bold text sharp with main foreground */
+    --md-typeset-color: var(--time-foreground);
+    --md-typeset-a-color: var(--time-primary);
+
+    --md-code-bg-color: var(--time-muted);
+    --md-code-fg-color: var(--time-foreground);
+
+    --md-admonition-bg-color: var(--time-muted);
+
+    --md-typeset-table-color: oklch(from var(--time-foreground) l c h / 0.12);
+}
+
+/* Dark Mode Palette & Overrides */
+[data-md-color-scheme="slate"] {
+    /* Redefine base vars for dark mode */
+    --time-background: oklch(0.2598 0.0306 262.6666);
+    --time-foreground: oklch(0.9219 0 0);
+    --time-muted: oklch(0.3095 0.0266 266.7132);
+    --time-muted-foreground: oklch(0.7155 0 0);
+
+    /* Dark Mode Charts (if different, checking index.css...) */
+    /* In index.css .dark: */
+    --time-chart-1: oklch(0.7156 0.0605 248.6845);
+    /* Same */
+    --time-chart-2: oklch(0.7693 0.0876 34.1875);
+    /* Slightly different in dark */
+    --time-chart-3: oklch(0.5778 0.0759 254.1573);
+    /* Same */
+    --time-chart-4: oklch(0.5016 0.0849 259.4902);
+    /* Same */
+
+    /* Apply Mappings */
+    --md-default-bg-color: var(--time-background);
+    --md-default-bg-color--light: oklch(
+        from var(--time-background) l c h / 0.7
+    );
+
+    /* Soften dark mode text */
+    --md-default-fg-color: var(--time-muted-foreground);
+    --md-default-fg-color--light: oklch(
+        from var(--time-muted-foreground) l c h / 0.7
+    );
+
+    --md-typeset-color: var(--time-foreground);
+    --md-typeset-a-color: var(--time-primary);
+    /* Primary stays same usually */
+
+    --md-code-bg-color: var(--time-muted);
+    --md-code-fg-color: var(--time-foreground);
+
+    --md-admonition-bg-color: var(--time-muted);
+
+    --md-typeset-table-color: oklch(from var(--time-foreground) l c h / 0.12);
+
+    /* Re-apply Syntax Highlighting with new variable values */
+    --md-code-hl-keyword-color: var(--time-primary);
+    --md-code-hl-function-color: var(--time-chart-3);
+    --md-code-hl-string-color: var(--time-chart-1);
+    --md-code-hl-number-color: var(--time-chart-2);
+    /* Uses dark chart-2 */
+    --md-code-hl-special-color: var(--time-chart-4);
+    --md-code-hl-operator-color: var(--time-muted-foreground);
+    --md-code-hl-punctuation-color: var(--time-muted-foreground);
+    --md-code-hl-comment-color: var(--time-muted-foreground);
+    --md-code-hl-name-color: var(--time-foreground);
+    --md-code-hl-variable-color: var(--time-foreground);
+    --md-code-hl-generic-color: var(--time-foreground);
+}
+
+/* User's Specific Request (Specificity Boost) */
+
+/* Background for HTML-based labels */
+.edgeLabel span,
+.edgeLabel p,
+.edgeLabel div {
+    background-color: transparent !important;
+    color: var(--time-foreground) !important;
+}
+
+.md-search__output {
+    box-shadow: none !important;
+}
+
+:root > * {
+    /* Set label background color variable */
+    /* Ensure these stick if overridden elsewhere */
+    --md-code-hl-string-color: var(--time-chart-1);
+    --md-code-hl-keyword-color: var(--time-primary);
+    --md-code-hl-function-color: var(--time-chart-3);
+    --md-code-hl-number-color: var(--time-chart-2);
+    --md-code-hl-variable-color: var(--time-foreground);
+    --md-code-hl-generic-color: var(--time-foreground);
+
+    /* define a static off-white that doesn't change with mode */
+    --time-static-off-white: oklch(0.9383 0.0042 236.4993);
+    /* Value of light mode --background */
+}
+
+/* Ensure headings and bold text are sharp (Foreground), body is soft (Default FG which is now Muted) */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong,
+b,
+.md-typeset__title {
+    color: var(--time-foreground) !important;
+}
+
+body,
+.md-typeset p,
+.md-typeset li {
+    color: var(--md-default-fg-color);
+}
+
+.md-search__scrollwrap {
+    border-radius: var(--time-radius) !important;
+}
+
+.md-header {
+    color: var(--time-static-off-white) !important;
+}
+
+.md-header .md-header__title,
+.md-header .md-header__topic,
+.md-header .md-header__button,
+.md-header .md-tabs__link,
+.md-header .md-header__source {
+    color: var(--time-static-off-white) !important;
+    /* Force theme's off-white for title, repo link, and nav buttons */
+}
+
+/* Ensure the repository count/stars are also colored if present */
+.md-header__source .md-source__fact {
+    color: oklch(from var(--time-static-off-white) l c h / 0.7) !important;
+}
+
+/* ========================================================================
+   Logo Overrides
+   ======================================================================== */
+[data-md-color-scheme="slate"] .theme-logo {
+    content: url("../assets/images/prime-bank-white.png");
+}
+
+/* ========================================================================
+   Refined Aesthetics & Border Radius
+   ======================================================================== */
+:root {
+    /* Frontend radius: 0.75rem */
+    --time-radius: 0.75rem;
+}
+
+/* Apply Radius to key elements */
+/* Code Blocks: Apply radius to the outer wrapper and ensure content clips */
+.md-typeset .highlight {
+    border-radius: var(--time-radius) !important;
+    overflow: hidden !important;
+    /* Clip corners */
+}
+
+.md-typeset pre > code {
+    border-radius: 0 !important;
+    /* Let container handle radius to prevent double-rounding artifacts */
+}
+
+.md-typeset .admonition {
+    border-radius: var(--time-radius) !important;
+}
+
+.admonition-title {
+    border-radius: var(--time-radius) var(--time-radius) 0 0 !important;
+}
+
+.md-footer__inner {
+    border-radius: var(--time-radius) !important;
+}
+
+/* "Bolder" adjustments */
+/* Make the header more distinct */
+.md-header {
+    background-color: var(--time-primary) !important;
+    color: var(--time-primary-foreground) !important;
+}
+
+/* Tabs/Navigation with more weight */
+.md-tabs {
+    background-color: oklch(from var(--time-primary) l c h / 0.9) !important;
+}
+
+/* Admonitions - stronger border/background */
+.md-typeset .admonition {
+    border: 1px solid var(--time-primary);
+    /* Add colored border */
+    background-color: oklch(from var(--time-muted) l c h / 0.8) !important;
+}
+
+/* Search Bar Fixes */
+/* Ensure containers don't have conflicting backgrounds */
+.md-search__form,
+.md-search__inner {
+    background-color: transparent !important;
+    border-radius: var(--time-radius) !important;
+    padding: 0 !important;
+    /* Remove padding that reveals background */
+}
+
+/* The input itself should be the pill */
+.md-search__input {
+    border-radius: var(--time-radius) !important;
+    /* Use solid background to prevent see-through artifacts */
+    background-color: var(--md-default-bg-color) !important;
+    border: none !important;
+    color: var(--time-foreground) !important;
+    /* Explicitly use time-foreground (Dark) */
+    padding-left: 2.5rem !important;
+    /* Ensure text doesn't overlap icon if needed */
+    height: 100% !important;
+}
+
+/* Fix Placeholder Text */
+.md-search__input::placeholder {
+    color: oklch(from var(--time-foreground) l c h / 0.5) !important;
+}
+
+/* Fix icon positioning/color if needed */
+.md-search__icon {
+    color: var(--time-foreground) !important;
+}
+
+.md-search__input:focus {
+    background-color: var(--md-default-bg-color) !important;
+    opacity: 1 !important;
+    color: var(--time-foreground) !important;
+}
+
+/* Ensure global text isn't affected by header inheritance quirks */
+body,
+.md-typeset {
+    color: var(--md-default-fg-color);
+}
+
+/* ========================================================================
+   Tabbed Code Blocks (pymdownx.tabbed)
+   ======================================================================== */
+.md-typeset .tabbed-set {
+    border-radius: var(--time-radius) !important;
+    background-color: var(--md-code-bg-color) !important;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 0;
+    box-shadow: none !important;
+    border: 1px solid transparent;
+    /* or matching border if desired */
+    overflow: hidden;
+    /* clean corners */
+}
+
+/* Tab Labels Container */
+.md-typeset .tabbed-labels {
+    box-shadow: none !important;
+    border-bottom: 1px solid var(--md-default-fg-color--lightest);
+    background-color: oklch(
+        from var(--md-default-bg-color) l c h / 0.5
+    ) !important;
+    /* Slightly distinct header bg */
+    padding: 0 0.5rem;
+}
+
+/* Individual Tab Label */
+.md-typeset .tabbed-labels .tabbed-label {
+    border-top: 2px solid transparent;
+    border-bottom: none;
+    padding: 0.8em 1.2em;
+    font-weight: 500;
+    color: var(--md-default-fg-color--light);
+    cursor: pointer;
+}
+
+/* Active Tab Label */
+.md-typeset .tabbed-labels .tabbed-label--active {
+    color: var(--time-primary);
+    border-top-color: var(--time-primary);
+    /* Material style top highlight */
+    background-color: transparent;
+}
+
+/* Tab Content */
+.md-typeset .tabbed-content {
+    box-shadow: none !important;
+    padding: 1em 0;
+    /* Add global padding to content area */
+}
+
+/* Fix nested code blocks inside tabs */
+.md-typeset .tabbed-content .highlight {
+    /* Reset nested highlights to just be blocks */
+    border: none !important;
+    background-color: transparent !important;
+    /* Seamless background */
+    margin: 0 !important;
+    /* Reset margins */
+    border-radius: 0 !important;
+    /* No internal radius if seamless */
+    box-shadow: none !important;
+}
+
+/* If there are multiple blocks, separate them nicely */
+.md-typeset .tabbed-content .highlight + .highlight {
+    margin-top: 1em !important;
+}
+
+/* Ensure proper coloring for seamless integration */
+.md-typeset .tabbed-content pre > code {
+    background-color: transparent !important;
+}
+
+/* Fix Line Numbers Table (highlighttable) specifically */
+.highlighttable {
+    border-radius: var(--time-radius) !important;
+    overflow: hidden !important;
+}
+
+.highlighttable tbody,
+.highlighttable tr,
+.highlighttable td {
+    border-radius: 0 !important;
+}
+
+/* Sidebar active item highlight */
+.md-nav__item .md-nav__link--active {
+    font-weight: 700;
+    color: var(--time-primary) !important;
+}

@@ -14,7 +14,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: backend-t:1.0.0
+        image: backend:1.0.0
         restart: unless-stopped
         env_file:
             - .env
