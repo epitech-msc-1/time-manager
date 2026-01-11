@@ -187,6 +187,8 @@ class CreateRequestModifyTimeClock(graphene.Mutation):
             description=description,
             new_clock_in=new_clock_in,
             new_clock_out=new_clock_out,
+            old_clock_in=tc.clock_in,
+            old_clock_out=tc.clock_out,
         )
         return CreateRequestModifyTimeClock(request=rmtc)  # pyright: ignore[reportCallIssue]
 
