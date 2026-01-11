@@ -98,3 +98,15 @@ export const GET_USER_BY_EMAIL = gql`
         }
     }
 `;
+
+export const GET_ME = gql`
+    query Me {
+        me {
+            id
+            email
+            firstName
+            lastName
+            isAdmin
+        }
+    }
+`;

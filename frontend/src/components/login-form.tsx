@@ -81,9 +81,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
             <Card>
                 <CardHeader>
                     <CardTitle>Sign in to your account</CardTitle>
-                    <CardDescription>
-                        Enter your email and password to sign in
-                    </CardDescription>
+                    <CardDescription>Enter your email and password to sign in</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit}>

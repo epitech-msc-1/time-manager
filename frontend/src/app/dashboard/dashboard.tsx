@@ -142,6 +142,7 @@ export default function Page() {
             },
             skip: !user || !viewedUserId,
             fetchPolicy: "cache-and-network",
+            pollInterval: 3600000,
         },
     );
 
@@ -158,6 +159,7 @@ export default function Page() {
         },
         skip: !user,
         fetchPolicy: "cache-and-network",
+        pollInterval: 3600000,
     });
 
     const authUserOption = useMemo(() => {
@@ -312,7 +314,7 @@ export default function Page() {
                 />
                 <div className="flex flex-1 flex-col">
                     <div className="@container/main flex flex-1 flex-col gap-2">
-                        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+                        <div className="flex flex-1 min-h-0 flex-col gap-4 py-4 md:gap-6 md:py-6 overflow-hidden">
                             <SectionCards
                                 metrics={metrics ?? undefined}
                                 isLoading={loading}
@@ -334,6 +336,7 @@ export default function Page() {
                                 onTeamUpdated={handleTeamRefresh}
                                 currentUserIsAdmin={Boolean(user?.isAdmin)}
                                 currentUserId={user?.id ?? null}
+                                className="flex-1 min-h-0"
                             />
                             {error ? (
                                 <p className="px-4 text-sm text-destructive lg:px-6">

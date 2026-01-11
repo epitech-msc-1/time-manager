@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
     Card,
     CardAction,
@@ -87,6 +87,7 @@ export function ChartAreaInteractive({
             .map((item) => ({
                 date: item.day,
                 hours: Number.isFinite(item.totalHours) ? Number(item.totalHours.toFixed(2)) : 0,
+                totalSeconds: item.totalSeconds,
             }));
     }, [data]);
 
@@ -116,7 +117,7 @@ export function ChartAreaInteractive({
                         value={timeRange}
                         onValueChange={handleTimeRangeChange}
                         variant="outline"
-                        className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
+                        className="hidden *:data-[slot=toggle-group-item]:px-4! @[767px]/card:flex"
                     >
                         <ToggleGroupItem value="90d">Last 3 months</ToggleGroupItem>
                         <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
@@ -164,7 +165,7 @@ export function ChartAreaInteractive({
                                 axisLine={false}
                                 tickFormatter={(value) => {
                                     const date = new Date(value);
-                                    return date.toLocaleDateString("fr-FR", {
+                                    return date.toLocaleDateString("us-US", {
                                         month: "short",
                                         day: "numeric",
                                         weekday: "long",
@@ -176,24 +177,36 @@ export function ChartAreaInteractive({
                                 content={
                                     <ChartTooltipContent
                                         labelFormatter={(value) => {
-                                            return new Date(value).toLocaleDateString("fr-FR", {
+                                            return new Date(value).toLocaleDateString("us-US", {
                                                 month: "short",
                                                 day: "numeric",
                                                 weekday: "long",
                                             });
                                         }}
+                                        valueFormatter={(value, payload) => {
+                                            const data = payload as
+                                                | { totalSeconds: number }
+                                                | undefined;
+                                            const hours = value as number;
+
+                                            // Prefer totalSeconds if available for better precision
+                                            const totalSeconds =
+                                                data?.totalSeconds ?? Math.round(hours * 3600);
+
+                                            const totalMinutes = Math.round(totalSeconds / 60);
+                                            const h = Math.floor(totalMinutes / 60);
+                                            const m = totalMinutes % 60;
+
+                                            if (h === 0) {
+                                                return `${m}min`;
+                                            }
+                                            return `${h}h ${m}min`;
+                                        }}
                                         indicator="dot"
                                     />
                                 }
                             />
-                            <Bar dataKey="hours" fill="var(--color-hours)" radius={8}>
-                                <LabelList
-                                    position="top"
-                                    offset={12}
-                                    className="fill-foreground"
-                                    fontSize={12}
-                                />
-                            </Bar>
+                            <Bar dataKey="hours" fill="var(--color-hours)" radius={8} />
                         </BarChart>
                     </ChartContainer>
                 )}

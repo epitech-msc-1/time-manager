@@ -2,10 +2,12 @@ import type { RouteObject } from "react-router";
 import { Navigate } from "react-router";
 import Dashboard from "@/app/dashboard/dashboard";
 import Page from "@/app/login/login";
+import ManagerDashboard from "@/app/manager-dashboard/manager-dashboard";
 import TeamDashboard from "@/app/team-dashboard/team-dashboard";
 import UsersDashboard from "@/app/users-dashboard/users-dashboard";
 import App from "./App";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PopUpRequest } from "./components/ui/PopUpRequest";
 import { useAuth } from "./contexts/AuthContext";
 
 const NotFoundPage = () => <div>Page non trouvée</div>;
@@ -18,7 +20,7 @@ const DefaultRoute = () => {
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto" />
-                    <p className="mt-4 text-gray-600">Chargement...</p>
+                    <p className="mt-4 text-gray-600">Loading...</p>
                 </div>
             </div>
         );
@@ -62,10 +64,26 @@ const routes: RouteObject[] = [
                 ),
             },
             {
+                path: "manager-dashboard",
+                element: (
+                    <ProtectedRoute requireManager>
+                        <ManagerDashboard />
+                    </ProtectedRoute>
+                ),
+            },
+            {
                 path: "users-dashboard",
                 element: (
                     <ProtectedRoute requireAdmin>
                         <UsersDashboard />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "popup-request",
+                element: (
+                    <ProtectedRoute>
+                        <PopUpRequest />
                     </ProtectedRoute>
                 ),
             },

@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv("DJANGO_DEBUG", 0)
 
 
 FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://localhost:" + os.getenv("VITE_PORT", "5173")
@@ -63,7 +63,7 @@ GRAPHENE = {
 
 GRAPHQL_JWT = {
     "JWT_COOKIE": True,
-    "JWT_COOKIE_SECURE": True,
+    "JWT_COOKIE_SECURE": not DEBUG,
     "JWT_VERIFY_EXPIRATION": True,
     # Acces token
     "JWT_EXPIRATION_DELTA": timedelta(minutes=15),
@@ -72,10 +72,10 @@ GRAPHQL_JWT = {
     # Refresh token
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     # Cookie settings
-    "JWT_COOKIE_SAMESITE": "None",  # None pour permettre les requetes cross-site/subdomain fiables
+    "JWT_COOKIE_SAMESITE": "None" if not DEBUG else "Lax",  # None pour permettre les requetes cross-site/subdomain fiables
     "JWT_COOKIE_NAME": "JWT",  # Nom du cookie pour le token
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-refresh-token",  # Cookie pour le refresh token
-    "JWT_REFRESH_TOKEN_COOKIE_SAMESITE": "None",
+    "JWT_REFRESH_TOKEN_COOKIE_SAMESITE": "None" if not DEBUG else "Lax",
     "JWT_COOKIE_HTTPONLY": True,  # Cookie accessible uniquement via HTTP(S)
     # Custom payload handler to include extra user info in tokens
     "JWT_PAYLOAD_HANDLER": "PrimeBankApp.schema_auth.jwt_payload",

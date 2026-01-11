@@ -86,7 +86,7 @@ services:
   frontend:
     image: ghcr.io/epitech-msc-1/time-manager-frontend:${TAG:-latest}
     environment:
-      VITE_API_URL: https://api.ytlabs.space/graphql
+      VITE_API_URL: /api/graphql
     deploy:
       replicas: 2
       update_config:

@@ -12,6 +12,12 @@ export default defineConfig(() => {
         server: {
             allowedHosts: ["localhost", "127.0.0.1", "::1", "ytlabs.space"],
             hmr: false,
+            proxy: {
+                "/api": {
+                    target: "http://localhost:8000",
+                    changeOrigin: true,
+                },
+            },
         },
         plugins: [react(), tailwindcss()],
         resolve: {
