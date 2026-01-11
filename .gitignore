@@ -20,3 +20,6 @@ bun.lockb
 
 # MkDocs
 site/
+
+# AI
+GEMINI.md
