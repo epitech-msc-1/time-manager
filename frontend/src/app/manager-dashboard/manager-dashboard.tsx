@@ -2,6 +2,7 @@
 
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
+import { format } from "date-fns";
 import {
     AlertCircle,
     Calendar,
@@ -15,7 +16,6 @@ import {
     Trash2,
     X,
 } from "lucide-react";
-import { format } from "date-fns";
 import type { CSSProperties } from "react";
 import * as React from "react";
 import { toast } from "sonner";
