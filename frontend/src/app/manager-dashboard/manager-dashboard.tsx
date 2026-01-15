@@ -217,13 +217,17 @@ export default function ManagerDashboard(): React.JSX.Element {
     function formatDateTime(dateStr?: string | null) {
         if (!dateStr) return "—";
         try {
-            // Check if it's already just a time string or a full ISO date
-            // The backend might send "YYYY-MM-DD HH:mm:ss" or ISO string
             const date = new Date(dateStr);
-            if (Number.isNaN(date.getTime())) {
-                return dateStr;
+            if (!Number.isNaN(date.getTime())) {
+                return format(date, "HH:mm");
             }
-            return format(date, "MMM d, yyyy HH:mm");
+
+            const timeMatch = dateStr.match(/^(\d{1,2}):(\d{2})/);
+            if (timeMatch) {
+                return `${timeMatch[1].padStart(2, "0")}:${timeMatch[2]}`;
+            }
+
+            return dateStr;
         } catch (_e) {
             return dateStr;
         }
@@ -340,10 +344,10 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>{formatDate(req.day)}</TableCell>
-                                                    <TableCell className="text-muted-foreground font-mono text-xs">
+                                                    <TableCell>
                                                         {formatDateTime(req.oldClockIn)}
                                                     </TableCell>
-                                                    <TableCell className="text-muted-foreground font-mono text-xs">
+                                                    <TableCell>
                                                         {formatDateTime(req.oldClockOut)}
                                                     </TableCell>
                                                     <TableCell className="text-right">
@@ -489,7 +493,7 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                         <div className="text-xs text-muted-foreground uppercase tracking-wider">
                                                             In
                                                         </div>
-                                                        <div className="font-mono text-sm">
+                                                        <div>
                                                             {formatDateTime(selected.oldClockIn)}
                                                         </div>
                                                     </div>
@@ -497,7 +501,7 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                         <div className="text-xs text-muted-foreground uppercase tracking-wider">
                                                             Out
                                                         </div>
-                                                        <div className="font-mono text-sm">
+                                                        <div>
                                                             {formatDateTime(selected.oldClockOut)}
                                                         </div>
                                                     </div>
@@ -513,7 +517,7 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                         <div className="text-xs text-muted-foreground uppercase tracking-wider">
                                                             In
                                                         </div>
-                                                        <div className="font-mono text-sm font-semibold">
+                                                        <div className="font-semibold">
                                                             {formatDateTime(selected.newClockIn)}
                                                         </div>
                                                     </div>
@@ -521,7 +525,7 @@ export default function ManagerDashboard(): React.JSX.Element {
                                                         <div className="text-xs text-muted-foreground uppercase tracking-wider">
                                                             Out
                                                         </div>
-                                                        <div className="font-mono text-sm font-semibold">
+                                                        <div className="font-semibold">
                                                             {formatDateTime(selected.newClockOut)}
                                                         </div>
                                                     </div>
