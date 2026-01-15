@@ -6,7 +6,16 @@
 
 ---
 
-## Badges
+## badges
+
+### General
+
+![GitHub last commit](https://img.shields.io/github/last-commit/epitech-msc-1/time-manager)
+![GitHub issues](https://img.shields.io/github/issues/epitech-msc-1/time-manager)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/epitech-msc-1/time-manager)
+![GitHub license](https://img.shields.io/github/license/epitech-msc-1/time-manager)
+[![Quality Gate Status](https://sonarqube.ytlabs.space/api/project_badges/measure?project=epitech-msc-1_time-manager_930a044e-d11b-4bb7-a886-cb83a682da69&metric=alert_status&token=sqb_fa39b3f08aa061c9a92bd27eb835444eaf5ec799)](https://sonarqube.ytlabs.space/dashboard?id=epitech-msc-1_time-manager_930a044e-d11b-4bb7-a886-cb83a682da69)
+[![Coverage](https://sonarqube.ytlabs.space/api/project_badges/measure?project=epitech-msc-1_time-manager_930a044e-d11b-4bb7-a886-cb83a682da69&metric=coverage&token=sqb_fa39b3f08aa061c9a92bd27eb835444eaf5ec799)](https://sonarqube.ytlabs.space/dashboard?id=epitech-msc-1_time-manager_930a044e-d11b-4bb7-a886-cb83a682da69)
 
 ### Frontend
 

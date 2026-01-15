@@ -6,6 +6,8 @@ dist/
 wheels/
 *.egg-info
 .venv/
+.ruff_cache
+.pytest_cache
 uv.lock
 
 # Secrets
@@ -24,3 +26,7 @@ site/
 
 # AI
 GEMINI.md
+
+# Coverage
+coverage.xml
+.coverage
