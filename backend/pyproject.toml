@@ -30,3 +30,4 @@ dev = ["ruff>=0.14.0"]
 pythonpath = ["PrimeBank"]
 DJANGO_SETTINGS_MODULE = "PrimeBank.settings"
 python_files = ["test_*.py"]
+addopts = "--nomigrations --cov=PrimeBank --cov-report=term-missing --cov-report=xml"
